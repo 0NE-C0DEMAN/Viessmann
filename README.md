@@ -135,6 +135,7 @@ public/
 
 ## Releases
 
+- **v0.2.10** — admin mobile drawer rebuilt: slide-in animation, safe-area-aware header/footer, nav grouped into 4 sections with descriptions, active-route highlight, account-info header.
 - **v0.2.9** — `npm run db:reset` wipes dynamic data (receipts, ledger, redemptions, audit) but keeps seed data intact for clean demo runs.
 - **v0.2.8** — admin header responsive: hamburger drawer on `<lg`, horizontal nav (8 operational tabs) + profile dropdown for Settings/Sign out on `≥lg`; "Croatia · Pilot" badge moved into the dropdown.
 - **v0.2.7** — adopted the official Viessmann wordmark as the in-app logo (new `<Brand>` component); regenerated `favicon.ico` in red (the leftover create-next-app default was orange).

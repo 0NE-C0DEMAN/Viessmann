@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.2.10 — 2026-05-07
+
+### Admin mobile drawer rebuilt
+
+The hamburger drawer now actually showcases everything an admin can do, with a real slide-in animation:
+
+- **Slide-in transform animation** (200 ms ease-out) instead of an opacity fade — the panel slides from the right edge so the user sees the motion clearly. Backdrop fades independently.
+- **Safe-area aware** — drawer header now respects iPhone notch (`v-safe-top`); footer respects iOS home-indicator inset (`v-safe-bottom`).
+- **Account header expanded** — shows "Viessmann Admin" label, full admin email, and a `Shield · Croatia · Pilot` line (the pilot badge that used to live in the header bar is now anchored here).
+- **Nav grouped into sections** with small caps headers: *Daily work* (Queue, Fulfillment) · *Directory* (Installers, Wholesalers) · *Configuration* (Campaigns, Rewards) · *Reports & system* (Intelligence, Audit, Settings). Each item has a one-line description so it's obvious what's behind each entry.
+- **Active route highlighted** — the page you're currently on shows a brand-tinted background + dark-red text in the drawer.
+- **Auto-closes on route change** so clicking a nav item closes the drawer cleanly even if the link's onClick is missed.
+- **Pointer-events handled** so the (now permanently rendered) backdrop doesn't intercept taps when closed.
+
 ## v0.2.9 — 2026-05-07
 
 ### Demo reset script
