@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.1.6 — 2026-05-07
+
+### Fix: photo upload "Unexpected token R" error
+
+- The OCR submit was sending the **full base64-encoded image** along with the extracted text. Phone photos are 5–10 MB → base64 makes that 7–13 MB → Vercel's serverless body limit (4.5 MB) returned a plain-text 413 → the client tried `res.json()` on `Request Entity Too Large` and threw `Unexpected token R`.
+- Fixed by sending only the OCR'd text + filename to `/api/receipts/from-text`. Body is now ~2 KB regardless of photo size.
+- Added a defensive `safeJson()` helper around every fetch so any future non-JSON response surfaces the actual server error (or a friendly fallback like "File is too large") instead of a confusing parse error.
+- Server endpoint now caps the extracted text at 50 KB (more than enough for any invoice) so the `from-text` route can never be a body-size attack target.
+
 ## v0.1.5 — 2026-05-07
 
 ### Image uploads now work — on-device OCR, no AI

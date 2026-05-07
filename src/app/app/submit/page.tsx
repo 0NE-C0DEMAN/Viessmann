@@ -118,8 +118,10 @@ export default function SubmitPage() {
       /\.(jpe?g|png|webp|heic|heif)$/i.test(lower);
 
     if (isImage) {
-      // Image path: OCR in the browser, then send extracted text to the
-      // server. No AI, no API key.
+      // Image path: OCR in the browser, then send only the extracted text
+      // to the server. We deliberately do NOT send the original image — the
+      // photo can be 5+ MB which blows past Vercel's serverless body limit
+      // and returns a non-JSON error page.
       setStage("ocr");
       setOcrProgress(0);
       setOcrStatus("Loading OCR engine");
@@ -136,13 +138,12 @@ export default function SubmitPage() {
         }
         setStage("uploading");
         startProgress();
-        const imageDataUrl = await fileToDataUrl(file);
         const res = await fetch("/api/receipts/from-text", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ extractedText: text, fileName: file.name, imageDataUrl }),
+          body: JSON.stringify({ extractedText: text, fileName: file.name }),
         });
-        const json = (await res.json()) as PipelineResponse;
+        const json = await safeJson<PipelineResponse>(res);
         stopProgress();
         setProgressStep(PROGRESS_STEPS.length - 1);
         if (!res.ok && res.status !== 409) {
@@ -166,7 +167,7 @@ export default function SubmitPage() {
       const fd = new FormData();
       fd.append("file", file);
       const res = await fetch("/api/receipts", { method: "POST", body: fd });
-      const json = (await res.json()) as PipelineResponse;
+      const json = await safeJson<PipelineResponse>(res);
       stopProgress();
       setProgressStep(PROGRESS_STEPS.length - 1);
       if (!res.ok && res.status !== 409) {
@@ -182,13 +183,21 @@ export default function SubmitPage() {
     }
   }
 
-  function fileToDataUrl(f: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(new Error("read failed"));
-      reader.readAsDataURL(f);
-    });
+  // Defensive JSON parser — returns a typed response even if the server
+  // sent back HTML / plain text (e.g. a Vercel 413 page). The caller still
+  // checks `res.ok` and surfaces the embedded `error` field.
+  async function safeJson<T extends { error?: string }>(res: Response): Promise<T> {
+    const text = await res.text();
+    try {
+      return text ? (JSON.parse(text) as T) : ({} as T);
+    } catch {
+      const snippet = text.replace(/<[^>]+>/g, " ").trim().slice(0, 180);
+      const fallback =
+        res.status === 413
+          ? "File is too large for the upload endpoint."
+          : snippet || `Server returned status ${res.status}`;
+      return { error: fallback } as T;
+    }
   }
 
   function reset() {

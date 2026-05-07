@@ -135,6 +135,7 @@ public/
 
 ## Releases
 
+- **v0.1.6** — fix: photo OCR submit was including the full base64 image and hitting Vercel's body-size limit, returning a non-JSON error that crashed the client. Now we send only the extracted text. Defensive `safeJson()` around every fetch so future non-JSON responses surface the real cause.
 - **v0.1.5** — photo uploads now work end-to-end via Tesseract.js running on-device. Same Croatian-invoice parser; new `/api/receipts/from-text` endpoint; lazy-loaded OCR worker.
 - **v0.1.4** — image uploads route through a friendly scan-to-PDF guide (superseded by v0.1.5).
 - **v0.1.3** — perf pass #2: memoised session reads, tree-shaken icon/chart bundles, long-cache PWA assets, parser-used badge on result screen, two unused deps removed.

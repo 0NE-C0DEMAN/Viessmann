@@ -1,9 +1,11 @@
 // Accepts already-extracted text (from client-side OCR) and runs it through
 // the same Croatian-invoice parser + downstream pipeline as the PDF / XML
 // paths. Used for image uploads where OCR happens in the browser.
+//
+// Body is intentionally tiny (just the OCR'd text + filename) so we never
+// hit Vercel's serverless body-size limit.
 
 import { NextResponse } from "next/server";
-import { put } from "@vercel/blob";
 import { z } from "zod";
 import { requireInstaller } from "@/lib/session";
 import { parseCroatianInvoiceText } from "@/lib/croatian-invoice-parser";
@@ -13,9 +15,8 @@ export const runtime = "nodejs";
 export const maxDuration = 30;
 
 const Body = z.object({
-  extractedText: z.string().min(20),
+  extractedText: z.string().min(20).max(50_000),
   fileName: z.string().min(1).max(200),
-  imageDataUrl: z.string().optional(), // optional preview image, base64 data URL
 });
 
 export async function POST(req: Request) {
@@ -43,30 +44,11 @@ export async function POST(req: Request) {
     );
   }
 
-  // Optional: store the original image in blob if a preview was sent.
-  let fileUrl: string | null = null;
-  if (body.data.imageDataUrl && process.env.BLOB_READ_WRITE_TOKEN) {
-    try {
-      const m = body.data.imageDataUrl.match(/^data:(image\/[a-z+]+);base64,(.+)$/);
-      if (m) {
-        const buf = Buffer.from(m[2], "base64");
-        const blob = await put(`receipts/${user.installerId}/${Date.now()}-${body.data.fileName}`, buf, {
-          access: "public",
-          contentType: m[1],
-          addRandomSuffix: true,
-        });
-        fileUrl = blob.url;
-      }
-    } catch (e) {
-      console.error("Blob upload failed", e);
-    }
-  }
-
   try {
     const result = await runReceiptPipeline({
       installerId: user.installerId,
       source: "ocr",
-      fileUrl,
+      fileUrl: null,
       fileName: body.data.fileName,
       parsed,
       rawText: body.data.extractedText,
