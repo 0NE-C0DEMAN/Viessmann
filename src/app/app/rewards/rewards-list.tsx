@@ -10,6 +10,7 @@ export function RewardsList({ rewards, initialBalance }: { rewards: Reward[]; in
   const [balance, setBalance] = useState(initialBalance);
   const [busy, setBusy] = useState<string | null>(null);
   const [redeemed, setRedeemed] = useState<Set<string>>(new Set());
+  const [stockOverrides, setStockOverrides] = useState<Record<string, number>>({});
 
   async function redeem(reward: Reward) {
     if (!confirm(`Redeem "${reward.name}" for ${formatPoints(reward.pointCost)} points?`)) return;
@@ -27,12 +28,20 @@ export function RewardsList({ rewards, initialBalance }: { rewards: Reward[]; in
       }
       setBalance(json.newBalance);
       setRedeemed((prev) => new Set(prev).add(reward.id));
+      setStockOverrides((prev) => ({
+        ...prev,
+        [reward.id]: Math.max(0, (prev[reward.id] ?? reward.inventory) - 1),
+      }));
       toast.success(`Redeemed: ${reward.name}`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Network error");
     } finally {
       setBusy(null);
     }
+  }
+
+  function inventoryFor(r: Reward): number {
+    return stockOverrides[r.id] ?? r.inventory;
   }
 
   return (
@@ -54,9 +63,10 @@ export function RewardsList({ rewards, initialBalance }: { rewards: Reward[]; in
       ) : (
         <div className="grid gap-3">
           {rewards.map((r) => {
-            const can = balance >= r.pointCost && r.inventory > 0;
+            const stock = inventoryFor(r);
+            const can = balance >= r.pointCost && stock > 0;
             const isRedeemed = redeemed.has(r.id);
-            const stockLow = r.inventory > 0 && r.inventory <= 5;
+            const stockLow = stock > 0 && stock <= 5;
             return (
               <div key={r.id} className="v-card flex items-center gap-3">
                 <div className="w-14 h-14 rounded-2xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center flex-shrink-0">
@@ -67,10 +77,10 @@ export function RewardsList({ rewards, initialBalance }: { rewards: Reward[]; in
                   <div className="text-xs text-[var(--vie-ink-muted)] truncate">{r.description}</div>
                   <div className="text-xs mt-1.5 flex items-center gap-2 flex-wrap">
                     <span className="font-bold text-[var(--vie-orange-dark)] v-numeric">{formatPoints(r.pointCost)} pts</span>
-                    {r.inventory <= 0 ? (
+                    {stock <= 0 ? (
                       <span className="v-pill v-pill-muted">Out of stock</span>
                     ) : stockLow ? (
-                      <span className="v-pill v-pill-warn">Only {r.inventory} left</span>
+                      <span className="v-pill v-pill-warn">Only {stock} left</span>
                     ) : null}
                   </div>
                 </div>

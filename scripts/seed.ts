@@ -2,9 +2,9 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 config({ path: ".env", override: false });
 import { db } from "../src/db";
-import { installers, wholesalers, products, rewards } from "../src/db/schema";
+import { installers, wholesalers, products, rewards, campaigns } from "../src/db/schema";
 import { hashPassword } from "../src/lib/password";
-import { SEED_INSTALLERS, SEED_WHOLESALERS, SEED_PRODUCTS, SEED_REWARDS } from "../src/lib/seed-data";
+import { SEED_INSTALLERS, SEED_WHOLESALERS, SEED_PRODUCTS, SEED_REWARDS, SEED_CAMPAIGNS } from "../src/lib/seed-data";
 import { sql } from "drizzle-orm";
 
 async function main() {
@@ -12,7 +12,7 @@ async function main() {
 
   // Clear existing seed rows (idempotent for demo).
   await db.execute(sql`TRUNCATE TABLE points_ledger, redemptions, receipt_line_items, receipts, audit_log RESTART IDENTITY CASCADE`);
-  await db.execute(sql`TRUNCATE TABLE rewards, products, wholesalers, installers RESTART IDENTITY CASCADE`);
+  await db.execute(sql`TRUNCATE TABLE campaigns, rewards, products, wholesalers, installers RESTART IDENTITY CASCADE`);
 
   // Wholesalers
   for (const w of SEED_WHOLESALERS) {
@@ -47,6 +47,19 @@ async function main() {
     await db.insert(rewards).values(r).onConflictDoNothing();
   }
   console.log(`  ${SEED_REWARDS.length} rewards`);
+
+  // Campaigns
+  for (const c of SEED_CAMPAIGNS) {
+    await db.insert(campaigns).values({
+      name: c.name,
+      description: c.description,
+      productFamily: c.productFamily,
+      bonusMultiplier: c.bonusMultiplier,
+      bonusFlatPerUnit: c.bonusFlatPerUnit,
+      active: c.active,
+    }).onConflictDoNothing();
+  }
+  console.log(`  ${SEED_CAMPAIGNS.length} campaigns`);
 
   console.log("Done.");
   process.exit(0);

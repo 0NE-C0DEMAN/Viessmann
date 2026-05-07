@@ -108,7 +108,14 @@ export default async function AdminReceiptDetail({ params }: { params: Promise<{
                         <span className="text-[var(--vie-ink-soft)]">other</span>
                       )}
                     </td>
-                    <td className="py-2 text-right text-xs font-semibold">{line.pointsAwarded > 0 ? `+${formatPoints(line.pointsAwarded)}` : "—"}</td>
+                    <td className="py-2 text-right text-xs font-semibold">
+                      {line.pointsAwarded > 0 ? `+${formatPoints(line.pointsAwarded)}` : "—"}
+                      {line.campaignName && line.pointsAwarded > line.pointsBase && (
+                        <div className="text-[10px] text-[var(--vie-success)] font-semibold">
+                          +{formatPoints(line.pointsAwarded - line.pointsBase)} · {line.campaignName}
+                        </div>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

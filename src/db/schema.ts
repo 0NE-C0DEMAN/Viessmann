@@ -89,9 +89,12 @@ export const receiptLineItems = pgTable("receipt_line_items", {
   amountCents: bigint("amount_cents", { mode: "number" }).notNull(),
   matchedProductId: uuid("matched_product_id").references(() => products.id),
   matchConfidence: integer("match_confidence"), // 0..100
-  matchKind: text("match_kind"), // exact | normalized | fuzzy | none
+  matchKind: text("match_kind"), // exact | normalized | fuzzy | family | none
   isViessmann: boolean("is_viessmann").notNull().default(false),
+  pointsBase: integer("points_base").notNull().default(0),
   pointsAwarded: integer("points_awarded").notNull().default(0),
+  campaignId: uuid("campaign_id"),
+  campaignName: text("campaign_name"),
 }, (t) => [
   index("rli_receipt_idx").on(t.receiptId),
 ]);

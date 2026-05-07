@@ -4,7 +4,7 @@ import { requireInstaller } from "@/lib/session";
 import { parseReceiptWithClaude } from "@/lib/receipt-parser";
 import { parseEInvoiceXml } from "@/lib/xml-parser";
 import { parsePdfTextLight } from "@/lib/pdf-text-parser";
-import { runReceiptPipeline, DuplicateReceiptError } from "@/lib/receipt-pipeline";
+import { runReceiptPipeline } from "@/lib/receipt-pipeline";
 import { db } from "@/db";
 import { receipts } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
@@ -131,12 +131,6 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({ ok: true, ...result, parsed, parserUsed });
   } catch (e) {
-    if (e instanceof DuplicateReceiptError) {
-      return NextResponse.json(
-        { ok: false, status: "duplicate", message: "This invoice has already been submitted.", existingId: e.existingId },
-        { status: 409 },
-      );
-    }
     const msg = e instanceof Error ? e.message : String(e);
     console.error("pipeline error", e);
     return NextResponse.json({ error: msg }, { status: 500 });

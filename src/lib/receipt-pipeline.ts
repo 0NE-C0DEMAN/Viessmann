@@ -8,12 +8,22 @@
 //   7. Persist receipt + line items, append points to ledger if approved.
 
 import { db } from "@/db";
-import { receipts, receiptLineItems, products, pointsLedger, auditLog, wholesalers, installers } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import {
+  receipts,
+  receiptLineItems,
+  products,
+  pointsLedger,
+  auditLog,
+  wholesalers,
+  installers,
+  campaigns,
+} from "@/db/schema";
+import { and, eq, lte, or, isNull, gt } from "drizzle-orm";
 import { matchLine } from "@/lib/sku-matcher";
 import { parseCroatianAmountToCents, parseQuantity } from "@/lib/money";
 import { isValidOib, normaliseOib } from "@/lib/oib";
 import type { ParsedReceipt } from "@/lib/receipt-parser";
+import type { Campaign } from "@/db/schema";
 
 export interface PipelineResult {
   receiptId: string;
@@ -68,8 +78,20 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
     }).onConflictDoNothing();
   }
 
-  // Match line items
-  const allProducts = await db.select().from(products);
+  // Match line items + load active campaigns once.
+  const [allProducts, activeCampaigns] = await Promise.all([
+    db.select().from(products),
+    db
+      .select()
+      .from(campaigns)
+      .where(
+        and(
+          eq(campaigns.active, true),
+          lte(campaigns.startsAt, new Date()),
+          or(isNull(campaigns.endsAt), gt(campaigns.endsAt, new Date())),
+        ),
+      ),
+  ]);
 
   const totalCents = parseCroatianAmountToCents(parsed.total) ?? null;
   const subtotalCents = parseCroatianAmountToCents(parsed.subtotal) ?? null;
@@ -87,7 +109,10 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
     confidence: number;
     matchKind: string;
     isViessmann: boolean;
+    pointsBase: number;
     pointsAwarded: number;
+    campaignId: string | null;
+    campaignName: string | null;
   }> = [];
 
   let totalPoints = 0;
@@ -99,11 +124,19 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
     const qtyNum = Number(qty) || 0;
 
     const match = matchLine(li.raw_description, li.kpd_sifra, allProducts);
-    const points = match.product ? Math.round(match.product.pointsPerUnit * qtyNum) : 0;
+    const basePoints = match.product ? Math.round(match.product.pointsPerUnit * qtyNum) : 0;
+
+    // Pick the best applicable campaign for this line.
+    // Match rule: campaign.productFamily IS NULL (matches all) OR equals match.product.family.
+    // Stack rule: highest final-points wins; non-stackable.
+    const family = match.product?.family ?? null;
+    const candidate = pickBestCampaign(activeCampaigns, family, basePoints, qtyNum);
+    const finalPoints = candidate ? candidate.finalPoints : basePoints;
+
     if (match.isViessmann && match.product == null) {
       fraudFlags.push(`line_unmatched_viessmann:${li.raw_description.slice(0, 60)}`);
     }
-    totalPoints += points;
+    totalPoints += finalPoints;
 
     lineRecords.push({
       raw: li.raw_description,
@@ -117,7 +150,10 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
       confidence: match.confidence,
       matchKind: match.kind,
       isViessmann: match.isViessmann,
-      pointsAwarded: points,
+      pointsBase: basePoints,
+      pointsAwarded: finalPoints,
+      campaignId: candidate?.campaign.id ?? null,
+      campaignName: candidate?.campaign.name ?? null,
     });
   }
 
@@ -154,41 +190,61 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
   const hasViessmann = lineRecords.some((l) => l.isViessmann);
   if (!hasViessmann) status = "rejected";
 
-  // Insert receipt
-  const inserted = await db.insert(receipts).values({
-    installerId,
-    source,
-    status,
-    fileUrl,
-    fileName,
-    rawText,
-    parsedJson: parsed as unknown as Record<string, unknown>,
-    wholesalerOib: wholesalerOib || null,
-    wholesalerName: parsed.wholesaler?.name ?? null,
-    buyerOib: buyerOib || null,
-    buyerName: parsed.buyer?.name ?? null,
-    invoiceNumber: parsed.invoice_number ?? null,
-    issueDate: issueDate ?? null,
-    dueDate: parsed.due_date ? new Date(parsed.due_date) : null,
-    currency: parsed.currency ?? "EUR",
-    subtotalCents: subtotalCents ?? null,
-    vatCents: vatCents ?? null,
-    totalCents: totalCents ?? null,
-    pointsAwarded: status === "approved" ? totalPoints : 0,
-    fraudFlags,
-  }).returning({ id: receipts.id }).catch(async (err: unknown) => {
-    // Duplicate (unique on wholesaler_oib, invoice_number, buyer_oib, total_cents)
-    if (err && typeof err === "object" && "code" in err && (err as { code: string }).code === "23505") {
-      // Find existing
-      const dup = await db.select({ id: receipts.id }).from(receipts).where(and(
-        eq(receipts.wholesalerOib, wholesalerOib),
-        eq(receipts.invoiceNumber, parsed.invoice_number ?? ""),
-        eq(receipts.buyerOib, buyerOib),
-      )).limit(1);
-      throw new DuplicateReceiptError(dup[0]?.id);
+  // Pre-flight duplicate check: if a row already exists for this
+  // (seller OIB, invoice nr, buyer OIB, total), persist a new "duplicate"
+  // row anyway so admins can see all attempts in the queue + filter tab.
+  let existingReceiptId: string | null = null;
+  if (wholesalerOib && parsed.invoice_number && buyerOib && totalCents != null) {
+    const existing = await db
+      .select({ id: receipts.id })
+      .from(receipts)
+      .where(
+        and(
+          eq(receipts.wholesalerOib, wholesalerOib),
+          eq(receipts.invoiceNumber, parsed.invoice_number),
+          eq(receipts.buyerOib, buyerOib),
+          eq(receipts.totalCents, totalCents),
+        ),
+      )
+      .limit(1);
+    if (existing.length > 0) {
+      existingReceiptId = existing[0].id;
+      status = "duplicate";
+      fraudFlags.push("duplicate_of_existing_receipt");
     }
-    throw err;
-  });
+  }
+
+  // For duplicate receipts, drop the strict unique-tuple fields so the row
+  // can be inserted alongside the original. We mark `invoice_number` with
+  // a "-duplicate-<ts>" suffix to avoid colliding with the unique index.
+  const dedupeSuffix = status === "duplicate" ? `__dup_${Date.now()}` : "";
+
+  const inserted = await db
+    .insert(receipts)
+    .values({
+      installerId,
+      source,
+      status,
+      fileUrl,
+      fileName,
+      rawText,
+      parsedJson: parsed as unknown as Record<string, unknown>,
+      wholesalerOib: wholesalerOib || null,
+      wholesalerName: parsed.wholesaler?.name ?? null,
+      buyerOib: buyerOib || null,
+      buyerName: parsed.buyer?.name ?? null,
+      invoiceNumber: parsed.invoice_number ? parsed.invoice_number + dedupeSuffix : null,
+      issueDate: issueDate ?? null,
+      dueDate: parsed.due_date ? new Date(parsed.due_date) : null,
+      currency: parsed.currency ?? "EUR",
+      subtotalCents: subtotalCents ?? null,
+      vatCents: vatCents ?? null,
+      totalCents: totalCents ?? null,
+      pointsAwarded: status === "approved" ? totalPoints : 0,
+      reviewerNote: status === "duplicate" ? `Duplicate of receipt ${existingReceiptId}` : null,
+      fraudFlags,
+    })
+    .returning({ id: receipts.id });
 
   const receiptId = inserted[0].id;
 
@@ -209,7 +265,10 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
         matchConfidence: l.confidence,
         matchKind: l.matchKind,
         isViessmann: l.isViessmann,
+        pointsBase: l.pointsBase,
         pointsAwarded: l.pointsAwarded,
+        campaignId: l.campaignId,
+        campaignName: l.campaignName,
       })),
     );
   }
@@ -243,6 +302,31 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
   };
 }
 
+interface CampaignPick {
+  campaign: Campaign;
+  finalPoints: number;
+}
+
+function pickBestCampaign(
+  campaignsList: Campaign[],
+  family: string | null,
+  basePoints: number,
+  qty: number,
+): CampaignPick | null {
+  let best: CampaignPick | null = null;
+  for (const c of campaignsList) {
+    if (c.productFamily && family !== c.productFamily) continue;
+    const multiplied = Math.round(basePoints * (c.bonusMultiplier / 100));
+    const flat = Math.round(c.bonusFlatPerUnit * qty);
+    const finalPoints = multiplied + flat;
+    if (finalPoints <= basePoints) continue; // not actually a bonus
+    if (!best || finalPoints > best.finalPoints) {
+      best = { campaign: c, finalPoints };
+    }
+  }
+  return best;
+}
+
 export class DuplicateReceiptError extends Error {
   constructor(public existingId?: string) {
     super("Duplicate receipt");
@@ -257,7 +341,8 @@ function messageFor(status: PipelineResult["status"], flags: string[]): string {
       return "Rejected: the buyer OIB on this invoice does not match your account.";
     return "Rejected: no Viessmann products found on this invoice.";
   }
-  if (status === "duplicate") return "This receipt has already been submitted.";
+  if (status === "duplicate") return "This invoice has already been submitted previously.";
   return "Submitted for manual review by Viessmann.";
 }
+
 

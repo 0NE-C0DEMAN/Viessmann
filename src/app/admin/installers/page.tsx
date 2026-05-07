@@ -4,12 +4,24 @@ import { InstallersClient } from "./installers-client";
 
 export default async function AdminInstallers() {
   const rows = await db.execute(sql`
+    WITH balances AS (
+      SELECT installer_id, COALESCE(SUM(delta), 0)::int AS balance
+      FROM points_ledger
+      GROUP BY installer_id
+    )
     SELECT
-      i.id, i.email, i.company_name, i.oib, i.city, i.tier, i.created_at,
-      COALESCE((SELECT SUM(delta) FROM points_ledger WHERE installer_id = i.id), 0)::int AS balance,
+      i.id, i.email, i.company_name, i.oib, i.city, i.created_at,
+      COALESCE(b.balance, 0) AS balance,
+      CASE
+        WHEN COALESCE(b.balance, 0) >= 25000 THEN 'Platinum'
+        WHEN COALESCE(b.balance, 0) >= 8000 THEN 'Gold'
+        WHEN COALESCE(b.balance, 0) >= 2000 THEN 'Silver'
+        ELSE 'Bronze'
+      END AS tier,
       (SELECT COUNT(*) FROM receipts WHERE installer_id = i.id)::int AS submissions,
       (SELECT COUNT(*) FROM receipts WHERE installer_id = i.id AND status = 'approved')::int AS approved
     FROM installers i
+    LEFT JOIN balances b ON b.installer_id = i.id
     WHERE i.role = 'installer'
     ORDER BY balance DESC
   `);

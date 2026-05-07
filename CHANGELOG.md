@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.1.7 — 2026-05-07
+
+### Wiring up the half-built features
+
+A full audit of the codebase turned up several disconnected feature seams. Closing them all in one release.
+
+**Broken behaviour fixed:**
+- **Campaigns engine is now connected.** The pipeline fetches active campaigns (matching by `productFamily` and the current date window), picks the best non-stackable campaign per Viessmann line, and applies the multiplier + flat-per-unit bonus. The line item record now stores `pointsBase`, `pointsAwarded`, `campaignId`, and `campaignName`. Both installer and admin receipt-detail screens show "+X bonus · Campaign Name" next to the points where applicable.
+- **Cancelled redemptions now refund the points** (compensating ledger entry tagged `reason: 'reversal'`) and **restock one unit** of inventory.
+- **Admin password change is reachable** at the new `/admin/settings` page (Settings tab in the admin nav). Reuses the same `PasswordForm` component the installer side uses.
+- **`/app/settings` no longer has fake toggles.** Removed the non-functional notification-preference checkboxes and the language selector that did nothing. Replaced with honest copy explaining that push notifications are part of the production build.
+- **Landing-page Privacy and Terms links** now point to `/privacy` and `/terms` placeholder pages instead of `#`.
+- **Duplicate receipts are now persisted** with `status: 'duplicate'` instead of being silently rejected. The Duplicate filter tabs in the admin queue, installer history, and notifications branch are populated with real rows. The pipeline pre-checks the unique tuple and tags the new row with a "Duplicate of receipt {existingId}" reviewer note.
+
+**Inconsistencies fixed:**
+- **Admin installers list** now computes tier from balance via SQL `CASE` (Bronze / Silver / Gold / Platinum). No more "every installer is bronze".
+- **Reviewer notes** are now visible to the installer on the receipt-detail page in a highlighted "Note from Viessmann" card — previously they were invisible unless the receipt was rejected and rendered through the notifications feed.
+- **Rewards stock count refreshes locally** after a redeem so the user sees the new "Only N left" badge immediately.
+
+**Demo data:**
+- Two SPIFF campaigns auto-seeded: a 2× heat-pump push (matches `vitocal`) and a flat +50 pts/unit on every Viessmann line. Submitting `Invoice_AGRIA_003.pdf` (which has 2× Vitocal 150-A) now visibly awards bonus points with campaign attribution.
+
 ## v0.1.6 — 2026-05-07
 
 ### Fix: photo upload "Unexpected token R" error

@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireInstaller } from "@/lib/session";
 import { parseCroatianInvoiceText } from "@/lib/croatian-invoice-parser";
-import { runReceiptPipeline, DuplicateReceiptError } from "@/lib/receipt-pipeline";
+import { runReceiptPipeline } from "@/lib/receipt-pipeline";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -55,12 +55,6 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({ ok: true, ...result, parsed, parserUsed: "tesseract-ocr" });
   } catch (e) {
-    if (e instanceof DuplicateReceiptError) {
-      return NextResponse.json(
-        { ok: false, status: "duplicate", message: "This invoice has already been submitted.", existingId: e.existingId },
-        { status: 409 },
-      );
-    }
     const msg = e instanceof Error ? e.message : String(e);
     console.error("from-text pipeline error", e);
     return NextResponse.json({ error: msg }, { status: 500 });

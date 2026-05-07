@@ -119,6 +119,27 @@ export const SEED_PRODUCTS = [
   { family: "vitocell", model: "Zidna konzola ZK06061", description: "Zidna konzola za vanjsku jedinicu", kpdSifra: "28.21.19", pointsPerUnit: 5 },
 ];
 
+// Demo SPIFF campaigns. The pipeline applies the highest-finalPoints campaign
+// per Viessmann line; non-stackable.
+export const SEED_CAMPAIGNS = [
+  {
+    name: "Q2 Vitocal push",
+    description: "Double points on heat pumps for the Spring 2026 push.",
+    productFamily: "vitocal",
+    bonusMultiplier: 200, // 2x base points
+    bonusFlatPerUnit: 0,
+    active: true,
+  },
+  {
+    name: "All-family Spring +50",
+    description: "Flat +50 pts per Viessmann unit through Q2.",
+    productFamily: null as string | null,
+    bonusMultiplier: 100, // no multiplier
+    bonusFlatPerUnit: 50,
+    active: true,
+  },
+];
+
 export const SEED_REWARDS = [
   { name: "Viessmann polo majica", description: "Brendirana polo majica, S-XXL", pointCost: 500, inventory: 50 },
   { name: "Set alata 12-dijelni", description: "Profesionalni set alata u koferu", pointCost: 2500, inventory: 20 },

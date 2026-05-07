@@ -85,8 +85,8 @@ export default async function Home() {
         <div className="flex flex-wrap gap-4 items-center justify-between">
           <span>Viessmann B2B Loyalty · Prototype · {new Date().getFullYear()}</span>
           <span className="flex gap-4">
-            <a href="#" className="hover:text-[var(--vie-ink)]">Privacy</a>
-            <a href="#" className="hover:text-[var(--vie-ink)]">Terms</a>
+            <Link href="/privacy" className="hover:text-[var(--vie-ink)]">Privacy</Link>
+            <Link href="/terms" className="hover:text-[var(--vie-ink)]">Terms</Link>
             <a href="https://github.com/0NE-C0DEMAN/Viessmann" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--vie-ink)]">GitHub</a>
           </span>
         </div>

@@ -94,6 +94,11 @@ export default async function ReceiptDetail({ params }: { params: Promise<{ id: 
                   {line.pointsAwarded > 0 && (
                     <div className="text-xs font-bold text-[var(--vie-orange)] v-numeric">+{formatPoints(line.pointsAwarded)}</div>
                   )}
+                  {line.campaignName && line.pointsAwarded > line.pointsBase && (
+                    <div className="text-[10px] text-[var(--vie-success)] font-semibold mt-0.5">
+                      +{formatPoints(line.pointsAwarded - line.pointsBase)} bonus · {line.campaignName}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -111,6 +116,13 @@ export default async function ReceiptDetail({ params }: { params: Promise<{ id: 
         <div className="text-sm font-bold mb-3">Status timeline</div>
         <Timeline submitted={r.createdAt!} status={r.status} reviewed={r.reviewedAt} ledgerEntries={ledger.length} />
       </div>
+
+      {r.reviewerNote && (
+        <div className="v-card border-[var(--vie-orange-light)] bg-[var(--vie-orange-light)]/30">
+          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-orange-dark)] mb-1.5">Note from Viessmann</div>
+          <div className="text-sm">{r.reviewerNote}</div>
+        </div>
+      )}
 
       {flags.length > 0 && (
         <div className="v-card">
