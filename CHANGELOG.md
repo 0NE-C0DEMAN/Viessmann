@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.9 — 2026-05-07
+
+### Demo reset script
+
+- New `npm run db:reset` (`scripts/reset-data.ts`) wipes user-generated data — receipts, line items, points ledger, redemptions, audit log — while keeping all seed data (4 installers, 3 wholesalers, 24 products, 5 rewards, 2 campaigns) intact. Reward inventory restored to seeded values, deactivated rewards re-activated, disabled installers re-enabled.
+- Run before a demo so testers start with a blank ledger but their existing logins still work.
+- Production DB reset for the upcoming demo with Frane.
+
 ## v0.2.8 — 2026-05-07
 
 ### Admin header: responsive nav

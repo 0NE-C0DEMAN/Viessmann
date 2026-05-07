@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Viessmann B2B Loyalty — installer-side PWA + admin web for receipt-driven loyalty in Croatia.",
   "license": "UNLICENSED",
   "repository": {
@@ -16,7 +16,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:seed": "tsx scripts/seed.ts"
+    "db:seed": "tsx scripts/seed.ts",
+    "db:reset": "tsx scripts/reset-data.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.0",
