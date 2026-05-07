@@ -1,0 +1,17 @@
+{
+  "name": "Viessmann B2B Loyalty",
+  "short_name": "Viessmann B2B",
+  "description": "B2B loyalty programme for Viessmann installers. Submit invoices, earn points, redeem rewards.",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fafafa",
+  "theme_color": "#ff7c1c",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "lang": "hr"
+}

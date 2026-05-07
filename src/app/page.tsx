@@ -1,65 +1,69 @@
-import Image from "next/image";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getSession } from "@/lib/session";
 
-export default function Home() {
+export default async function Home() {
+  const s = await getSession();
+  if (s.installerId) {
+    redirect(s.role === "admin" ? "/admin" : "/app");
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col flex-1 min-h-screen bg-[var(--vie-paper)]">
+      <header className="px-6 py-5 flex items-center justify-between max-w-5xl w-full mx-auto">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-md bg-[var(--vie-orange)]" />
+          <span className="font-bold tracking-tight">Viessmann <span className="text-[var(--vie-orange)]">B2B</span></span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        <Link href="/login" className="v-btn v-btn-ghost text-sm">Sign in</Link>
+      </header>
+
+      <main className="flex-1 px-6 max-w-5xl w-full mx-auto">
+        <section className="pt-10 pb-12 grid md:grid-cols-2 gap-8 items-center">
+          <div>
+            <span className="v-pill v-pill-processing mb-4">Loyalty programme · pilot</span>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
+              Scan an invoice.<br />
+              <span className="text-[var(--vie-orange)]">Earn points.</span>
+            </h1>
+            <p className="mt-4 text-[var(--vie-ink-soft)] text-lg max-w-md">
+              The B2B loyalty programme for Viessmann installers in Croatia. Submit your wholesaler invoice — we read it, match the products, and credit your account.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <Link href="/signup" className="v-btn v-btn-primary">Become a member</Link>
+              <Link href="/login" className="v-btn v-btn-ghost">I already have an account</Link>
+            </div>
+            <p className="mt-3 text-xs text-[var(--vie-ink-soft)]">Demo: any installer in <code>Instalaterm</code>, <code>Energo-Mont</code>, <code>Termo-Projekt</code> can sign in with password <code>demo1234</code>.</p>
+          </div>
+          <div className="v-card relative overflow-hidden">
+            <div className="text-xs text-[var(--vie-ink-soft)] mb-3">How it works</div>
+            <ol className="space-y-3 text-sm">
+              <li className="flex gap-3"><span className="w-6 h-6 rounded-full bg-[var(--vie-orange)] text-white flex items-center justify-center font-bold text-xs">1</span> Take a photo of your wholesaler receipt or upload an e-invoice XML.</li>
+              <li className="flex gap-3"><span className="w-6 h-6 rounded-full bg-[var(--vie-orange)] text-white flex items-center justify-center font-bold text-xs">2</span> The app reads it, finds Viessmann products, calculates points.</li>
+              <li className="flex gap-3"><span className="w-6 h-6 rounded-full bg-[var(--vie-orange)] text-white flex items-center justify-center font-bold text-xs">3</span> Points hit your balance. Redeem for tools, training, and rewards.</li>
+            </ol>
+          </div>
+        </section>
+
+        <section className="grid md:grid-cols-3 gap-4 pb-12">
+          <div className="v-card">
+            <div className="text-2xl font-bold">OCR + e-Invoice</div>
+            <p className="text-sm text-[var(--vie-ink-soft)] mt-1">Photos today, XML from 01.01.2026 — both flow into the same pipeline.</p>
+          </div>
+          <div className="v-card">
+            <div className="text-2xl font-bold">OIB-verified</div>
+            <p className="text-sm text-[var(--vie-ink-soft)] mt-1">We validate the buyer&apos;s OIB checksum and match it to your account.</p>
+          </div>
+          <div className="v-card">
+            <div className="text-2xl font-bold">Tier rewards</div>
+            <p className="text-sm text-[var(--vie-ink-soft)] mt-1">Bronze → Silver → Gold → Platinum. More points, better catalog.</p>
+          </div>
+        </section>
       </main>
+
+      <footer className="px-6 py-6 text-xs text-[var(--vie-ink-soft)] max-w-5xl w-full mx-auto">
+        Viessmann B2B Loyalty · Prototype · {new Date().getFullYear()}
+      </footer>
     </div>
   );
 }
