@@ -135,6 +135,9 @@ public/
 
 ## Releases
 
+- **v0.2.15** — fix: list-row content overflowing the card edge on narrow phones. Rewards-list cards restructured into two stacked rows (icon+title above the divider, points/stock+button below) so the Redeem button can never get clipped off the right edge. Profile redemption rows + recent-activity rows hardened with `min-w-0 flex-1` on the left text column and `flex-shrink-0` on the amount.
+- **v0.2.14** — Sign out actually visible on every screen size; previously hidden at `<lg` breakpoints behind the avatar dropdown.
+- **v0.2.13** — explicit "Sign out" button next to the admin avatar on desktop. The avatar-dropdown pattern is industry standard but not obvious to everyone — Sign out was buried and was getting missed.
 - **v0.2.12** — dashboard quick actions now open the file picker / camera immediately (mobile blocked the previous `setTimeout(...).click()` due to user-gesture rules). Upload picker no longer offers Camera / Photo Library — `accept` is PDF + XML only on that path.
 - **v0.2.11** — fix: admin drawer was being trapped inside the sticky header's `backdrop-filter` containing block (rendered as two stranded chunks). Now portaled to `document.body` so it covers the full viewport.
 - **v0.2.10** — admin mobile drawer rebuilt: slide-in animation, safe-area-aware header/footer, nav grouped into 4 sections with descriptions, active-route highlight, account-info header.

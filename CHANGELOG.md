@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.2.15 — 2026-05-07
+
+### Fix: list-row content overflowing the card edge on narrow phones
+
+Frane's screenshot on the Rewards page showed the "Redeem" button clipped off the right edge to "Re…". Two compounding causes:
+
+1. **Card was a single-row flex** with the icon, title, description, points, stock pills, and button all competing for one horizontal axis. On 320–360px screens with Croatian product names ("Vitocal 100-A jednofazni 230V"), the button got squeezed past the card boundary.
+2. **`truncate` on a flex container doesn't propagate to its flex children** — the parent had `truncate` but the inner `<span>` did not, so the title pushed the row wider than its parent.
+
+Fixes:
+
+- **Rewards list** — restructured each card into two stacked rows separated by a divider. Top row is icon + title (with `truncate min-w-0` *on the text element itself*) + tier pill; bottom row is points/stock pills + redeem button on its own line. Button is `flex-shrink-0` so it can never be pushed off-screen.
+- **Profile page** — redemption rows and recent-activity rows now have `min-w-0 flex-1` on the left text column, `truncate` on every text line, `flex-shrink-0` on the right amount, and `gap-3` between them. Long reward names or invoice notes now ellipsis cleanly instead of pushing the amount off the card.
+
+History, notifications, and receipt-detail line items already had the correct pattern.
+
+## v0.2.14 — 2026-05-07
+
+### Sign out actually visible on every screen
+
+v0.2.13 hid the explicit Sign-out button at `<lg` breakpoints (the hamburger drawer was supposed to cover mobile). On many tablet sizes the drawer wasn't surfaced and the avatar dropdown wasn't obvious, so users couldn't find Sign out at all.
+
+- `LogoutButton` now renders on every viewport size with proper button styling (padding, hover background turning the icon red).
+- Header gap loosens slightly so the avatar / Sign out / hamburger trio breathes on mid-sized screens.
+
 ## v0.2.13 — 2026-05-07
 
 ### Sign-out is back as an explicit button on desktop admin

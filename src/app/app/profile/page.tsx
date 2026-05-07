@@ -107,12 +107,12 @@ export default async function ProfilePage() {
         ) : (
           <div className="space-y-2">
             {myRedemptions.map(({ r, reward }) => (
-              <div key={r.id} className="flex items-center justify-between text-sm">
-                <div>
-                  <div className="font-medium">{reward?.name ?? "—"}</div>
-                  <div className="text-xs text-[var(--vie-ink-muted)]">{new Date(r.createdAt).toLocaleDateString("hr-HR")} · {r.status}</div>
+              <div key={r.id} className="flex items-center justify-between gap-3 text-sm">
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium truncate">{reward?.name ?? "—"}</div>
+                  <div className="text-xs text-[var(--vie-ink-muted)] truncate">{new Date(r.createdAt).toLocaleDateString("hr-HR")} · {r.status}</div>
                 </div>
-                <div className="text-sm font-bold v-numeric text-[var(--vie-error)]">−{formatPoints(r.pointCost)}</div>
+                <div className="text-sm font-bold v-numeric text-[var(--vie-error)] flex-shrink-0">−{formatPoints(r.pointCost)}</div>
               </div>
             ))}
           </div>
@@ -126,12 +126,12 @@ export default async function ProfilePage() {
         ) : (
           <div className="space-y-2">
             {recentLedger.map((l) => (
-              <div key={l.id} className="flex items-center justify-between text-sm">
-                <div>
+              <div key={l.id} className="flex items-center justify-between gap-3 text-sm">
+                <div className="min-w-0 flex-1">
                   <div className="text-xs font-medium capitalize">{l.reason}</div>
-                  <div className="text-[10px] text-[var(--vie-ink-muted)]">{new Date(l.createdAt).toLocaleString("hr-HR")} · {l.note ?? "—"}</div>
+                  <div className="text-[10px] text-[var(--vie-ink-muted)] truncate">{new Date(l.createdAt).toLocaleString("hr-HR")} · {l.note ?? "—"}</div>
                 </div>
-                <div className={`font-bold v-numeric ${l.delta >= 0 ? "text-[var(--vie-success)]" : "text-[var(--vie-error)]"}`}>
+                <div className={`font-bold v-numeric flex-shrink-0 ${l.delta >= 0 ? "text-[var(--vie-success)]" : "text-[var(--vie-error)]"}`}>
                   {l.delta >= 0 ? "+" : ""}{formatPoints(l.delta)}
                 </div>
               </div>

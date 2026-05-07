@@ -95,38 +95,73 @@ export function RewardsList({
             const stockLow = inStock && stock <= 5;
             const requiredTier = r.tierRequired as Tier;
             return (
-              <div key={r.id} className={`v-card flex items-center gap-3 ${!tierOk ? "opacity-75" : ""}`}>
-                <div className="w-14 h-14 rounded-2xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center flex-shrink-0">
-                  <Gift size={22} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm truncate flex items-center gap-2">
-                    {r.name}
-                    {requiredTier && requiredTier !== "Bronze" && (
-                      <span className={`v-pill text-[10px] ${TIER_BADGE[requiredTier]}`}>{requiredTier}+</span>
-                    )}
+              <div key={r.id} className={`v-card ${!tierOk ? "opacity-80" : ""}`}>
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center flex-shrink-0">
+                    <Gift size={20} />
                   </div>
-                  <div className="text-xs text-[var(--vie-ink-muted)] truncate">{r.description}</div>
-                  <div className="text-xs mt-1.5 flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-[var(--vie-red-dark)] v-numeric">{formatPoints(r.pointCost)} pts</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-semibold text-sm truncate min-w-0">{r.name}</span>
+                      {requiredTier && requiredTier !== "Bronze" && (
+                        <span className={`v-pill text-[10px] flex-shrink-0 ${TIER_BADGE[requiredTier]}`}>
+                          {requiredTier}+
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-[var(--vie-ink-muted)] line-clamp-2 mt-0.5">
+                      {r.description}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-[var(--vie-line)] flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 flex-wrap min-w-0">
+                    <span className="font-bold text-[var(--vie-red-dark)] v-numeric text-sm whitespace-nowrap">
+                      {formatPoints(r.pointCost)} pts
+                    </span>
                     {!inStock ? (
                       <span className="v-pill v-pill-muted">Out of stock</span>
                     ) : stockLow ? (
                       <span className="v-pill v-pill-warn">Only {stock} left</span>
                     ) : null}
                     {!tierOk && (
-                      <span className="v-pill v-pill-muted text-[10px]">Reach {requiredTier} to unlock</span>
+                      <span className="v-pill v-pill-muted text-[10px]">
+                        Reach {requiredTier} to unlock
+                      </span>
                     )}
                   </div>
+                  <button
+                    disabled={!can || busy === r.id || isRedeemed}
+                    onClick={() => setPending(r)}
+                    className={`v-btn v-btn-sm flex-shrink-0 ${
+                      isRedeemed ? "v-btn-success" : can ? "v-btn-primary" : "v-btn-ghost"
+                    }`}
+                    title={
+                      !tierOk
+                        ? `Requires ${requiredTier}+`
+                        : !enoughPts
+                        ? "Not enough points"
+                        : !inStock
+                        ? "Out of stock"
+                        : "Redeem"
+                    }
+                  >
+                    {busy === r.id ? (
+                      "…"
+                    ) : isRedeemed ? (
+                      <>
+                        <Check size={14} /> Done
+                      </>
+                    ) : can ? (
+                      "Redeem"
+                    ) : (
+                      <>
+                        <Lock size={14} />
+                      </>
+                    )}
+                  </button>
                 </div>
-                <button
-                  disabled={!can || busy === r.id || isRedeemed}
-                  onClick={() => setPending(r)}
-                  className={`v-btn flex-shrink-0 ${isRedeemed ? "v-btn-success" : can ? "v-btn-primary" : "v-btn-ghost"} v-btn-sm`}
-                  title={!tierOk ? `Requires ${requiredTier}+` : !enoughPts ? "Not enough points" : !inStock ? "Out of stock" : "Redeem"}
-                >
-                  {busy === r.id ? "…" : isRedeemed ? <><Check size={14} /> Done</> : can ? "Redeem" : <><Lock size={14} /></>}
-                </button>
               </div>
             );
           })}
