@@ -1,5 +1,39 @@
 # Changelog
 
+## v0.2.1 — 2026-05-07
+
+### Closing remaining account / admin / observability gaps
+
+After a fresh page-by-page audit, eight items still missing. All shipped.
+
+**Account lifecycle**
+- `installers.disabled` + `installers.disabled_reason` columns. Login refuses disabled accounts with a friendly explainer (and the reason if set).
+- New admin endpoint `POST /api/admin/installers/[id]/disable` with audit-log entry. Detail page exposes a "Disable account" / "Re-enable account" button + reason textarea.
+- New admin endpoint `POST /api/admin/installers/[id]/reset-password` generating a 12-char temporary password the admin can copy and hand off; recorded in audit log.
+
+**Forgot password path** — new `/forgot-password` page that explains the support-email flow (since the prototype has no SMTP). Login page now has a "Forgot password?" link.
+
+**VIES VAT validation** — signup calls VIES (EU VAT registry) and stores the result on the installer. Best-effort with a 6 s timeout so VIES outages never block signup. Admin installer detail shows: ✓ Verified · ⚠ Not registered · ⓘ check unavailable.
+
+**Bell badge** — installer header bell now shows a count of `needs_review` submissions (capped at "9+"), styled as a brand-orange dot with a number.
+
+**Wholesalers admin** — new `/admin/wholesalers` tab with all wholesalers seen in submissions, ranked by approved value. Search by name / OIB; click "View receipts" to filter the queue.
+
+**CSV export**
+- `GET /api/admin/export/queue` — all submissions with installer + wholesaler + parsed totals + flags + reviewer note. UTF-8 with BOM so Excel/Numbers open Croatian characters cleanly.
+- `GET /api/admin/export/installers` — all installers with balance, tier (computed in SQL), submissions, approved count, disabled flag, VIES status.
+- "Export CSV" buttons on the queue and installers pages.
+
+**Audit log filters** — search box (matches actor, action, entity id, payload), action dropdown (auto-populated from data), entity-type dropdown.
+
+**Resubmit CTA** — receipt detail page for `rejected` / `duplicate` receipts now shows "Submit a corrected version" / "Submit a different invoice" linking to the submit flow.
+
+### Schema changes
+- `installers.disabled boolean NOT NULL DEFAULT false`
+- `installers.disabled_reason text`
+- `installers.vies_validated boolean NOT NULL DEFAULT false`
+- `installers.vies_checked_at timestamp WITH TIME ZONE`
+
 ## v0.2.0 — 2026-05-07
 
 ### Admin reaches the rest of the catalog + proper modals

@@ -71,8 +71,9 @@ export default function LoginPage() {
           <button type="submit" disabled={loading} className="v-btn v-btn-primary w-full">
             {loading ? <Loader2 className="animate-spin" size={16} /> : <>Sign in <ArrowRight size={16} /></>}
           </button>
-          <div className="text-sm text-center text-[var(--vie-ink-soft)]">
-            Don&apos;t have an account? <Link href="/signup" className="text-[var(--vie-orange)] font-semibold">Register</Link>
+          <div className="flex items-center justify-between text-sm">
+            <Link href="/forgot-password" className="text-[var(--vie-ink-muted)] hover:text-[var(--vie-ink)]">Forgot password?</Link>
+            <Link href="/signup" className="text-[var(--vie-orange)] font-semibold">Register</Link>
           </div>
         </form>
 

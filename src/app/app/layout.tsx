@@ -3,11 +3,23 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { Home, Upload, Gift, History as HistoryIcon, Bell, User } from "lucide-react";
 import { ProfileMenu } from "@/components/profile-menu";
+import { db } from "@/db";
+import { receipts } from "@/db/schema";
+import { and, eq, gt, sql } from "drizzle-orm";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const s = await getSession();
   if (!s.installerId) redirect("/login");
   if (s.role === "admin") redirect("/admin");
+
+  // Notification badge: count of submissions still pending review for this installer.
+  const pendingRows = (await db.execute(
+    sql`SELECT COUNT(*)::int AS n FROM receipts WHERE installer_id = ${s.installerId} AND status = 'needs_review'`,
+  )) as unknown as Array<{ n: number }>;
+  const pendingCount = pendingRows[0]?.n ?? 0;
+
+  // Suppress unused warnings (we may use these directly later).
+  void receipts; void and; void eq; void gt;
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--vie-paper)]">
@@ -18,8 +30,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <span className="font-bold tracking-tight">Viessmann <span className="text-[var(--vie-orange)]">Loyalty</span></span>
           </Link>
           <div className="flex items-center gap-1">
-            <Link href="/app/notifications" prefetch className="p-2 rounded-lg hover:bg-[var(--vie-line)] text-[var(--vie-ink-soft)] hover:text-[var(--vie-ink)] transition-colors" title="Notifications">
+            <Link href="/app/notifications" prefetch className="relative p-2 rounded-lg hover:bg-[var(--vie-line)] text-[var(--vie-ink-soft)] hover:text-[var(--vie-ink)] transition-colors" title={pendingCount > 0 ? `${pendingCount} pending` : "Notifications"}>
               <Bell size={18} />
+              {pendingCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--vie-orange)] text-white text-[10px] font-bold flex items-center justify-center v-numeric">
+                  {pendingCount > 9 ? "9+" : pendingCount}
+                </span>
+              )}
             </Link>
             <ProfileMenu email={s.email!} companyName={s.companyName ?? s.email!} />
           </div>

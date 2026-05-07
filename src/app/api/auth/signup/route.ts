@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { hashPassword } from "@/lib/password";
 import { getSession } from "@/lib/session";
 import { isValidOib, normaliseOib } from "@/lib/oib";
+import { checkOibViaVies } from "@/lib/vies";
 import { z } from "zod";
 
 const Body = z.object({
@@ -43,6 +44,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "An account with this OIB already exists" }, { status: 409 });
   }
 
+  // VIES check is best-effort. We let the signup proceed even when VIES is
+  // unreachable; admins can re-validate later from the installer detail page.
+  const vies = await checkOibViaVies(oibClean, "HR");
+
   const inserted = await db.insert(installers).values({
     email: emailLc,
     passwordHash: hashPassword(password),
@@ -54,6 +59,8 @@ export async function POST(req: Request) {
     postalCode: postalCode || null,
     phone: phone || null,
     country: "HR",
+    viesValidated: vies.valid,
+    viesCheckedAt: vies.authoritative ? new Date() : null,
   }).returning({ id: installers.id });
 
   await db.insert(auditLog).values({
@@ -62,6 +69,7 @@ export async function POST(req: Request) {
     action: "installer.signup",
     entityType: "installer",
     entityId: inserted[0].id,
+    payload: { vies: { valid: vies.valid, authoritative: vies.authoritative, message: vies.message } },
   });
 
   const session = await getSession();

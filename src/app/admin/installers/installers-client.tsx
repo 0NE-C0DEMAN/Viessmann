@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Search, Plus, Minus } from "lucide-react";
+import { Search, Plus, Minus, Download } from "lucide-react";
 import { formatPoints } from "@/lib/money";
 
 interface Installer {
@@ -63,9 +63,14 @@ export function InstallersClient({ installers }: { installers: Installer[] }) {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Installers</h1>
-        <p className="text-sm text-[var(--vie-ink-soft)]">All registered installers. Click an installer to adjust points.</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Installers</h1>
+          <p className="text-sm text-[var(--vie-ink-soft)]">All registered installers. Click <em>Adjust pts</em> for the modal or <em>Open</em> for the full picture.</p>
+        </div>
+        <a href="/api/admin/export/installers" download className="v-btn v-btn-ghost v-btn-sm">
+          <Download size={14} /> Export CSV
+        </a>
       </div>
 
       <div className="relative max-w-md">

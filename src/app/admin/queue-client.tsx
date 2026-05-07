@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { StatusPill } from "@/components/status-pill";
 import { formatEur, formatPoints } from "@/lib/money";
 import { relativeDate } from "@/lib/utils";
-import { Search } from "lucide-react";
+import { Search, Download } from "lucide-react";
 import type { Receipt } from "@/db/schema";
 
 type Row = Receipt & {
@@ -42,9 +42,14 @@ export function AdminQueueClient({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Review queue</h1>
-        <p className="text-sm text-[var(--vie-ink-soft)]">All submissions across all installers.</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Review queue</h1>
+          <p className="text-sm text-[var(--vie-ink-soft)]">All submissions across all installers.</p>
+        </div>
+        <a href="/api/admin/export/queue" download className="v-btn v-btn-ghost v-btn-sm">
+          <Download size={14} /> Export CSV
+        </a>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

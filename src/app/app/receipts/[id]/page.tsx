@@ -142,6 +142,12 @@ export default async function ReceiptDetail({ params }: { params: Promise<{ id: 
           <FileText size={16} /> View original file
         </a>
       )}
+
+      {(r.status === "rejected" || r.status === "duplicate") && r.installerId === s.installerId && (
+        <Link href="/app/submit" className="v-btn v-btn-primary w-full">
+          {r.status === "duplicate" ? "Submit a different invoice" : "Submit a corrected version"}
+        </Link>
+      )}
     </div>
   );
 }

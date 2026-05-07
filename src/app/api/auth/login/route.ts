@@ -25,6 +25,17 @@ export async function POST(req: Request) {
   }
   const u = found[0];
 
+  if (u.disabled) {
+    return NextResponse.json(
+      {
+        error: u.disabledReason
+          ? `This account has been disabled: ${u.disabledReason}. Contact loyalty@viessmann.hr.`
+          : "This account has been disabled. Contact loyalty@viessmann.hr.",
+      },
+      { status: 403 },
+    );
+  }
+
   const session = await getSession();
   session.installerId = u.id;
   session.email = u.email;

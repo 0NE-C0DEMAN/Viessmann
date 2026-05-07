@@ -14,6 +14,12 @@ export const installers = pgTable("installers", {
   country: text("country").notNull().default("HR"),
   phone: text("phone"),
   tier: text("tier").notNull().default("bronze"),
+  // Account lifecycle
+  disabled: boolean("disabled").notNull().default(false),
+  disabledReason: text("disabled_reason"),
+  // VIES (EU VAT registry) validation status — recorded at signup if available.
+  viesValidated: boolean("vies_validated").notNull().default(false),
+  viesCheckedAt: timestamp("vies_checked_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [
   uniqueIndex("installers_oib_idx").on(t.oib),

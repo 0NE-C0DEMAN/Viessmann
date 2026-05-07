@@ -8,7 +8,8 @@ import { tierForBalance } from "@/lib/tier";
 import { formatEur, formatPoints } from "@/lib/money";
 import { StatusPill } from "@/components/status-pill";
 import { relativeDate } from "@/lib/utils";
-import { ArrowLeft, Mail, MapPin, Phone, Hash, Calendar, ScrollText } from "lucide-react";
+import { ArrowLeft, Mail, MapPin, Phone, Hash, Calendar, ScrollText, BadgeCheck, AlertCircle } from "lucide-react";
+import { AdminInstallerActions } from "./admin-actions";
 
 export default async function AdminInstallerDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -76,6 +77,25 @@ export default async function AdminInstallerDetail({ params }: { params: Promise
             <Stat label="Submissions" value={stats.submissions} />
             <Stat label="Approved" value={stats.approved} tone="success" />
           </div>
+
+          <div className="v-card v-card-tight">
+            <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--vie-ink-muted)] mb-1">VIES (EU VAT registry)</div>
+            {me.viesValidated ? (
+              <div className="text-sm flex items-center gap-1.5 text-[var(--vie-success)]"><BadgeCheck size={14} /> Verified {me.viesCheckedAt && `· ${new Date(me.viesCheckedAt).toLocaleDateString("hr-HR")}`}</div>
+            ) : me.viesCheckedAt ? (
+              <div className="text-sm flex items-center gap-1.5 text-[var(--vie-warn)]"><AlertCircle size={14} /> Not registered in VIES</div>
+            ) : (
+              <div className="text-sm flex items-center gap-1.5 text-[var(--vie-ink-muted)]"><AlertCircle size={14} /> VIES check unavailable at signup</div>
+            )}
+          </div>
+
+          <AdminInstallerActions
+            installerId={me.id}
+            companyName={me.companyName}
+            email={me.email}
+            disabled={me.disabled}
+            disabledReason={me.disabledReason}
+          />
         </div>
 
         <div className="md:col-span-2 space-y-5">
