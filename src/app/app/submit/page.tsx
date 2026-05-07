@@ -31,6 +31,7 @@ interface PipelineResponse {
   message?: string;
   receiptId?: string;
   parsed?: PipelineParsed;
+  parserUsed?: "pdf-text" | "xml" | "claude-vision";
   existingId?: string;
   error?: string;
 }
@@ -39,11 +40,17 @@ type Stage = "choose" | "preview" | "uploading" | "result";
 
 const PROGRESS_STEPS = [
   "Uploading the file",
-  "Reading the invoice with AI",
+  "Reading the invoice",
   "Validating OIB",
   "Matching Viessmann products",
   "Calculating points",
 ];
+
+const PARSER_LABELS: Record<string, { label: string; tone: "success" | "info" | "warn" }> = {
+  "pdf-text": { label: "Light PDF parser · free", tone: "success" },
+  xml: { label: "e-Invoice XML · free", tone: "success" },
+  "claude-vision": { label: "Claude vision OCR", tone: "info" },
+};
 
 export default function SubmitPage() {
   const router = useRouter();
@@ -308,7 +315,14 @@ function ResultStage({ response, onAnother, onView }: { response: PipelineRespon
 
       {parsed && (
         <div className="v-card">
-          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-ink-muted)] mb-3">What we read</div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-ink-muted)]">What we read</div>
+            {response.parserUsed && (
+              <span className={`v-pill v-pill-${PARSER_LABELS[response.parserUsed]?.tone ?? "muted"} text-[10px]`}>
+                {PARSER_LABELS[response.parserUsed]?.label ?? response.parserUsed}
+              </span>
+            )}
+          </div>
           <dl className="grid grid-cols-2 gap-y-2 text-sm">
             <DefRow label="Seller" value={parsed.wholesaler?.name ?? "—"} />
             <DefRow label="Buyer" value={parsed.buyer?.name ?? "—"} />

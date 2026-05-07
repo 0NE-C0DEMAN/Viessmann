@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { getIronSession, type SessionOptions } from "iron-session";
 
 export interface SessionData {
@@ -19,10 +20,12 @@ export const sessionOptions: SessionOptions = {
   },
 };
 
-export async function getSession() {
+// Memoised per server-request render so each page only decrypts the cookie
+// once, even when multiple server components call getSession().
+export const getSession = cache(async () => {
   const cookieStore = await cookies();
   return getIronSession<SessionData>(cookieStore, sessionOptions);
-}
+});
 
 export async function requireInstaller() {
   const session = await getSession();

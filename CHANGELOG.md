@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.1.3 — 2026-05-07
+
+### Performance pass #2 + parser visibility
+
+- `getSession()` is now memoised per-request via React's `cache()` — multiple server components in the same render share one cookie decryption.
+- `next.config` now declares `optimizePackageImports` for `lucide-react`, `sonner`, and `recharts` so unused exports are properly tree-shaken into per-route chunks.
+- Long-cache headers added for the PWA icons / SVG / manifest; the service worker is left short-cache so updates roll out promptly.
+- Removed two unused npm dependencies (`class-variance-authority`, `date-fns`) — slightly smaller install + lockfile.
+- Submit-result screen now shows a colored badge identifying which parser ran (`Light PDF parser · free`, `e-Invoice XML · free`, or `Claude vision OCR`) so the data flow is visible to the user.
+
 ## v0.1.2 — 2026-05-07
 
 ### Performance + dead code
