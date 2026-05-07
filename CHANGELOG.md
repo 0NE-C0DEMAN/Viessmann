@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.13 — 2026-05-07
+
+### Sign-out is back as an explicit button on desktop admin
+
+The avatar-dropdown pattern is industry standard but not obvious to everyone — Sign out was buried inside the dropdown and was getting missed.
+
+- Explicit "Sign out" button now sits next to the admin avatar on desktop, separated by a thin divider. Hidden on mobile (the hamburger drawer already has its own Sign out at the bottom).
+
 ## v0.2.12 — 2026-05-07
 
 ### Quick actions actually open the picker; upload no longer offers camera

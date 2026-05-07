@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { Brand } from "@/components/brand";
+import { LogoutButton } from "@/components/logout-button";
 import { AdminMobileNav } from "./admin-mobile-nav";
 import { AdminProfileMenu } from "./admin-profile-menu";
 import {
@@ -55,8 +56,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             ))}
           </nav>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <AdminProfileMenu email={s.email!} />
+            <span className="hidden lg:inline-flex items-center pl-2 ml-1 border-l border-[var(--vie-line)]">
+              <LogoutButton />
+            </span>
             <AdminMobileNav email={s.email!} />
           </div>
         </div>
