@@ -5,6 +5,7 @@ import { Gift, Lock, Check } from "lucide-react";
 import { toast } from "sonner";
 import { formatPoints } from "@/lib/money";
 import { meetsTier, tierForBalance, type Tier } from "@/lib/tier";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import type { Reward } from "@/db/schema";
 
 const TIER_BADGE: Record<Tier, string> = {
@@ -27,11 +28,14 @@ export function RewardsList({
   const [busy, setBusy] = useState<string | null>(null);
   const [redeemed, setRedeemed] = useState<Set<string>>(new Set());
   const [stockOverrides, setStockOverrides] = useState<Record<string, number>>({});
+  const [pending, setPending] = useState<Reward | null>(null);
 
   const tier = tierForBalance(balance) ?? initialTier;
 
-  async function redeem(reward: Reward) {
-    if (!confirm(`Redeem "${reward.name}" for ${formatPoints(reward.pointCost)} points?`)) return;
+  async function confirmRedeem() {
+    const reward = pending;
+    if (!reward) return;
+    setPending(null);
     setBusy(reward.id);
     try {
       const res = await fetch("/api/redemptions", {
@@ -117,7 +121,7 @@ export function RewardsList({
                 </div>
                 <button
                   disabled={!can || busy === r.id || isRedeemed}
-                  onClick={() => redeem(r)}
+                  onClick={() => setPending(r)}
                   className={`v-btn flex-shrink-0 ${isRedeemed ? "v-btn-success" : can ? "v-btn-primary" : "v-btn-ghost"} v-btn-sm`}
                   title={!tierOk ? `Requires ${requiredTier}+` : !enoughPts ? "Not enough points" : !inStock ? "Out of stock" : "Redeem"}
                 >
@@ -128,6 +132,24 @@ export function RewardsList({
           })}
         </div>
       )}
+
+      <ConfirmDialog
+        open={pending !== null}
+        title={`Redeem ${pending?.name ?? "reward"}?`}
+        description={
+          pending ? (
+            <>
+              <strong className="text-[var(--vie-orange-dark)]">{formatPoints(pending.pointCost)} pts</strong> will be deducted from your balance.
+              You&apos;ll be left with <strong>{formatPoints(balance - pending.pointCost)} pts</strong>. Viessmann ships within 5 business days.
+            </>
+          ) : null
+        }
+        confirmLabel="Redeem"
+        cancelLabel="Cancel"
+        busy={busy !== null}
+        onConfirm={confirmRedeem}
+        onCancel={() => setPending(null)}
+      />
     </div>
   );
 }

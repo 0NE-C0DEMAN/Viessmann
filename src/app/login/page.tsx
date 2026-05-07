@@ -42,9 +42,9 @@ export default function LoginPage() {
   }
 
   const demoUsers = [
-    { email: "ivo@instalaterm.hr", company: "Instalaterm d.o.o.", oib: "98765432109" },
-    { email: "marko@energomont.hr", company: "Energo-Mont d.o.o.", oib: "11223344556" },
-    { email: "ana@termoprojekt.hr", company: "Termo-Projekt d.o.o.", oib: "12345678901" },
+    { email: "ivo@instalaterm.hr", company: "Instalaterm d.o.o.", city: "Zagreb", oib: "98765432109" },
+    { email: "marko@energomont.hr", company: "Energo-Mont d.o.o.", city: "Osijek", oib: "11223344556" },
+    { email: "ana@termoprojekt.hr", company: "Termo-Projekt d.o.o.", city: "Zagreb", oib: "12345678901" },
   ];
 
   return (
@@ -76,33 +76,45 @@ export default function LoginPage() {
           </div>
         </form>
 
-        <div className="mt-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-ink-muted)] mb-2 px-1">Quick demo login</div>
-          <div className="space-y-2">
+        <div className="mt-8">
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <span className="v-pill v-pill-brand text-[10px]">Demo only</span>
+            <span className="text-xs text-[var(--vie-ink-muted)]">Try the prototype with a sample account</span>
+          </div>
+          <div className="grid gap-2">
             {demoUsers.map((u) => (
               <button
                 key={u.email}
                 onClick={() => quick(u.email)}
-                className="w-full v-card v-card-tight v-card-interactive text-left flex items-center justify-between"
+                className="v-card v-card-tight v-card-interactive text-left flex items-center gap-3"
               >
-                <div className="min-w-0">
-                  <div className="font-semibold text-sm truncate">{u.company}</div>
-                  <div className="text-xs text-[var(--vie-ink-muted)] truncate">{u.email} · OIB {u.oib}</div>
+                <div className="w-9 h-9 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] font-bold text-sm flex items-center justify-center flex-shrink-0">
+                  {u.company[0]}
                 </div>
-                <span className="v-pill v-pill-muted text-[10px]">Tap</span>
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold text-sm truncate">{u.company}</div>
+                  <div className="text-xs text-[var(--vie-ink-muted)] truncate v-numeric">{u.city} · OIB {u.oib}</div>
+                </div>
+                <span className="text-xs text-[var(--vie-ink-muted)]">Installer</span>
               </button>
             ))}
             <button
               onClick={() => quick("admin@viessmann.com", "admin1234")}
-              className="w-full v-card v-card-tight v-card-interactive text-left flex items-center justify-between"
+              className="v-card v-card-tight v-card-interactive text-left flex items-center gap-3"
             >
-              <div className="min-w-0">
-                <div className="font-semibold text-sm truncate">Viessmann admin</div>
-                <div className="text-xs text-[var(--vie-ink-muted)] truncate">admin@viessmann.com · password admin1234</div>
+              <div className="w-9 h-9 rounded-xl bg-[var(--vie-ink)] text-white font-bold text-sm flex items-center justify-center flex-shrink-0">
+                V
               </div>
-              <span className="v-pill v-pill-brand text-[10px]">Admin</span>
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold text-sm truncate">Viessmann admin</div>
+                <div className="text-xs text-[var(--vie-ink-muted)] truncate">Review queue · campaigns · intelligence</div>
+              </div>
+              <span className="text-xs text-[var(--vie-ink-muted)]">Admin</span>
             </button>
           </div>
+          <p className="text-[11px] text-[var(--vie-ink-muted)] mt-3 px-1">
+            All passwords: <code className="px-1 py-0.5 bg-[var(--vie-line)] rounded">demo1234</code> · admin: <code className="px-1 py-0.5 bg-[var(--vie-line)] rounded">admin1234</code>
+          </p>
         </div>
       </main>
     </div>

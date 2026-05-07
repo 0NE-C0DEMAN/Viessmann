@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.2.0 — 2026-05-07
+
+### Admin reaches the rest of the catalog + proper modals
+
+**Native `confirm()` dialogs replaced.** Browser-default confirmation popups (used to look ugly and inconsistent across browsers) replaced with a reusable `<ConfirmDialog>` component:
+- Rewards page: redeem confirmation now shows the points cost, projected new balance, and a clean Cancel/Redeem button pair.
+- Admin Campaigns: delete-campaign now uses a danger-toned dialog explaining that already-credited bonus points stay on installer ledgers.
+- Admin Fulfillment: cancel-redemption confirms the refund + restock side-effects before firing.
+
+**Login demo-accounts polished.** The "Try as" cards now lead with a "Demo only" pill, show city + OIB cleanly, and end with a single line listing the password. Less "test accounts dumped on the page", more "guided demo".
+
+**Admin rewards CRUD** at `/admin/rewards` (new tab in admin nav).
+- Add new rewards · edit name, description, point cost, inventory, tier required, active flag · soft-deactivate (sets `active=false`, doesn't delete redemption history).
+- New `/api/admin/rewards` (POST + GET) and `/api/admin/rewards/[id]` (PATCH + DELETE).
+- Tier badge + stock indicator on every catalog card.
+- Audit log entries for `reward.created`, `reward.updated`, `reward.deactivated`.
+
+**Admin installer detail** at `/admin/installers/[id]` (drill-down from the installers list).
+- Account card (logo, OIB, contact details, joined date, current tier).
+- Stat tiles: balance, lifetime earned, total submissions, approved.
+- Their submissions table with quick links to receipt detail.
+- Their redemptions list.
+- Their full points-ledger feed.
+- Their audit-log entries.
+- The installers list now offers both **Adjust pts** (modal) and **Open →** (drill-down) on each row.
+
 ## v0.1.9 — 2026-05-07
 
 ### Loyalty engine — close the remaining edge cases

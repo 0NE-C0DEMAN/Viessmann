@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Plus, Trash2, Megaphone } from "lucide-react";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import type { Campaign } from "@/db/schema";
 
 const FAMILIES = ["", "vitodens", "vitocal", "vitocell", "vitosol", "vitoclima", "vitoconnect", "vitotron"];
@@ -12,6 +13,7 @@ export function CampaignsClient({ campaigns: initial }: { campaigns: Campaign[] 
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<Campaign | null>(null);
   const [draft, setDraft] = useState({
     name: "",
     description: "",
@@ -57,8 +59,10 @@ export function CampaignsClient({ campaigns: initial }: { campaigns: Campaign[] 
     router.refresh();
   }
 
-  async function remove(c: Campaign) {
-    if (!confirm(`Delete campaign "${c.name}"?`)) return;
+  async function performDelete() {
+    const c = confirmDelete;
+    if (!c) return;
+    setConfirmDelete(null);
     await fetch(`/api/admin/campaigns/${c.id}`, { method: "DELETE" });
     toast.success("Campaign deleted");
     router.refresh();
@@ -146,12 +150,23 @@ export function CampaignsClient({ campaigns: initial }: { campaigns: Campaign[] 
               </div>
               <div className="flex gap-2 mt-3">
                 <button onClick={() => toggle(c)} className="v-btn v-btn-ghost v-btn-sm flex-1">{c.active ? "Pause" : "Resume"}</button>
-                <button onClick={() => remove(c)} className="v-btn v-btn-danger v-btn-sm v-btn-icon"><Trash2 size={14} /></button>
+                <button onClick={() => setConfirmDelete(c)} className="v-btn v-btn-danger v-btn-sm v-btn-icon"><Trash2 size={14} /></button>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmDelete !== null}
+        title={`Delete campaign "${confirmDelete?.name}"?`}
+        description="This permanently deletes the campaign. Already-credited bonus points are not reversed — they stay on the installers' ledgers."
+        confirmLabel="Delete campaign"
+        cancelLabel="Keep it"
+        tone="danger"
+        onConfirm={performDelete}
+        onCancel={() => setConfirmDelete(null)}
+      />
     </div>
   );
 }

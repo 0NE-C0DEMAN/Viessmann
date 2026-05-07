@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Package, Truck, X, Search } from "lucide-react";
 import { formatPoints } from "@/lib/money";
 import { relativeDate } from "@/lib/utils";
+import { ConfirmDialog } from "@/components/confirm-dialog";
 import type { Redemption, Reward } from "@/db/schema";
 
 type Row = {
@@ -25,6 +26,7 @@ export function FulfillmentClient({ rows }: { rows: Row[] }) {
   const [filter, setFilter] = useState<"all" | "requested" | "shipped" | "cancelled">("requested");
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
+  const [confirmCancel, setConfirmCancel] = useState<Row | null>(null);
 
   const filtered = useMemo(() => {
     const norm = q.trim().toLowerCase();
@@ -113,7 +115,7 @@ export function FulfillmentClient({ rows }: { rows: Row[] }) {
               </div>
               {r.status === "requested" && (
                 <div className="flex gap-2 mt-3">
-                  <button disabled={busy === r.id} onClick={() => update(r.id, "cancelled")} className="v-btn v-btn-danger v-btn-sm flex-1"><X size={14} /> Cancel</button>
+                  <button disabled={busy === r.id} onClick={() => setConfirmCancel({ r, reward, installer })} className="v-btn v-btn-danger v-btn-sm flex-1"><X size={14} /> Cancel</button>
                   <button disabled={busy === r.id} onClick={() => update(r.id, "shipped")} className="v-btn v-btn-success v-btn-sm flex-1"><Truck size={14} /> Mark shipped</button>
                 </div>
               )}
@@ -121,6 +123,29 @@ export function FulfillmentClient({ rows }: { rows: Row[] }) {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmCancel !== null}
+        title="Cancel this redemption?"
+        description={
+          confirmCancel ? (
+            <>
+              <strong>{formatPoints(confirmCancel.r.pointCost)} pts</strong> will be refunded to <strong>{confirmCancel.installer?.companyName ?? "the installer"}</strong> and one unit of stock will go back to the catalog.
+            </>
+          ) : null
+        }
+        confirmLabel="Cancel & refund"
+        cancelLabel="Keep it"
+        tone="danger"
+        busy={busy !== null}
+        onConfirm={async () => {
+          if (!confirmCancel) return;
+          const id = confirmCancel.r.id;
+          setConfirmCancel(null);
+          await update(id, "cancelled");
+        }}
+        onCancel={() => setConfirmCancel(null)}
+      />
     </div>
   );
 }

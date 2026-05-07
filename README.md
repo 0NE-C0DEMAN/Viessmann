@@ -135,6 +135,7 @@ public/
 
 ## Releases
 
+- **v0.2.0** — admin completeness: rewards CRUD at /admin/rewards, installer drill-down at /admin/installers/[id], reusable ConfirmDialog replacing native browser confirms across rewards / campaigns / fulfillment, login demo-accounts polished.
 - **v0.1.9** — loyalty engine edge-case pass: tier-gated rewards (Bronze/Silver/Gold/Platinum), admin reversals/adjustments + tier-ups now generate notifications, negative-balance banner, currency validation, submission velocity rate-limit, campaign per-installer cap, audit log viewer at /admin/audit.
 - **v0.1.8** — duplicate-submission flow polished: clean invoice numbers (no internal `__dup_<ts>` suffix), pipeline returns `existingReceiptId`, submit-result offers "Open original" + "View this attempt", receipt-detail reviewer note auto-links UUID references.
 - **v0.1.7** — wired up half-built seams: campaigns engine now applies bonuses, cancelled redemptions refund + restock, admins have a settings page (password change), settings page stripped of fake toggles, /privacy + /terms pages added, duplicate receipts persisted (filter tabs populate), admin installers tier computed in SQL, reviewer notes visible to installers, rewards stock refreshes after redeem, demo campaigns seeded.

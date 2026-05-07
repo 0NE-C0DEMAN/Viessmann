@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Search, Plus, Minus } from "lucide-react";
 import { formatPoints } from "@/lib/money";
@@ -99,8 +100,10 @@ export function InstallersClient({ installers }: { installers: Installer[] }) {
                 <td className="py-2.5 v-numeric">{r.submissions}</td>
                 <td className="py-2.5 v-numeric">{r.approved}</td>
                 <td className="py-2.5 font-semibold v-numeric">{formatPoints(r.balance)}</td>
-                <td className="py-2.5 text-right">
-                  <button onClick={() => setAdjusting(r)} className="text-[var(--vie-orange)] font-semibold text-xs">Adjust →</button>
+                <td className="py-2.5 text-right whitespace-nowrap">
+                  <button onClick={() => setAdjusting(r)} className="text-[var(--vie-ink-soft)] font-semibold text-xs hover:text-[var(--vie-ink)]">Adjust pts</button>
+                  <span className="mx-2 text-[var(--vie-line-strong)]">·</span>
+                  <Link href={`/admin/installers/${r.id}`} className="text-[var(--vie-orange)] font-semibold text-xs">Open →</Link>
                 </td>
               </tr>
             ))}
