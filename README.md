@@ -135,6 +135,7 @@ public/
 
 ## Releases
 
+- **v0.2.12** — dashboard quick actions now open the file picker / camera immediately (mobile blocked the previous `setTimeout(...).click()` due to user-gesture rules). Upload picker no longer offers Camera / Photo Library — `accept` is PDF + XML only on that path.
 - **v0.2.11** — fix: admin drawer was being trapped inside the sticky header's `backdrop-filter` containing block (rendered as two stranded chunks). Now portaled to `document.body` so it covers the full viewport.
 - **v0.2.10** — admin mobile drawer rebuilt: slide-in animation, safe-area-aware header/footer, nav grouped into 4 sections with descriptions, active-route highlight, account-info header.
 - **v0.2.9** — `npm run db:reset` wipes dynamic data (receipts, ledger, redemptions, audit) but keeps seed data intact for clean demo runs.

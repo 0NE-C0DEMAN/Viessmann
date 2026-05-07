@@ -7,7 +7,8 @@ import { redirect } from "next/navigation";
 import { formatPoints, formatEur } from "@/lib/money";
 import { StatusPill } from "@/components/status-pill";
 import { relativeDate } from "@/lib/utils";
-import { Camera, FileText, ArrowRight, TrendingUp, Sparkles } from "lucide-react";
+import { ArrowRight, TrendingUp, Sparkles } from "lucide-react";
+import { QuickActions } from "./quick-actions";
 
 interface DashboardAggregate {
   balance: number;
@@ -102,25 +103,7 @@ export default async function InstallerHome() {
         <Stat label="Pending" value={agg.pending} accent="warn" />
       </div>
 
-      <div>
-        <div className="text-sm font-bold mb-2 mt-3">Quick actions</div>
-        <div className="grid grid-cols-2 gap-3">
-          <Link href="/app/submit?mode=upload" prefetch className="v-card v-card-interactive flex flex-col gap-1">
-            <div className="w-10 h-10 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center">
-              <FileText size={18} />
-            </div>
-            <div className="font-semibold text-sm mt-1">Upload PDF / XML</div>
-            <div className="text-xs text-[var(--vie-ink-muted)]">Fastest path</div>
-          </Link>
-          <Link href="/app/submit?mode=camera" prefetch className="v-card v-card-interactive flex flex-col gap-1">
-            <div className="w-10 h-10 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center">
-              <Camera size={18} />
-            </div>
-            <div className="font-semibold text-sm mt-1">Scan with camera</div>
-            <div className="text-xs text-[var(--vie-ink-muted)]">On-device OCR · free</div>
-          </Link>
-        </div>
-      </div>
+      <QuickActions />
 
       <div>
         <div className="flex items-center justify-between mb-2 mt-3">

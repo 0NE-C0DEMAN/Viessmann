@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Camera, FileText, Loader2, CheckCircle2, AlertTriangle, XCircle, FileImage, ArrowLeft, RefreshCw, Smartphone, ScanLine } from "lucide-react";
 import { formatEur, formatPoints } from "@/lib/money";
+import { takePendingFile } from "../pending-upload";
 
 interface PipelineLine {
   raw_description: string;
@@ -55,8 +56,6 @@ const PARSER_LABELS: Record<string, { label: string; tone: "success" | "info" | 
 
 export default function SubmitPage() {
   const router = useRouter();
-  const params = useSearchParams();
-  const initialMode = params.get("mode");
   const fileRef = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<Stage>("choose");
   const [file, setFile] = useState<File | null>(null);
@@ -214,8 +213,11 @@ export default function SubmitPage() {
     el.click();
   }
   function pickFile() {
+    // PDF + XML only. Images come in via the camera path; allowing image/*
+    // here makes mobile pickers offer a "Camera" / "Photo Library" option,
+    // which is confusing when the user explicitly chose "Upload PDF / XML".
     const el = fileRef.current!;
-    el.accept = "application/pdf,image/*,text/xml,application/xml,.xml";
+    el.accept = "application/pdf,text/xml,application/xml,.xml";
     el.removeAttribute("capture");
     el.value = "";
     el.click();
@@ -224,12 +226,18 @@ export default function SubmitPage() {
     setStage("image_help");
   }
 
-  // Auto-trigger based on URL param on first render
-  useMemo(() => {
-    if (typeof window === "undefined") return;
-    if (initialMode === "camera") setTimeout(pickCamera, 100);
-    else if (initialMode === "upload") setTimeout(pickFile, 100);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // If the user came from a dashboard quick action, the picked File was
+  // stashed in `pending-upload`. Pull it on mount and jump straight into
+  // the preview stage — no choose-stage flash, no broken setTimeout
+  // auto-trigger that mobile browsers reject due to user-gesture rules.
+  useEffect(() => {
+    const pending = takePendingFile();
+    if (!pending) return;
+    setFile(pending);
+    if (pending.type.startsWith("image/")) {
+      setPreviewUrl(URL.createObjectURL(pending));
+    }
+    setStage("preview");
   }, []);
 
   return (

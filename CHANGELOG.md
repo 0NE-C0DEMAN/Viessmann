@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.2.12 — 2026-05-07
+
+### Quick actions actually open the picker; upload no longer offers camera
+
+Two real bugs in the submit flow.
+
+**1. Dashboard quick action just showed the choose-stage page.** The Link → `/app/submit?mode=*` → `setTimeout(pickCamera, 100)` pattern relied on a programmatic `.click()` after navigation. Mobile Safari / Chrome reject that — they require the file-input click to happen inside the same synchronous user-gesture handler, otherwise the picker silently doesn't open.
+
+- New `QuickActions` client component on the dashboard owns its own hidden file inputs. Tapping a button calls `inputRef.current.click()` synchronously inside the gesture handler — picker opens immediately on the dashboard, before any navigation.
+- Once a file is selected, it's stashed in a tiny `pending-upload.ts` module singleton and the page navigates to `/app/submit`.
+- Submit page mounts, pulls the pending file, and jumps straight to the **preview stage** — no choose-stage flash, no auto-trigger fallback.
+- Removed the `?mode=upload` / `?mode=camera` URL params (no longer needed).
+
+**2. "Upload PDF / XML" picker was offering Camera / Photo Library.** The `accept` attribute on that path included `image/*`, which is what makes mobile pickers add those options.
+
+- Submit-page `pickFile()` accept now reads only `application/pdf,text/xml,application/xml,.xml`. Cameras live exclusively on the camera path.
+- The dashboard quick-action upload button uses the same accept.
+
 ## v0.2.11 — 2026-05-07
 
 ### Fix: admin drawer rendered as two stranded chunks on mobile
