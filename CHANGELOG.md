@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.2.4 — 2026-05-07
+
+### Toast notifications restyled (Linear / Vercel style)
+
+The previous toast style was fluorescent — `richColors` flooded the whole card green or red, plus a visible close button, anchored top-center where it overlapped the page header.
+
+- Switched to **bottom-center** position so toasts no longer cover the header / logo on mobile.
+- Dropped `richColors` and `closeButton`. Toasts now auto-dismiss after 3.5s.
+- Custom CSS overrides: white card, subtle border + shadow, **3 px coloured accent strip on the left edge** (the only place the green / red / amber lives now). Tighter padding, smaller icon (16 px), lighter description text. Same compact look you'd see in Linear, Vercel, Stripe.
+- Dropped two purely-decorative confirmation toasts where a redirect already speaks for itself: "Welcome back!" on login and "Welcome to Viessmann Loyalty!" on signup.
+
 ## v0.2.3 — 2026-05-07
 
 - Removed GitHub link from the landing-page footer.

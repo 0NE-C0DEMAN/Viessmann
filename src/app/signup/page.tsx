@@ -58,7 +58,6 @@ export default function SignupPage() {
         setLoading(false);
         return;
       }
-      toast.success("Welcome to Viessmann Loyalty!");
       router.push(json.redirect || "/app");
       router.refresh();
     } catch (err) {

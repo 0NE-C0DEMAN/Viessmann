@@ -51,10 +51,25 @@ export default function RootLayout({
         <RegisterSW />
         {children}
         <Toaster
-          position="top-center"
-          richColors
-          closeButton
-          toastOptions={{ className: "rounded-xl" }}
+          position="bottom-center"
+          theme="light"
+          duration={3500}
+          gap={8}
+          offset={16}
+          mobileOffset={20}
+          visibleToasts={3}
+          toastOptions={{
+            classNames: {
+              toast: "v-toast",
+              title: "v-toast-title",
+              description: "v-toast-desc",
+              icon: "v-toast-icon",
+              success: "v-toast--success",
+              error: "v-toast--error",
+              warning: "v-toast--warning",
+              info: "v-toast--info",
+            },
+          }}
         />
       </body>
     </html>

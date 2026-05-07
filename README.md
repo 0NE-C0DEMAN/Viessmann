@@ -135,6 +135,7 @@ public/
 
 ## Releases
 
+- **v0.2.4** — toast notifications restyled (bottom-center, white card with brand-coloured 3px accent strip, no `richColors` / `closeButton`); dropped two decorative welcome toasts.
 - **v0.2.3** — removed GitHub link from the landing-page footer.
 - **v0.2.2** — brand alignment to Viessmann red `#ff3e17` (sampled from viessmann.com / viessmann-us.com), CSS vars renamed `--vie-orange*` → `--vie-red*`, logo mark + PWA icons regenerated.
 - **v0.2.1** — account lifecycle (disable + admin password reset), forgot-password explainer, VIES EU VAT validation on signup, bell badge counter for pending reviews, wholesalers admin tab, CSV export from queue + installers, audit log filters/search, resubmit CTA on rejected/duplicate receipts.

@@ -27,7 +27,6 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
-      toast.success(json.role === "admin" ? "Welcome, admin." : "Welcome back!");
       router.push(json.redirect || "/app");
       router.refresh();
     } catch (err) {
