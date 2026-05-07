@@ -72,7 +72,7 @@ export function FulfillmentClient({ rows }: { rows: Row[] }) {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--vie-ink-muted)]" />
           <input className="v-input pl-10" placeholder="Search installer or reward…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex gap-2 flex-wrap">
           {(["requested", "shipped", "cancelled", "all"] as const).map((f) => {
             const active = filter === f;
             const labels = { requested: "Requested", shipped: "Shipped", cancelled: "Cancelled", all: "All" };
@@ -80,10 +80,13 @@ export function FulfillmentClient({ rows }: { rows: Row[] }) {
             return (
               <button
                 key={f}
+                type="button"
+                aria-pressed={active}
                 onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${active ? "bg-[var(--vie-ink)] text-white border-[var(--vie-ink)]" : "bg-white text-[var(--vie-ink-soft)] border-[var(--vie-line)] hover:border-[var(--vie-line-strong)]"}`}
+                className="v-pill-btn"
               >
-                {labels[f]} <span className={active ? "opacity-70" : "text-[var(--vie-ink-muted)]"}>· {count}</span>
+                <span>{labels[f]}</span>
+                <span className="v-pill-btn-count">{count}</span>
               </button>
             );
           })}

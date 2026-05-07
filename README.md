@@ -135,6 +135,7 @@ public/
 
 ## Releases
 
+- **v0.2.17** — filter pills redesigned: brand-red active state with subtle shadow, counts moved into their own oval chip inside each pill (was cramped inline " · 3"), horizontal scrollbar hidden in favour of a right-edge gradient fade, more breathing room between the pills row and the list. New shared `.v-pill-btn` / `.v-pill-btn-count` classes power History, admin queue, and admin fulfillment for a consistent look.
 - **v0.2.16** — fix: search icon was colliding with placeholder text in 6 search bars. Root cause: `.v-input` was defined outside `@layer components` so its shorthand `padding` won over Tailwind's `pl-9`, leaving text starting at 15px while the 16px icon spanned 12–28px. Fixed by moving input rules into the components layer + bumping search inputs to `pl-10` for cleaner spacing.
 - **v0.2.15** — fix: list-row content overflowing the card edge on narrow phones. Rewards-list cards restructured into two stacked rows (icon+title above the divider, points/stock+button below) so the Redeem button can never get clipped off the right edge. Profile redemption rows + recent-activity rows hardened with `min-w-0 flex-1` on the left text column and `flex-shrink-0` on the amount.
 - **v0.2.14** — Sign out actually visible on every screen size; previously hidden at `<lg` breakpoints behind the avatar dropdown.

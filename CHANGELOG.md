@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.2.17 — 2026-05-07
+
+### Filter pills redesigned: brand-red active state, count badges, better spacing
+
+The filter-pill rows in History (and the matching admin queue / fulfillment rows) looked dated — black active state, " · 3" count text crammed inline, a visible scrollbar showing on desktop, and barely any breathing room below before the list started.
+
+- New shared `.v-pill-btn` + `.v-pill-btn-count` classes in `globals.css`. Active state uses Viessmann red with a subtle shadow; counts now render as their own oval chip inside the pill (semi-transparent white on active, light-grey on inactive).
+- New `.v-pills-scroll` class hides the horizontal scrollbar entirely (kept the touch-scroll behaviour); paired with a soft right-edge gradient fade in History to hint scrollability without showing the bar.
+- More vertical padding around the pills row in History (`pt-1 pb-2`) so it doesn't crowd the list below.
+- Applied to History, admin queue, and admin fulfillment for one consistent look across the app. `aria-pressed` on each button drives the active styling and gives screen readers the toggle state for free.
+
 ## v0.2.16 — 2026-05-07
 
 ### Fix: search icon was colliding with the placeholder text

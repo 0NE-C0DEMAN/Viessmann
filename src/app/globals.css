@@ -220,6 +220,57 @@ body {
 .v-scroll-x::-webkit-scrollbar { height: 6px; }
 .v-scroll-x::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
 
+/* Hidden-scrollbar variant for pill rows / segmented controls. */
+.v-pills-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.v-pills-scroll::-webkit-scrollbar { display: none; }
+
+/* Filter / segmented-control pill button. Used across history, admin queue, etc. */
+.v-pill-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid var(--vie-line);
+  background: var(--vie-paper-elev);
+  color: var(--vie-ink-soft);
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+}
+.v-pill-btn:hover { border-color: var(--vie-line-strong); color: var(--vie-ink); }
+.v-pill-btn[aria-pressed="true"] {
+  background: var(--vie-red);
+  border-color: var(--vie-red);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(255, 62, 23, 0.25);
+}
+.v-pill-btn-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.1rem;
+  padding: 0 0.4rem;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--vie-paper);
+  color: var(--vie-ink-muted);
+}
+.v-pill-btn[aria-pressed="true"] .v-pill-btn-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
 /* Logo mark — solid red square (Viessmann uses solid red, not gradients). */
 .v-logo {
   width: 28px;

@@ -65,7 +65,7 @@ export function AdminQueueClient({
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--vie-ink-muted)]" />
             <input className="v-input pl-10" placeholder="Search installer, invoice, OIB…" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
-          <div className="flex gap-1.5 flex-wrap">
+          <div className="flex gap-2 flex-wrap">
             {(["needs_review", "approved", "rejected", "duplicate", "all"] as Filter[]).map((f) => {
               const labels: Record<Filter, string> = { needs_review: "Review", approved: "Approved", rejected: "Rejected", duplicate: "Duplicate", all: "All" };
               const counts: Record<Filter, number> = { needs_review: stats.needs_review, approved: stats.approved, rejected: stats.rejected, duplicate: stats.duplicate, all: stats.total };
@@ -73,10 +73,13 @@ export function AdminQueueClient({
               return (
                 <button
                   key={f}
+                  type="button"
+                  aria-pressed={active}
                   onClick={() => setFilter(f)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${active ? "bg-[var(--vie-ink)] text-white border-[var(--vie-ink)]" : "bg-white text-[var(--vie-ink-soft)] border-[var(--vie-line)] hover:border-[var(--vie-line-strong)]"}`}
+                  className="v-pill-btn"
                 >
-                  {labels[f]} <span className={active ? "opacity-70" : "text-[var(--vie-ink-muted)]"}>· {counts[f]}</span>
+                  <span>{labels[f]}</span>
+                  <span className="v-pill-btn-count">{counts[f]}</span>
                 </button>
               );
             })}

@@ -49,24 +49,30 @@ export function HistoryClient({ rows }: { rows: Receipt[] }) {
         />
       </div>
 
-      <div className="v-scroll-x flex gap-1.5 -mx-4 px-4 pb-1">
-        {TABS.map((t) => {
-          const count = t.key === "all" ? rows.length : rows.filter((r) => r.status === t.key).length;
-          const active = filter === t.key;
-          return (
-            <button
-              key={t.key}
-              onClick={() => setFilter(t.key)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
-                active
-                  ? "bg-[var(--vie-ink)] text-white border-[var(--vie-ink)]"
-                  : "bg-white text-[var(--vie-ink-soft)] border-[var(--vie-line)] hover:border-[var(--vie-line-strong)]"
-              }`}
-            >
-              {t.label} <span className={active ? "opacity-70" : "text-[var(--vie-ink-muted)]"}>· {count}</span>
-            </button>
-          );
-        })}
+      <div className="relative -mx-4 pt-1 pb-2">
+        <div className="v-pills-scroll flex gap-2 px-4">
+          {TABS.map((t) => {
+            const count = t.key === "all" ? rows.length : rows.filter((r) => r.status === t.key).length;
+            const active = filter === t.key;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setFilter(t.key)}
+                className="v-pill-btn"
+              >
+                <span>{t.label}</span>
+                <span className="v-pill-btn-count">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+        {/* Right-edge fade hint for scrollable pills row */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[var(--vie-paper)] to-transparent"
+        />
       </div>
 
       {filtered.length === 0 ? (
