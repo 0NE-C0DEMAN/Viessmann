@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.1.8 — 2026-05-07
+
+### Duplicate-submission flow polished
+
+- **Dropped the strict unique index** on `(seller OIB, invoice nr, buyer OIB, total cents)` and replaced it with a non-unique tuple index for query performance. The pipeline's pre-flight duplicate check is the source of truth.
+- **Duplicate rows now display clean invoice numbers.** Previously the row had a `__dup_<timestamp>` suffix appended to satisfy the unique index — that internal mechanic was leaking into the admin queue and history list. Gone.
+- **Pipeline returns `existingReceiptId`** when a duplicate is detected so callers know which receipt was duplicated.
+- **Submit result screen** now shows two buttons when a duplicate is detected: **"Open original submission"** (jumps to the receipt that already credited the points) + **"View this attempt"** (jumps to the new duplicate row).
+- **Receipt detail's reviewer note** auto-detects UUID references and renders them as clickable links — so "Duplicate of receipt 1a2b…" jumps to the original.
+- Pipeline only treats a previously-`approved` receipt as the "original". Two consecutive `needs_review` submissions of the same data are both kept as needs-review (no false duplicate flag while review is pending).
+
 ## v0.1.7 — 2026-05-07
 
 ### Wiring up the half-built features

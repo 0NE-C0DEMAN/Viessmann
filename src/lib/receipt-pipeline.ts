@@ -31,6 +31,7 @@ export interface PipelineResult {
   pointsAwarded: number;
   fraudFlags: string[];
   message: string;
+  existingReceiptId?: string;
 }
 
 export interface PipelineInput {
@@ -191,8 +192,8 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
   if (!hasViessmann) status = "rejected";
 
   // Pre-flight duplicate check: if a row already exists for this
-  // (seller OIB, invoice nr, buyer OIB, total), persist a new "duplicate"
-  // row anyway so admins can see all attempts in the queue + filter tab.
+  // (seller OIB, invoice nr, buyer OIB, total), persist the new submission
+  // as a "duplicate" row anyway so admins / installers can see all attempts.
   let existingReceiptId: string | null = null;
   if (wholesalerOib && parsed.invoice_number && buyerOib && totalCents != null) {
     const existing = await db
@@ -204,8 +205,10 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
           eq(receipts.invoiceNumber, parsed.invoice_number),
           eq(receipts.buyerOib, buyerOib),
           eq(receipts.totalCents, totalCents),
+          eq(receipts.status, "approved"), // only consider already-credited receipts as the "original"
         ),
       )
+      .orderBy(receipts.createdAt)
       .limit(1);
     if (existing.length > 0) {
       existingReceiptId = existing[0].id;
@@ -213,11 +216,6 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
       fraudFlags.push("duplicate_of_existing_receipt");
     }
   }
-
-  // For duplicate receipts, drop the strict unique-tuple fields so the row
-  // can be inserted alongside the original. We mark `invoice_number` with
-  // a "-duplicate-<ts>" suffix to avoid colliding with the unique index.
-  const dedupeSuffix = status === "duplicate" ? `__dup_${Date.now()}` : "";
 
   const inserted = await db
     .insert(receipts)
@@ -233,7 +231,7 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
       wholesalerName: parsed.wholesaler?.name ?? null,
       buyerOib: buyerOib || null,
       buyerName: parsed.buyer?.name ?? null,
-      invoiceNumber: parsed.invoice_number ? parsed.invoice_number + dedupeSuffix : null,
+      invoiceNumber: parsed.invoice_number ?? null,
       issueDate: issueDate ?? null,
       dueDate: parsed.due_date ? new Date(parsed.due_date) : null,
       currency: parsed.currency ?? "EUR",
@@ -241,7 +239,7 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
       vatCents: vatCents ?? null,
       totalCents: totalCents ?? null,
       pointsAwarded: status === "approved" ? totalPoints : 0,
-      reviewerNote: status === "duplicate" ? `Duplicate of receipt ${existingReceiptId}` : null,
+      reviewerNote: existingReceiptId ? `Duplicate of receipt ${existingReceiptId}` : null,
       fraudFlags,
     })
     .returning({ id: receipts.id });
@@ -299,6 +297,7 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
     pointsAwarded: status === "approved" ? totalPoints : 0,
     fraudFlags,
     message: messageFor(status, fraudFlags),
+    existingReceiptId: existingReceiptId ?? undefined,
   };
 }
 

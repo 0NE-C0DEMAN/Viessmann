@@ -32,7 +32,7 @@ interface PipelineResponse {
   receiptId?: string;
   parsed?: PipelineParsed;
   parserUsed?: "pdf-text" | "xml" | "claude-vision" | "tesseract-ocr";
-  existingId?: string;
+  existingReceiptId?: string;
   error?: string;
 }
 
@@ -476,7 +476,8 @@ function ResultStage({ response, onAnother, onView }: { response: PipelineRespon
 
   const flags = response.fraudFlags ?? [];
   const parsed = response.parsed;
-  const targetId = response.receiptId || response.existingId;
+  const targetId = response.receiptId;
+  const originalId = response.existingReceiptId;
 
   return (
     <div className="space-y-4">
@@ -525,11 +526,23 @@ function ResultStage({ response, onAnother, onView }: { response: PipelineRespon
         </div>
       )}
 
-      <div className="flex gap-2">
-        {targetId && (
-          <button className="v-btn v-btn-primary flex-1" onClick={() => onView(targetId)}>View detail</button>
+      <div className="flex flex-col gap-2">
+        {originalId && (
+          <button className="v-btn v-btn-primary" onClick={() => onView(originalId)}>
+            Open original submission
+          </button>
         )}
-        <button className="v-btn v-btn-ghost flex-1" onClick={onAnother}>Submit another</button>
+        <div className="flex gap-2">
+          {targetId && (
+            <button
+              className={`v-btn ${originalId ? "v-btn-ghost" : "v-btn-primary"} flex-1`}
+              onClick={() => onView(targetId)}
+            >
+              {originalId ? "View this attempt" : "View detail"}
+            </button>
+          )}
+          <button className="v-btn v-btn-ghost flex-1" onClick={onAnother}>Submit another</button>
+        </div>
       </div>
     </div>
   );

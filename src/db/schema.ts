@@ -73,7 +73,11 @@ export const receipts = pgTable("receipts", {
 }, (t) => [
   index("receipts_installer_idx").on(t.installerId),
   index("receipts_status_idx").on(t.status),
-  uniqueIndex("receipts_dedupe_idx").on(t.wholesalerOib, t.invoiceNumber, t.buyerOib, t.totalCents),
+  // Non-unique tuple index — speeds up the pre-flight duplicate lookup in the
+  // pipeline. We don't enforce uniqueness at the DB level any more so that
+  // duplicate submissions can be persisted (with status='duplicate') alongside
+  // the original.
+  index("receipts_tuple_idx").on(t.wholesalerOib, t.invoiceNumber, t.buyerOib, t.totalCents),
 ]);
 
 export const receiptLineItems = pgTable("receipt_line_items", {

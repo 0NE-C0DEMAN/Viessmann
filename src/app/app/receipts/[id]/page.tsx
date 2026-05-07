@@ -120,7 +120,9 @@ export default async function ReceiptDetail({ params }: { params: Promise<{ id: 
       {r.reviewerNote && (
         <div className="v-card border-[var(--vie-orange-light)] bg-[var(--vie-orange-light)]/30">
           <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-orange-dark)] mb-1.5">Note from Viessmann</div>
-          <div className="text-sm">{r.reviewerNote}</div>
+          <div className="text-sm">
+            <ReviewerNote note={r.reviewerNote} />
+          </div>
         </div>
       )}
 
@@ -151,6 +153,25 @@ function Party({ icon, label, name, oib }: { icon: React.ReactNode; label: strin
       <div className="font-semibold mt-0.5 truncate">{name ?? "—"}</div>
       <div className="text-[var(--vie-ink-muted)] v-numeric">OIB {oib ?? "—"}</div>
     </div>
+  );
+}
+
+// Renders a reviewer note. If the note contains a reference like
+// "Duplicate of receipt <uuid>" (or any UUID-shaped token), the UUID is
+// rendered as a link to that receipt's detail page.
+const UUID_RE = /\b([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\b/i;
+function ReviewerNote({ note }: { note: string }) {
+  const m = note.match(UUID_RE);
+  if (!m) return <>{note}</>;
+  const [before, after] = note.split(m[1]);
+  return (
+    <>
+      {before}
+      <Link href={`/app/receipts/${m[1]}`} className="text-[var(--vie-orange)] font-semibold underline">
+        {m[1].slice(0, 8)}…
+      </Link>
+      {after}
+    </>
   );
 }
 

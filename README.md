@@ -135,6 +135,7 @@ public/
 
 ## Releases
 
+- **v0.1.8** — duplicate-submission flow polished: clean invoice numbers (no internal `__dup_<ts>` suffix), pipeline returns `existingReceiptId`, submit-result offers "Open original" + "View this attempt", receipt-detail reviewer note auto-links UUID references.
 - **v0.1.7** — wired up half-built seams: campaigns engine now applies bonuses, cancelled redemptions refund + restock, admins have a settings page (password change), settings page stripped of fake toggles, /privacy + /terms pages added, duplicate receipts persisted (filter tabs populate), admin installers tier computed in SQL, reviewer notes visible to installers, rewards stock refreshes after redeem, demo campaigns seeded.
 - **v0.1.6** — fix: photo OCR submit was including the full base64 image and hitting Vercel's body-size limit, returning a non-JSON error that crashed the client. Now we send only the extracted text. Defensive `safeJson()` around every fetch so future non-JSON responses surface the real cause.
 - **v0.1.5** — photo uploads now work end-to-end via Tesseract.js running on-device. Same Croatian-invoice parser; new `/api/receipts/from-text` endpoint; lazy-loaded OCR worker.
