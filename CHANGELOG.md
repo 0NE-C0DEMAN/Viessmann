@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.1.5 — 2026-05-07
+
+### Image uploads now work — on-device OCR, no AI
+
+- New `lib/client-ocr.ts` runs Tesseract.js (`hrv` + `eng` traineddata) **in the browser** to extract text from invoice photos. Lazy-loaded — the WASM/language data only download when the user actually picks an image.
+- New shared `lib/croatian-invoice-parser.ts` houses the regex/heuristic parser. Both the PDF light parser (text from `unpdf`) and the OCR path (text from Tesseract) now feed into the same parser.
+- New `POST /api/receipts/from-text` endpoint accepts the extracted text + filename + optional preview image, runs the same downstream pipeline (OIB validation → SKU match → fraud flags → ledger).
+- Submit page now has an `OcrStage` with a real progress bar that shows engine-load / language-load / recognition phases. First photo takes ~30s while Tesseract loads, subsequent ones are faster.
+- "Scan with camera" CTA on the dashboard re-enabled (was a help-only stub in v0.1.4).
+- `parserUsed: "tesseract-ocr"` on responses; result-screen badge reads "On-device OCR · free".
+- The scan-to-PDF guide remains accessible as a "for best results" tip — PDFs are still the recommended fast path (~1s vs ~20s).
+- Server `/api/receipts` for direct image POSTs returns a 422 pointing the caller at the in-app camera flow (this is a fallback for scripted clients).
+
+The full path: photo → on-device OCR → text → server parser → ledger. Zero API keys, zero per-invoice cost.
+
 ## v0.1.4 — 2026-05-07
 
 ### Image uploads → friendly scan-to-PDF guide (no AI)

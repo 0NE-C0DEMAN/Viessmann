@@ -106,11 +106,11 @@ export default async function InstallerHome() {
             <div className="text-xs text-[var(--vie-ink-muted)]">Fastest path</div>
           </Link>
           <Link href="/app/submit?mode=camera" prefetch className="v-card v-card-interactive flex flex-col gap-1">
-            <div className="w-10 h-10 rounded-xl bg-[var(--vie-line)] text-[var(--vie-ink-soft)] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center">
               <Camera size={18} />
             </div>
-            <div className="font-semibold text-sm mt-1">Scan to PDF</div>
-            <div className="text-xs text-[var(--vie-ink-muted)]">Phone scanner guide</div>
+            <div className="font-semibold text-sm mt-1">Scan with camera</div>
+            <div className="text-xs text-[var(--vie-ink-muted)]">On-device OCR · free</div>
           </Link>
         </div>
       </div>

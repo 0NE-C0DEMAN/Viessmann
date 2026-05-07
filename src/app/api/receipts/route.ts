@@ -98,11 +98,15 @@ export async function POST(req: Request) {
         );
       }
     } else {
-      // Image upload → vision required
+      // Direct image POST. The PWA OCRs in the browser and posts to
+      // /api/receipts/from-text instead — this code path only fires for old
+      // clients or scripted uploads. If the API key is set we use vision;
+      // otherwise we ask the caller to OCR client-side first.
       if (!process.env.ANTHROPIC_API_KEY) {
         return NextResponse.json(
           {
-            error: "Photo upload isn't enabled yet. Please use your phone's built-in scanner (iOS Files or Notes → Scan Documents; Android Google Drive → +  → Scan) to capture as PDF, then upload that.",
+            error:
+              "Direct image uploads aren't supported on this endpoint. Please use the in-app camera flow which OCRs the image on-device, or upload a PDF / e-invoice XML.",
           },
           { status: 422 },
         );

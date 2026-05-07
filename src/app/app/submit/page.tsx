@@ -31,12 +31,12 @@ interface PipelineResponse {
   message?: string;
   receiptId?: string;
   parsed?: PipelineParsed;
-  parserUsed?: "pdf-text" | "xml" | "claude-vision";
+  parserUsed?: "pdf-text" | "xml" | "claude-vision" | "tesseract-ocr";
   existingId?: string;
   error?: string;
 }
 
-type Stage = "choose" | "preview" | "uploading" | "result" | "image_help";
+type Stage = "choose" | "preview" | "uploading" | "ocr" | "result" | "image_help";
 
 const PROGRESS_STEPS = [
   "Uploading the file",
@@ -49,6 +49,7 @@ const PROGRESS_STEPS = [
 const PARSER_LABELS: Record<string, { label: string; tone: "success" | "info" | "warn" }> = {
   "pdf-text": { label: "Light PDF parser · free", tone: "success" },
   xml: { label: "e-Invoice XML · free", tone: "success" },
+  "tesseract-ocr": { label: "On-device OCR · free", tone: "info" },
   "claude-vision": { label: "Claude vision OCR", tone: "info" },
 };
 
@@ -61,6 +62,8 @@ export default function SubmitPage() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [progressStep, setProgressStep] = useState(0);
+  const [ocrStatus, setOcrStatus] = useState("Preparing OCR");
+  const [ocrProgress, setOcrProgress] = useState(0);
   const [response, setResponse] = useState<PipelineResponse | null>(null);
 
   const stepInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -87,23 +90,78 @@ export default function SubmitPage() {
     const isXml = f.type === "text/xml" || f.type === "application/xml" || lower.endsWith(".xml");
     const isImage = f.type.startsWith("image/") || /\.(jpe?g|png|webp|heic|heif)$/i.test(lower);
 
-    if (isImage && !isPdf && !isXml) {
-      // We don't run AI vision for the prototype — point users to scan-to-PDF.
-      setFile(null);
-      setStage("image_help");
-      return;
-    }
-
     setFile(f);
-    setPreviewUrl(null);
+    if (isImage && !isPdf && !isXml) {
+      const u = URL.createObjectURL(f);
+      setPreviewUrl(u);
+    } else {
+      setPreviewUrl(null);
+    }
     setStage("preview");
+  }
+
+  function handleResult(json: PipelineResponse) {
+    setResponse(json);
+    setStage("result");
+    if (json.status === "approved") toast.success(`+${json.pointsAwarded} pts credited!`);
+    else if (json.status === "needs_review") toast.info("Submitted for manual review.");
+    else if (json.status === "rejected") toast.error("Rejected.");
+    else if (json.status === "duplicate") toast.warning("This invoice was already submitted.");
   }
 
   async function uploadNow() {
     if (!file) return;
+
+    const lower = file.name.toLowerCase();
+    const isImage =
+      file.type.startsWith("image/") ||
+      /\.(jpe?g|png|webp|heic|heif)$/i.test(lower);
+
+    if (isImage) {
+      // Image path: OCR in the browser, then send extracted text to the
+      // server. No AI, no API key.
+      setStage("ocr");
+      setOcrProgress(0);
+      setOcrStatus("Loading OCR engine");
+      try {
+        const { extractTextFromImage } = await import("@/lib/client-ocr");
+        const text = await extractTextFromImage(file, ({ status, progress }) => {
+          setOcrStatus(status);
+          setOcrProgress(progress);
+        });
+        if (!text || text.trim().length < 20) {
+          toast.error("Could not read enough text from the photo. Try better lighting or upload a PDF.");
+          setStage("preview");
+          return;
+        }
+        setStage("uploading");
+        startProgress();
+        const imageDataUrl = await fileToDataUrl(file);
+        const res = await fetch("/api/receipts/from-text", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ extractedText: text, fileName: file.name, imageDataUrl }),
+        });
+        const json = (await res.json()) as PipelineResponse;
+        stopProgress();
+        setProgressStep(PROGRESS_STEPS.length - 1);
+        if (!res.ok && res.status !== 409) {
+          toast.error(json.error ?? `Upload failed (${res.status})`);
+          setStage("preview");
+          return;
+        }
+        handleResult(json);
+      } catch (e) {
+        stopProgress();
+        toast.error(e instanceof Error ? e.message : "OCR failed");
+        setStage("preview");
+      }
+      return;
+    }
+
+    // PDF / XML path — go straight to the server-side parser.
     setStage("uploading");
     startProgress();
-
     try {
       const fd = new FormData();
       fd.append("file", file);
@@ -116,17 +174,21 @@ export default function SubmitPage() {
         setStage("preview");
         return;
       }
-      if (json.status === "approved") toast.success(`+${json.pointsAwarded} pts credited!`);
-      else if (json.status === "needs_review") toast.info("Submitted for manual review.");
-      else if (json.status === "rejected") toast.error("Rejected.");
-      else if (json.status === "duplicate") toast.warning("This invoice was already submitted.");
-      setResponse(json);
-      setStage("result");
+      handleResult(json);
     } catch (e) {
       stopProgress();
       toast.error(e instanceof Error ? e.message : "Network error");
       setStage("preview");
     }
+  }
+
+  function fileToDataUrl(f: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error("read failed"));
+      reader.readAsDataURL(f);
+    });
   }
 
   function reset() {
@@ -137,23 +199,28 @@ export default function SubmitPage() {
     setStage("choose");
   }
 
-  function showCameraHelp() {
-    // For the prototype we don't run AI vision, so a "camera" tap just shows
-    // the scan-to-PDF guide instead of capturing a useless image.
-    setStage("image_help");
+  function pickCamera() {
+    const el = fileRef.current!;
+    el.accept = "image/*";
+    el.setAttribute("capture", "environment");
+    el.value = "";
+    el.click();
   }
   function pickFile() {
     const el = fileRef.current!;
-    el.accept = "application/pdf,text/xml,application/xml,.xml";
+    el.accept = "application/pdf,image/*,text/xml,application/xml,.xml";
     el.removeAttribute("capture");
     el.value = "";
     el.click();
+  }
+  function showCameraHelp() {
+    setStage("image_help");
   }
 
   // Auto-trigger based on URL param on first render
   useMemo(() => {
     if (typeof window === "undefined") return;
-    if (initialMode === "camera") setTimeout(showCameraHelp, 100);
+    if (initialMode === "camera") setTimeout(pickCamera, 100);
     else if (initialMode === "upload") setTimeout(pickFile, 100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -170,7 +237,7 @@ export default function SubmitPage() {
       </div>
 
       {stage === "choose" && (
-        <ChooseStage onCamera={showCameraHelp} onFile={pickFile} />
+        <ChooseStage onCamera={pickCamera} onFile={pickFile} onShowHelp={showCameraHelp} />
       )}
 
       {stage === "image_help" && (
@@ -179,6 +246,10 @@ export default function SubmitPage() {
 
       {stage === "preview" && file && (
         <PreviewStage file={file} previewUrl={previewUrl} onUpload={uploadNow} onChange={pickFile} />
+      )}
+
+      {stage === "ocr" && (
+        <OcrStage status={ocrStatus} progress={ocrProgress} previewUrl={previewUrl} />
       )}
 
       {stage === "uploading" && (
@@ -194,12 +265,12 @@ export default function SubmitPage() {
   );
 }
 
-function ChooseStage({ onCamera, onFile }: { onCamera: () => void; onFile: () => void }) {
+function ChooseStage({ onCamera, onFile, onShowHelp }: { onCamera: () => void; onFile: () => void; onShowHelp: () => void }) {
   return (
     <>
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Submit invoice</h1>
-        <p className="text-sm text-[var(--vie-ink-soft)] mt-1">PDF or e-invoice XML.</p>
+        <p className="text-sm text-[var(--vie-ink-soft)] mt-1">PDF, photo, or e-invoice XML — your call.</p>
       </div>
 
       <div className="grid gap-3">
@@ -208,23 +279,27 @@ function ChooseStage({ onCamera, onFile }: { onCamera: () => void; onFile: () =>
             <FileText size={22} />
           </div>
           <div className="flex-1">
-            <div className="font-semibold text-sm">Upload PDF or XML</div>
-            <div className="text-xs text-[var(--vie-ink-muted)]">From your device — fastest path</div>
+            <div className="font-semibold text-sm flex items-center gap-2">
+              Upload PDF or XML
+              <span className="v-pill v-pill-success text-[10px]">recommended</span>
+            </div>
+            <div className="text-xs text-[var(--vie-ink-muted)]">Fastest, ~1 second, free</div>
           </div>
         </button>
-        <button onClick={onCamera} className="v-card v-card-interactive text-left flex items-center gap-3 opacity-90">
-          <div className="w-12 h-12 rounded-xl bg-[var(--vie-line)] text-[var(--vie-ink-soft)] flex items-center justify-center">
+        <button onClick={onCamera} className="v-card v-card-interactive text-left flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center">
             <Camera size={22} />
           </div>
           <div className="flex-1">
-            <div className="font-semibold text-sm flex items-center gap-2">
-              Scan with camera
-              <span className="v-pill v-pill-muted text-[10px]">scan-to-PDF</span>
-            </div>
-            <div className="text-xs text-[var(--vie-ink-muted)]">We&apos;ll show you how to capture as PDF on your phone</div>
+            <div className="font-semibold text-sm">Scan with camera</div>
+            <div className="text-xs text-[var(--vie-ink-muted)]">~20 seconds · on-device OCR · free</div>
           </div>
         </button>
       </div>
+
+      <button onClick={onShowHelp} className="text-xs text-[var(--vie-ink-muted)] underline self-start">
+        Tip: photos work best when scanned to PDF first
+      </button>
 
       <div className="v-card text-xs text-[var(--vie-ink-soft)] space-y-1">
         <div className="font-semibold text-[var(--vie-ink)] mb-1">What happens next</div>
@@ -237,13 +312,38 @@ function ChooseStage({ onCamera, onFile }: { onCamera: () => void; onFile: () =>
   );
 }
 
+function OcrStage({ status, progress, previewUrl }: { status: string; progress: number; previewUrl: string | null }) {
+  const pct = Math.round(progress * 100);
+  return (
+    <div className="space-y-4 pt-2 v-fade-in">
+      <div className="text-center">
+        <Loader2 className="mx-auto animate-spin text-[var(--vie-orange)]" size={36} />
+        <h2 className="text-xl font-bold mt-3">{status}…</h2>
+        <p className="text-sm text-[var(--vie-ink-muted)] mt-1">
+          Reading the invoice on your device. First photo can take ~30s while the language model loads — subsequent ones are faster.
+        </p>
+      </div>
+      <div className="v-card v-card-tight">
+        <div className="h-2 rounded-full bg-[var(--vie-line)] overflow-hidden">
+          <div className="h-full bg-[var(--vie-orange)] transition-all duration-200" style={{ width: `${pct}%` }} />
+        </div>
+        <div className="text-[11px] text-[var(--vie-ink-muted)] mt-1.5 text-right v-numeric">{pct}%</div>
+      </div>
+      {previewUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={previewUrl} alt="Preview" className="w-full max-h-[300px] object-contain rounded-xl bg-white border border-[var(--vie-line)]" />
+      )}
+    </div>
+  );
+}
+
 function ImageHelpStage({ onChooseFile, onBack }: { onChooseFile: () => void; onBack: () => void }) {
   return (
     <>
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Photo upload — coming later</h1>
+        <h1 className="text-2xl font-bold tracking-tight">For best results: scan to PDF</h1>
         <p className="text-sm text-[var(--vie-ink-soft)] mt-1">
-          We don&apos;t process raw photos yet. The good news: your phone can scan an invoice straight to PDF in two taps.
+          Photos work, but a PDF scan is faster and more accurate. Your phone can do it in two taps.
         </p>
       </div>
 

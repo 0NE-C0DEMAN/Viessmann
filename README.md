@@ -8,10 +8,11 @@ Mobile-first PWA prototype for the Viessmann B2B installer loyalty programme (Cr
 
 ## Features (v0.1.1)
 
-### Receipt parsing — three-tier strategy
-1. **Light PDF text parser** (default for PDFs) — extracts embedded text with `unpdf` and walks it with regex/heuristics tuned for Croatian invoices (Racun / OIB / Datum izdavanja / KPD sifra / Ukupan iznos za platiti). **Free, instant, no API key.** Handles 9/9 of Frane's demo invoices end-to-end.
+### Receipt parsing — four-tier strategy, all free
+1. **Light PDF text parser** (default for PDFs) — `unpdf` + Croatian-invoice regex parser. Free, ~1s, 100% accurate on Frane's 9 demo invoices.
 2. **e-Invoice XML** — UBL 2.1 / HR-CIUS / PEPPOL BIS 3.0 via `fast-xml-parser`. Free, no API key.
-3. **Claude vision** (optional fallback) — only invoked for image uploads (camera photos) or scanned PDFs without extractable text. Requires `ANTHROPIC_API_KEY` to be set; otherwise these inputs return a friendly error.
+3. **On-device OCR for photos** — Tesseract.js (`hrv` + `eng`) runs in the browser, lazy-loaded only when a user picks an image. Extracted text feeds into the same Croatian-invoice parser. ~20s per photo, free, no API key.
+4. **Claude vision** (optional, off by default) — only used for direct image POSTs from non-PWA clients, and only if `ANTHROPIC_API_KEY` is set. The PWA never reaches this path.
 
 ### Installer (mobile PWA at `/app`)
 - **Onboarding** — 2-step signup with live OIB checksum validation (Croatian mod-11-10).
@@ -134,7 +135,8 @@ public/
 
 ## Releases
 
-- **v0.1.4** — image uploads now show a friendly scan-to-PDF guide for iOS / Android instead of trying to OCR (the prototype is AI-free for now).
+- **v0.1.5** — photo uploads now work end-to-end via Tesseract.js running on-device. Same Croatian-invoice parser; new `/api/receipts/from-text` endpoint; lazy-loaded OCR worker.
+- **v0.1.4** — image uploads route through a friendly scan-to-PDF guide (superseded by v0.1.5).
 - **v0.1.3** — perf pass #2: memoised session reads, tree-shaken icon/chart bundles, long-cache PWA assets, parser-used badge on result screen, two unused deps removed.
 - **v0.1.2** — performance pass: loading-skeleton fallbacks, prefetched links, fewer DB round-trips per page, dead routes removed.
 - **v0.1.1** — light PDF text parser (no API key needed for digital PDFs); 9/9 of Frane's demo invoices parsed end-to-end with zero external cost. Vision LLM kept as fallback for image / scanned-PDF uploads only.
