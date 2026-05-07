@@ -6,7 +6,12 @@ Mobile-first PWA prototype for the Viessmann B2B installer loyalty programme (Cr
 
 **Live demo:** [viessmann-loyalty.vercel.app](https://viessmann-loyalty.vercel.app)
 
-## Features (v0.1.0)
+## Features (v0.1.1)
+
+### Receipt parsing — three-tier strategy
+1. **Light PDF text parser** (default for PDFs) — extracts embedded text with `unpdf` and walks it with regex/heuristics tuned for Croatian invoices (Racun / OIB / Datum izdavanja / KPD sifra / Ukupan iznos za platiti). **Free, instant, no API key.** Handles 9/9 of Frane's demo invoices end-to-end.
+2. **e-Invoice XML** — UBL 2.1 / HR-CIUS / PEPPOL BIS 3.0 via `fast-xml-parser`. Free, no API key.
+3. **Claude vision** (optional fallback) — only invoked for image uploads (camera photos) or scanned PDFs without extractable text. Requires `ANTHROPIC_API_KEY` to be set; otherwise these inputs return a friendly error.
 
 ### Installer (mobile PWA at `/app`)
 - **Onboarding** — 2-step signup with live OIB checksum validation (Croatian mod-11-10).
@@ -30,8 +35,8 @@ Mobile-first PWA prototype for the Viessmann B2B installer loyalty programme (Cr
 - **Intelligence dashboards** — Recharts-backed charts for monthly purchase volume, family spend split, top wholesalers by € approved, plus pricing-per-wholesaler and competitive-basket tables.
 
 ### Backend
-- **Receipt processing pipeline** — upload → blob storage → Claude vision OR XML parser → OIB validation → SKU match (KPD code, model substring, fuzzy) → fraud flags → status decision → append-only points ledger.
-- **e-Invoice support** — UBL 2.1, HR-CIUS, PEPPOL BIS 3.0 dialects via `fast-xml-parser`. Same downstream pipeline as the OCR path.
+- **Receipt processing pipeline** — upload → blob storage → light PDF text parser / XML parser / Claude vision (in that order of preference) → OIB validation → SKU match (KPD code, model substring, fuzzy) → fraud flags → status decision → append-only points ledger.
+- **e-Invoice support** — UBL 2.1, HR-CIUS, PEPPOL BIS 3.0 dialects via `fast-xml-parser`. Same downstream pipeline as the PDF/OCR path.
 - **Anti-fraud (light)** — DB uniqueness on `(seller OIB, invoice nr, buyer OIB, total)`; OIB-mismatch detection; date sanity checks; flagged for manual review rather than auto-rejected.
 - **Append-only ledger** — balance is always `SUM(delta)`. Reversals create compensating entries.
 - **Audit log** — every meaningful action (signup, submission, decision, adjustment, redemption, campaign change) is recorded with actor, action, payload.
@@ -75,7 +80,8 @@ Test invoices live in `../resources/Invoices/` — 9 Croatian PDFs from Agria, D
 | UI | sonner (toasts), recharts (charts), lucide-react (icons) |
 | Database | Postgres via Drizzle ORM + `postgres-js` |
 | Auth | iron-session + scrypt password hashing |
-| OCR | Claude vision (`@anthropic-ai/sdk`, `claude-haiku-4-5`) |
+| PDF text | `unpdf` (serverless-friendly) + custom Croatian-invoice parser |
+| OCR fallback | Claude vision (`@anthropic-ai/sdk`, `claude-haiku-4-5`) — only for images / scanned PDFs |
 | XML | `fast-xml-parser` |
 | Storage | Vercel Blob |
 | Validation | `zod` |
@@ -112,7 +118,8 @@ src/
     oib.ts                    # Croatian OIB checksum
     money.ts                  # Croatian decimal parser
     sku-matcher.ts            # Viessmann line matcher
-    receipt-parser.ts         # Claude vision wrapper
+    pdf-text-parser.ts        # light PDF text parser (default for digital PDFs)
+    receipt-parser.ts         # Claude vision wrapper (fallback for images/scans)
     xml-parser.ts             # UBL/HR-CIUS/PEPPOL parser
     receipt-pipeline.ts       # parse → match → ledger
     session.ts, password.ts
@@ -127,4 +134,5 @@ public/
 
 ## Releases
 
+- **v0.1.1** — light PDF text parser (no API key needed for digital PDFs); 9/9 of Frane's demo invoices parsed end-to-end with zero external cost. Vision LLM kept as fallback for image / scanned-PDF uploads only.
 - **v0.1.0** — first end-to-end prototype: installer PWA + admin web with full demo flow, OCR + XML, points ledger, campaigns, fulfillment, charts, OIB validation, audit log.

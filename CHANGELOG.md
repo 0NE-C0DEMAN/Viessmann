@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.1.1 — 2026-05-07
+
+### Light PDF parser (no API key)
+- New `lib/pdf-text-parser.ts` extracts embedded text from digital PDFs via `unpdf` and parses Croatian invoice fields (Racun, OIB, dates, line items, totals) with regex/heuristics.
+- All 9 of Frane's demo invoices parse end-to-end with zero API calls.
+- `/api/receipts` now tries the light parser first for PDFs, and only falls back to Claude vision for image uploads or scanned PDFs (where vision is genuinely required).
+- If `ANTHROPIC_API_KEY` is not set, image uploads return a friendly 422 explaining vision is needed; the PDF and XML flows work fine without it.
+- Result screen now reports which parser was used (`parserUsed: "pdf-text" | "xml" | "claude-vision"`).
+
 ## v0.1.0 — 2026-05-07
 
 First end-to-end prototype.

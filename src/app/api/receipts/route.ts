@@ -3,6 +3,7 @@ import { put } from "@vercel/blob";
 import { requireInstaller } from "@/lib/session";
 import { parseReceiptWithClaude } from "@/lib/receipt-parser";
 import { parseEInvoiceXml } from "@/lib/xml-parser";
+import { parsePdfTextLight } from "@/lib/pdf-text-parser";
 import { runReceiptPipeline, DuplicateReceiptError } from "@/lib/receipt-pipeline";
 import { db } from "@/db";
 import { receipts } from "@/db/schema";
@@ -41,8 +42,9 @@ export async function POST(req: Request) {
 
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  const isXml = file.type === "text/xml" || file.type === "application/xml" || file.name.toLowerCase().endsWith(".xml");
-  const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+  const lower = file.name.toLowerCase();
+  const isXml = file.type === "text/xml" || file.type === "application/xml" || lower.endsWith(".xml");
+  const isPdf = file.type === "application/pdf" || lower.endsWith(".pdf");
   const isImage = file.type.startsWith("image/");
 
   if (!isXml && !isPdf && !isImage) {
@@ -67,18 +69,45 @@ export async function POST(req: Request) {
   let parsed;
   let rawText: string | null = null;
   let source: "ocr" | "xml";
+  let parserUsed: "xml" | "pdf-text" | "claude-vision" = "claude-vision";
+
   try {
     if (isXml) {
       const xmlText = buffer.toString("utf-8");
       rawText = xmlText;
       parsed = parseEInvoiceXml(xmlText);
       source = "xml";
+      parserUsed = "xml";
+    } else if (isPdf) {
+      // Try the lightweight text-extraction parser first. Works for digital PDFs
+      // (e-invoices, accounting-software exports). Falls through to Claude vision
+      // if the PDF has no extractable text (scanned/imaged) AND the API key is set.
+      const light = await parsePdfTextLight(buffer);
+      if (light) {
+        parsed = light;
+        source = "ocr";
+        parserUsed = "pdf-text";
+      } else if (process.env.ANTHROPIC_API_KEY) {
+        parsed = await parseReceiptWithClaude({ fileBuffer: buffer, mimeType: "application/pdf" });
+        source = "ocr";
+        parserUsed = "claude-vision";
+      } else {
+        return NextResponse.json(
+          { error: "This PDF appears to be scanned (no extractable text). Vision OCR is required, but ANTHROPIC_API_KEY is not configured." },
+          { status: 422 },
+        );
+      }
     } else {
-      parsed = await parseReceiptWithClaude({
-        fileBuffer: buffer,
-        mimeType: isPdf ? "application/pdf" : file.type || "image/jpeg",
-      });
+      // Image upload → vision required
+      if (!process.env.ANTHROPIC_API_KEY) {
+        return NextResponse.json(
+          { error: "Image uploads require vision OCR. Please upload a digital PDF or e-invoice XML, or ask the admin to configure ANTHROPIC_API_KEY." },
+          { status: 422 },
+        );
+      }
+      parsed = await parseReceiptWithClaude({ fileBuffer: buffer, mimeType: file.type || "image/jpeg" });
       source = "ocr";
+      parserUsed = "claude-vision";
     }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
@@ -94,7 +123,7 @@ export async function POST(req: Request) {
       parsed,
       rawText,
     });
-    return NextResponse.json({ ok: true, ...result, parsed });
+    return NextResponse.json({ ok: true, ...result, parsed, parserUsed });
   } catch (e) {
     if (e instanceof DuplicateReceiptError) {
       return NextResponse.json(
