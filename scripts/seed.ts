@@ -56,6 +56,7 @@ async function main() {
       productFamily: c.productFamily,
       bonusMultiplier: c.bonusMultiplier,
       bonusFlatPerUnit: c.bonusFlatPerUnit,
+      capPerInstaller: c.capPerInstaller,
       active: c.active,
     }).onConflictDoNothing();
   }

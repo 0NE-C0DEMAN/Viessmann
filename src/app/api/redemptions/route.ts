@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { rewards, redemptions, pointsLedger, auditLog } from "@/db/schema";
+import { rewards, redemptions, pointsLedger, auditLog, installers } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { requireInstaller } from "@/lib/session";
+import { tierForBalance, meetsTier } from "@/lib/tier";
 import { z } from "zod";
 
 const Body = z.object({ rewardId: z.string().uuid() });
@@ -24,18 +25,32 @@ export async function POST(req: Request) {
 
   if (reward.inventory <= 0) return NextResponse.json({ error: "Out of stock" }, { status: 409 });
 
-  // Compute current balance
+  // Compute current balance.
   const balanceRows = await db.execute(
     sql`SELECT COALESCE(SUM(delta), 0)::int AS balance FROM points_ledger WHERE installer_id = ${user.installerId}`,
   );
   type Row = { balance: number };
   const balance = (balanceRows as unknown as Row[])[0]?.balance ?? 0;
 
+  // Tier gate.
+  const tier = tierForBalance(balance);
+  if (!meetsTier(tier, reward.tierRequired)) {
+    return NextResponse.json(
+      {
+        error: `This reward is for ${reward.tierRequired} tier and above. You're currently ${tier}.`,
+        balance,
+        tier,
+        required: reward.tierRequired,
+      },
+      { status: 403 },
+    );
+  }
+
   if (balance < reward.pointCost) {
     return NextResponse.json({ error: "Not enough points", balance, required: reward.pointCost }, { status: 402 });
   }
 
-  // Decrement inventory atomically
+  // Atomic inventory decrement.
   const upd = await db
     .update(rewards)
     .set({ inventory: sql`${rewards.inventory} - 1` })
@@ -64,7 +79,7 @@ export async function POST(req: Request) {
     action: "redemption.requested",
     entityType: "redemption",
     entityId: insertedRedemption[0].id,
-    payload: { rewardId: reward.id, pointCost: reward.pointCost },
+    payload: { rewardId: reward.id, pointCost: reward.pointCost, tier },
   });
 
   return NextResponse.json({ ok: true, redemptionId: insertedRedemption[0].id, newBalance: balance - reward.pointCost });
@@ -79,15 +94,15 @@ export async function GET() {
   }
 
   const rows = await db
-    .select({
-      r: redemptions,
-      reward: rewards,
-    })
+    .select({ r: redemptions, reward: rewards })
     .from(redemptions)
     .leftJoin(rewards, eq(rewards.id, redemptions.rewardId))
     .where(eq(redemptions.installerId, user.installerId))
     .orderBy(sql`${redemptions.createdAt} DESC`)
     .limit(50);
+
+  // suppress unused
+  void installers;
 
   return NextResponse.json({ redemptions: rows });
 }

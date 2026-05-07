@@ -4,13 +4,31 @@ import { useState } from "react";
 import { Gift, Lock, Check } from "lucide-react";
 import { toast } from "sonner";
 import { formatPoints } from "@/lib/money";
+import { meetsTier, tierForBalance, type Tier } from "@/lib/tier";
 import type { Reward } from "@/db/schema";
 
-export function RewardsList({ rewards, initialBalance }: { rewards: Reward[]; initialBalance: number }) {
+const TIER_BADGE: Record<Tier, string> = {
+  Bronze: "v-pill-muted",
+  Silver: "v-pill-info",
+  Gold: "v-pill-warn",
+  Platinum: "v-pill-brand",
+};
+
+export function RewardsList({
+  rewards,
+  initialBalance,
+  initialTier,
+}: {
+  rewards: Reward[];
+  initialBalance: number;
+  initialTier: Tier;
+}) {
   const [balance, setBalance] = useState(initialBalance);
   const [busy, setBusy] = useState<string | null>(null);
   const [redeemed, setRedeemed] = useState<Set<string>>(new Set());
   const [stockOverrides, setStockOverrides] = useState<Record<string, number>>({});
+
+  const tier = tierForBalance(balance) ?? initialTier;
 
   async function redeem(reward: Reward) {
     if (!confirm(`Redeem "${reward.name}" for ${formatPoints(reward.pointCost)} points?`)) return;
@@ -51,6 +69,7 @@ export function RewardsList({ rewards, initialBalance }: { rewards: Reward[]; in
         <div className="text-sm">
           <span className="text-[var(--vie-ink-muted)]">Balance: </span>
           <span className="font-bold v-numeric">{formatPoints(balance)} pts</span>
+          <span className={`v-pill ml-2 text-[10px] ${TIER_BADGE[tier]}`}>{tier}</span>
         </div>
       </div>
 
@@ -64,30 +83,43 @@ export function RewardsList({ rewards, initialBalance }: { rewards: Reward[]; in
         <div className="grid gap-3">
           {rewards.map((r) => {
             const stock = inventoryFor(r);
-            const can = balance >= r.pointCost && stock > 0;
+            const tierOk = meetsTier(tier, r.tierRequired);
+            const enoughPts = balance >= r.pointCost;
+            const inStock = stock > 0;
+            const can = tierOk && enoughPts && inStock;
             const isRedeemed = redeemed.has(r.id);
-            const stockLow = stock > 0 && stock <= 5;
+            const stockLow = inStock && stock <= 5;
+            const requiredTier = r.tierRequired as Tier;
             return (
-              <div key={r.id} className="v-card flex items-center gap-3">
+              <div key={r.id} className={`v-card flex items-center gap-3 ${!tierOk ? "opacity-75" : ""}`}>
                 <div className="w-14 h-14 rounded-2xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center flex-shrink-0">
                   <Gift size={22} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm truncate">{r.name}</div>
+                  <div className="font-semibold text-sm truncate flex items-center gap-2">
+                    {r.name}
+                    {requiredTier && requiredTier !== "Bronze" && (
+                      <span className={`v-pill text-[10px] ${TIER_BADGE[requiredTier]}`}>{requiredTier}+</span>
+                    )}
+                  </div>
                   <div className="text-xs text-[var(--vie-ink-muted)] truncate">{r.description}</div>
                   <div className="text-xs mt-1.5 flex items-center gap-2 flex-wrap">
                     <span className="font-bold text-[var(--vie-orange-dark)] v-numeric">{formatPoints(r.pointCost)} pts</span>
-                    {stock <= 0 ? (
+                    {!inStock ? (
                       <span className="v-pill v-pill-muted">Out of stock</span>
                     ) : stockLow ? (
                       <span className="v-pill v-pill-warn">Only {stock} left</span>
                     ) : null}
+                    {!tierOk && (
+                      <span className="v-pill v-pill-muted text-[10px]">Reach {requiredTier} to unlock</span>
+                    )}
                   </div>
                 </div>
                 <button
                   disabled={!can || busy === r.id || isRedeemed}
                   onClick={() => redeem(r)}
                   className={`v-btn flex-shrink-0 ${isRedeemed ? "v-btn-success" : can ? "v-btn-primary" : "v-btn-ghost"} v-btn-sm`}
+                  title={!tierOk ? `Requires ${requiredTier}+` : !enoughPts ? "Not enough points" : !inStock ? "Out of stock" : "Redeem"}
                 >
                   {busy === r.id ? "…" : isRedeemed ? <><Check size={14} /> Done</> : can ? "Redeem" : <><Lock size={14} /></>}
                 </button>

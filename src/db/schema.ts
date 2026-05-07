@@ -126,8 +126,14 @@ export const rewards = pgTable("rewards", {
   pointCost: integer("point_cost").notNull(),
   inventory: integer("inventory").notNull().default(0),
   imageUrl: text("image_url"),
+  // Lowest tier that can redeem this reward. "Bronze" = open to everyone.
+  tierRequired: text("tier_required").notNull().default("Bronze"),
   active: boolean("active").notNull().default(true),
 });
+
+// Campaigns also gain a per-installer cap so an unusually-large submission
+// can't drain the bonus budget for a single user.
+
 
 export const redemptions = pgTable("redemptions", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -147,6 +153,9 @@ export const campaigns = pgTable("campaigns", {
   productFamily: text("product_family"),
   bonusMultiplier: integer("bonus_multiplier").notNull().default(100), // percent: 200 = 2x
   bonusFlatPerUnit: integer("bonus_flat_per_unit").notNull().default(0),
+  // Per-installer cap on the bonus this campaign can hand out (in points).
+  // 0 = unlimited.
+  capPerInstaller: integer("cap_per_installer").notNull().default(0),
   startsAt: timestamp("starts_at", { withTimezone: true }).notNull().defaultNow(),
   endsAt: timestamp("ends_at", { withTimezone: true }),
   active: boolean("active").notNull().default(true),

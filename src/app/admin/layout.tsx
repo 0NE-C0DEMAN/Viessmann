@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { LogoutButton } from "@/components/logout-button";
-import { LayoutDashboard, Users, BarChart3, Megaphone, PackageCheck, Settings } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, Megaphone, PackageCheck, Settings, ScrollText } from "lucide-react";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const s = await getSession();
@@ -26,6 +26,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <NavTab href="/admin/campaigns" label="Campaigns" icon={<Megaphone size={14} />} />
             <NavTab href="/admin/fulfillment" label="Fulfillment" icon={<PackageCheck size={14} />} />
             <NavTab href="/admin/intelligence" label="Intelligence" icon={<BarChart3 size={14} />} />
+            <NavTab href="/admin/audit" label="Audit" icon={<ScrollText size={14} />} />
             <NavTab href="/admin/settings" label="Settings" icon={<Settings size={14} />} />
             <span className="mx-2 h-6 w-px bg-[var(--vie-line)]" />
             <LogoutButton />

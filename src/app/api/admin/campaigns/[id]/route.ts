@@ -15,6 +15,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     productFamily: json.productFamily ?? null,
     bonusMultiplier: json.bonusMultiplier,
     bonusFlatPerUnit: json.bonusFlatPerUnit,
+    capPerInstaller: json.capPerInstaller ?? 0,
     active: json.active,
     endsAt: json.endsAt ? new Date(json.endsAt) : null,
   }).where(eq(campaigns.id, id));

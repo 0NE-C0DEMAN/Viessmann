@@ -18,12 +18,17 @@ import {
   installers,
   campaigns,
 } from "@/db/schema";
-import { and, eq, lte, or, isNull, gt } from "drizzle-orm";
+import { and, eq, lte, or, isNull, gt, sql } from "drizzle-orm";
 import { matchLine } from "@/lib/sku-matcher";
 import { parseCroatianAmountToCents, parseQuantity } from "@/lib/money";
 import { isValidOib, normaliseOib } from "@/lib/oib";
+import { tierForBalance } from "@/lib/tier";
 import type { ParsedReceipt } from "@/lib/receipt-parser";
 import type { Campaign } from "@/db/schema";
+
+// Per-installer rate limit. We allow this many submissions per ROLLING_HOURS.
+const RATE_LIMIT_COUNT = 30;
+const RATE_LIMIT_HOURS = 1;
 
 export interface PipelineResult {
   receiptId: string;
@@ -51,6 +56,26 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
   const me = installer[0];
 
   const fraudFlags: string[] = [];
+
+  // Velocity check — flag for review if the installer has made too many
+  // submissions in the recent rolling window.
+  const velocityRows = await db.execute<{ n: number }>(
+    sql`SELECT COUNT(*)::int AS n FROM receipts
+        WHERE installer_id = ${installerId}
+          AND created_at > NOW() - (${RATE_LIMIT_HOURS}::int || ' hours')::interval`,
+  );
+  type VR = { n: number };
+  const recentN = (velocityRows as unknown as VR[])[0]?.n ?? 0;
+  if (recentN >= RATE_LIMIT_COUNT) {
+    fraudFlags.push(`velocity_exceeded:${recentN}_in_${RATE_LIMIT_HOURS}h`);
+  }
+
+  // Currency sanity — only EUR is supported in the Croatian B2B context after
+  // 01.01.2023. Anything else is flagged for review.
+  const currency = (parsed.currency || "EUR").toUpperCase();
+  if (currency !== "EUR") {
+    fraudFlags.push(`currency_not_eur:${currency}`);
+  }
 
   // OIB validation
   const wholesalerOib = normaliseOib(parsed.wholesaler?.oib ?? "");
@@ -80,7 +105,7 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
   }
 
   // Match line items + load active campaigns once.
-  const [allProducts, activeCampaigns] = await Promise.all([
+  const [allProducts, activeCampaigns, campaignSpend] = await Promise.all([
     db.select().from(products),
     db
       .select()
@@ -92,7 +117,22 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
           or(isNull(campaigns.endsAt), gt(campaigns.endsAt, new Date())),
         ),
       ),
+    // How much campaign bonus has this installer already claimed per campaign?
+    db.execute<{ campaign_id: string; total: number }>(sql`
+      SELECT rli.campaign_id, COALESCE(SUM(rli.points_awarded - rli.points_base), 0)::int AS total
+      FROM receipt_line_items rli
+      JOIN receipts r ON r.id = rli.receipt_id
+      WHERE r.installer_id = ${installerId}
+        AND r.status = 'approved'
+        AND rli.campaign_id IS NOT NULL
+      GROUP BY rli.campaign_id
+    `),
   ]);
+
+  type SpendRow = { campaign_id: string; total: number };
+  const spendByCampaign = new Map<string, number>(
+    (campaignSpend as unknown as SpendRow[]).map((r) => [r.campaign_id, r.total]),
+  );
 
   const totalCents = parseCroatianAmountToCents(parsed.total) ?? null;
   const subtotalCents = parseCroatianAmountToCents(parsed.subtotal) ?? null;
@@ -130,8 +170,10 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
     // Pick the best applicable campaign for this line.
     // Match rule: campaign.productFamily IS NULL (matches all) OR equals match.product.family.
     // Stack rule: highest final-points wins; non-stackable.
+    // Cap rule: if `capPerInstaller > 0`, the bonus this installer can earn
+    // from this campaign is clamped to whatever's left of the cap.
     const family = match.product?.family ?? null;
-    const candidate = pickBestCampaign(activeCampaigns, family, basePoints, qtyNum);
+    const candidate = pickBestCampaign(activeCampaigns, family, basePoints, qtyNum, spendByCampaign);
     const finalPoints = candidate ? candidate.finalPoints : basePoints;
 
     if (match.isViessmann && match.product == null) {
@@ -271,8 +313,16 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
     );
   }
 
-  // Append to ledger if approved
+  // Append to ledger if approved, then check if the new balance crossed a tier threshold.
   if (status === "approved" && totalPoints > 0) {
+    // Read the pre-accrual balance so we know whether this transaction
+    // crosses a tier line.
+    const beforeRows = await db.execute<{ b: number }>(
+      sql`SELECT COALESCE(SUM(delta), 0)::int AS b FROM points_ledger WHERE installer_id = ${installerId}`,
+    );
+    type B = { b: number };
+    const balanceBefore = (beforeRows as unknown as B[])[0]?.b ?? 0;
+
     await db.insert(pointsLedger).values({
       installerId,
       delta: totalPoints,
@@ -280,6 +330,20 @@ export async function runReceiptPipeline(input: PipelineInput): Promise<Pipeline
       receiptId,
       note: `Receipt ${parsed.invoice_number ?? receiptId}`,
     });
+
+    const balanceAfter = balanceBefore + totalPoints;
+    const tierBefore = tierForBalance(balanceBefore);
+    const tierAfter = tierForBalance(balanceAfter);
+    if (tierAfter !== tierBefore) {
+      await db.insert(auditLog).values({
+        actorId: installerId,
+        actorEmail: me.email,
+        action: "tier.changed",
+        entityType: "installer",
+        entityId: installerId,
+        payload: { from: tierBefore, to: tierAfter, balanceAfter },
+      });
+    }
   }
 
   await db.insert(auditLog).values({
@@ -311,14 +375,27 @@ function pickBestCampaign(
   family: string | null,
   basePoints: number,
   qty: number,
+  spendByCampaign: Map<string, number>,
 ): CampaignPick | null {
   let best: CampaignPick | null = null;
   for (const c of campaignsList) {
     if (c.productFamily && family !== c.productFamily) continue;
     const multiplied = Math.round(basePoints * (c.bonusMultiplier / 100));
     const flat = Math.round(c.bonusFlatPerUnit * qty);
-    const finalPoints = multiplied + flat;
-    if (finalPoints <= basePoints) continue; // not actually a bonus
+    let finalPoints = multiplied + flat;
+    if (finalPoints <= basePoints) continue;
+
+    // Apply per-installer cap (0 = unlimited).
+    if (c.capPerInstaller > 0) {
+      const alreadyClaimed = spendByCampaign.get(c.id) ?? 0;
+      const remainingBonus = Math.max(0, c.capPerInstaller - alreadyClaimed);
+      const proposedBonus = finalPoints - basePoints;
+      if (proposedBonus > remainingBonus) {
+        finalPoints = basePoints + remainingBonus;
+      }
+      if (finalPoints <= basePoints) continue;
+    }
+
     if (!best || finalPoints > best.finalPoints) {
       best = { campaign: c, finalPoints };
     }

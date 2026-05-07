@@ -18,6 +18,7 @@ export function CampaignsClient({ campaigns: initial }: { campaigns: Campaign[] 
     productFamily: "",
     bonusMultiplier: 100,
     bonusFlatPerUnit: 0,
+    capPerInstaller: 0,
     endsAt: "",
     active: true,
   });
@@ -38,7 +39,7 @@ export function CampaignsClient({ campaigns: initial }: { campaigns: Campaign[] 
       }
       toast.success("Campaign created");
       setOpen(false);
-      setDraft({ name: "", description: "", productFamily: "", bonusMultiplier: 100, bonusFlatPerUnit: 0, endsAt: "", active: true });
+      setDraft({ name: "", description: "", productFamily: "", bonusMultiplier: 100, bonusFlatPerUnit: 0, capPerInstaller: 0, endsAt: "", active: true });
       router.refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Network error");
@@ -100,9 +101,15 @@ export function CampaignsClient({ campaigns: initial }: { campaigns: Campaign[] 
               <input type="number" className="v-input" min={0} value={draft.bonusFlatPerUnit} onChange={(e) => setDraft({ ...draft, bonusFlatPerUnit: Number(e.target.value) })} />
             </div>
           </div>
-          <div>
-            <label className="v-label">Ends at (optional)</label>
-            <input type="datetime-local" className="v-input" value={draft.endsAt} onChange={(e) => setDraft({ ...draft, endsAt: e.target.value })} />
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="v-label">Cap per installer (0 = unlimited)</label>
+              <input type="number" className="v-input" min={0} value={draft.capPerInstaller} onChange={(e) => setDraft({ ...draft, capPerInstaller: Number(e.target.value) })} />
+            </div>
+            <div>
+              <label className="v-label">Ends at (optional)</label>
+              <input type="datetime-local" className="v-input" value={draft.endsAt} onChange={(e) => setDraft({ ...draft, endsAt: e.target.value })} />
+            </div>
           </div>
           <div className="flex gap-2">
             <button onClick={() => setOpen(false)} className="v-btn v-btn-ghost flex-1">Cancel</button>
@@ -128,10 +135,11 @@ export function CampaignsClient({ campaigns: initial }: { campaigns: Campaign[] 
                 </div>
                 <span className={`v-pill ${c.active ? "v-pill-success" : "v-pill-muted"}`}>{c.active ? "Active" : "Paused"}</span>
               </div>
-              <div className="grid grid-cols-3 gap-3 mt-3 text-xs">
+              <div className="grid grid-cols-4 gap-3 mt-3 text-xs">
                 <Stat label="Family">{c.productFamily ?? "All"}</Stat>
                 <Stat label="Multiplier">{c.bonusMultiplier}%</Stat>
                 <Stat label="Flat / unit">+{c.bonusFlatPerUnit}</Stat>
+                <Stat label="Cap / installer">{c.capPerInstaller > 0 ? c.capPerInstaller : "∞"}</Stat>
               </div>
               <div className="text-xs text-[var(--vie-ink-muted)] mt-2">
                 {c.endsAt ? `Ends ${new Date(c.endsAt).toLocaleDateString("hr-HR")}` : "No end date"}

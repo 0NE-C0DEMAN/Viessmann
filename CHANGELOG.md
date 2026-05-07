@@ -1,5 +1,41 @@
 # Changelog
 
+## v0.1.9 — 2026-05-07
+
+### Loyalty engine — close the remaining edge cases
+
+Audit of the loyalty engine against Frane's Excel "Edge Cases" sheet plus standard loyalty-program patterns. Closed everything that's user-visible.
+
+**Tier-gated rewards** — `rewards.tierRequired` schema column (Bronze/Silver/Gold/Platinum); seed data gates higher-value rewards (Bauhaus card → Gold+, iPhone 16 → Platinum). Server enforces at redemption with a friendly 403; UI shows tier badges + "Reach Silver to unlock" + locks the redeem button.
+
+**Notifications now surface admin actions:**
+- Reversal ledger entries (`reason: 'reversal'`) — surfaced as "Points reversed by Viessmann"
+- Manual adjustments (`reason: 'adjustment'`) — surfaced as "Points adjusted by Viessmann"
+- Tier-up events from the audit log — surfaced as "Welcome to Silver/Gold/Platinum!"
+
+**Negative-balance banner** — dashboard shows a clear red banner when balance goes below zero, explaining it's typically due to admin reversal and pointing the user at Notifications.
+
+**Currency validation** — pipeline flags `currency_not_eur:<code>` if the parsed receipt isn't in EUR, routing to needs-review.
+
+**Submission velocity rate-limit** — Postgres-based check (last 1 hour, 30 receipts max). Excessive submissions get the `velocity_exceeded:N_in_1h` flag and route to needs-review instead of auto-approving. No Redis required.
+
+**Tier-change audit event** — pipeline writes `tier.changed` to `audit_log` when an accrual crosses a threshold, with `{ from, to, balanceAfter }` payload. Notifications page picks this up.
+
+**Campaign per-installer cap** — `campaigns.capPerInstaller` (0 = unlimited). Pipeline computes how much bonus this installer has already claimed from each campaign and clamps the new bonus accordingly. Admin Campaigns UI exposes the field and shows "∞" when uncapped.
+
+**Audit log viewer** — `/admin/audit` lists the last 500 audit-log entries with actor, action, entity, payload preview. Was the biggest "writes a lot, reads nowhere" finding from the audit.
+
+### Schema changes
+- `rewards.tier_required text NOT NULL DEFAULT 'Bronze'`
+- `campaigns.cap_per_installer integer NOT NULL DEFAULT 0`
+
+### Out of prototype scope (per Frane's Excel)
+- Image-pHash duplicate detection (needs persistent image storage)
+- Points expiry / annual reset (not in plan)
+- Reward override shipping address (Excel calls "out of scope")
+- Wholesaler trust levels (`trusted` column unused — keeping for future)
+- VAT treatment of high-value rewards (Excel: "out of scope for engineering")
+
 ## v0.1.8 — 2026-05-07
 
 ### Duplicate-submission flow polished

@@ -135,6 +135,7 @@ public/
 
 ## Releases
 
+- **v0.1.9** — loyalty engine edge-case pass: tier-gated rewards (Bronze/Silver/Gold/Platinum), admin reversals/adjustments + tier-ups now generate notifications, negative-balance banner, currency validation, submission velocity rate-limit, campaign per-installer cap, audit log viewer at /admin/audit.
 - **v0.1.8** — duplicate-submission flow polished: clean invoice numbers (no internal `__dup_<ts>` suffix), pipeline returns `existingReceiptId`, submit-result offers "Open original" + "View this attempt", receipt-detail reviewer note auto-links UUID references.
 - **v0.1.7** — wired up half-built seams: campaigns engine now applies bonuses, cancelled redemptions refund + restock, admins have a settings page (password change), settings page stripped of fake toggles, /privacy + /terms pages added, duplicate receipts persisted (filter tabs populate), admin installers tier computed in SQL, reviewer notes visible to installers, rewards stock refreshes after redeem, demo campaigns seeded.
 - **v0.1.6** — fix: photo OCR submit was including the full base64 image and hitting Vercel's body-size limit, returning a non-JSON error that crashed the client. Now we send only the extracted text. Defensive `safeJson()` around every fetch so future non-JSON responses surface the real cause.

@@ -65,6 +65,13 @@ export default async function InstallerHome() {
         <div className="font-bold text-lg leading-tight">{agg.company_name}</div>
       </div>
 
+      {balance < 0 && (
+        <div className="v-card border-[var(--vie-error)] bg-[var(--vie-error-bg)]/40">
+          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-error)] mb-1">Negative balance</div>
+          <div className="text-sm">Your balance is below zero, usually because Viessmann reversed an earlier accrual. Submit more eligible invoices to clear it. Check the Notifications tab for details.</div>
+        </div>
+      )}
+
       <div className={`rounded-2xl p-5 text-white ${tierClass[tier]} shadow-md relative overflow-hidden`}>
         <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 80% 0%, rgba(255,255,255,0.4), transparent 50%)" }} />
         <div className="relative">

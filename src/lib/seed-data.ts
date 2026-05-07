@@ -128,6 +128,7 @@ export const SEED_CAMPAIGNS = [
     productFamily: "vitocal",
     bonusMultiplier: 200, // 2x base points
     bonusFlatPerUnit: 0,
+    capPerInstaller: 5000,
     active: true,
   },
   {
@@ -136,14 +137,19 @@ export const SEED_CAMPAIGNS = [
     productFamily: null as string | null,
     bonusMultiplier: 100, // no multiplier
     bonusFlatPerUnit: 50,
+    capPerInstaller: 0, // uncapped
     active: true,
   },
 ];
 
 export const SEED_REWARDS = [
-  { name: "Viessmann polo majica", description: "Brendirana polo majica, S-XXL", pointCost: 500, inventory: 50 },
-  { name: "Set alata 12-dijelni", description: "Profesionalni set alata u koferu", pointCost: 2500, inventory: 20 },
-  { name: "Tehnicki seminar Vitocal", description: "Jednodnevna obuka u Zagrebu", pointCost: 4000, inventory: 30 },
-  { name: "Bauhaus poklon kartica 100€", description: "Vrijedi u svim Bauhaus poslovnicama", pointCost: 5000, inventory: 100 },
-  { name: "iPhone 16 (puna nagrada)", description: "Najbolja nagrada za top-tier instaltere", pointCost: 50000, inventory: 5 },
+  // Bronze (everyone)
+  { name: "Viessmann polo majica", description: "Brendirana polo majica, S-XXL", pointCost: 500, inventory: 50, tierRequired: "Bronze" },
+  // Silver+
+  { name: "Set alata 12-dijelni", description: "Profesionalni set alata u koferu", pointCost: 2500, inventory: 20, tierRequired: "Silver" },
+  // Gold+
+  { name: "Tehnicki seminar Vitocal", description: "Jednodnevna obuka u Zagrebu", pointCost: 4000, inventory: 30, tierRequired: "Gold" },
+  { name: "Bauhaus poklon kartica 100€", description: "Vrijedi u svim Bauhaus poslovnicama", pointCost: 5000, inventory: 100, tierRequired: "Gold" },
+  // Platinum-only marquee reward
+  { name: "iPhone 16 (puna nagrada)", description: "Najbolja nagrada za top-tier instaltere", pointCost: 50000, inventory: 5, tierRequired: "Platinum" },
 ];
