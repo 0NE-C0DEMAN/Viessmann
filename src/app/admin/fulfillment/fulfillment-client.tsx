@@ -70,7 +70,7 @@ export function FulfillmentClient({ rows }: { rows: Row[] }) {
       <div className="flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[240px] max-w-md">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--vie-ink-muted)]" />
-          <input className="v-input pl-9" placeholder="Search installer or reward…" value={q} onChange={(e) => setQ(e.target.value)} />
+          <input className="v-input pl-10" placeholder="Search installer or reward…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <div className="flex gap-1.5">
           {(["requested", "shipped", "cancelled", "all"] as const).map((f) => {

@@ -130,25 +130,27 @@ body {
 /* ============================================================ */
 /* Inputs */
 /* ============================================================ */
-.v-input, .v-select, .v-textarea {
-  width: 100%;
-  padding: 0.7rem 0.95rem;
-  border: 1px solid var(--vie-line);
-  border-radius: 10px;
-  background: var(--vie-paper-elev);
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
-  font-family: inherit;
-  color: var(--vie-ink);
+@layer components {
+  .v-input, .v-select, .v-textarea {
+    width: 100%;
+    padding: 0.7rem 0.95rem;
+    border: 1px solid var(--vie-line);
+    border-radius: 10px;
+    background: var(--vie-paper-elev);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    font-family: inherit;
+    color: var(--vie-ink);
+  }
+  .v-input:focus, .v-select:focus, .v-textarea:focus {
+    border-color: var(--vie-red);
+    box-shadow: 0 0 0 3px rgba(255, 62, 23, 0.18);
+  }
+  .v-input::placeholder, .v-textarea::placeholder { color: var(--vie-ink-muted); }
+  .v-input-error { border-color: var(--vie-error); }
+  .v-input-error:focus { box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.18); }
 }
-.v-input:focus, .v-select:focus, .v-textarea:focus {
-  border-color: var(--vie-red);
-  box-shadow: 0 0 0 3px rgba(255, 62, 23, 0.18);
-}
-.v-input::placeholder, .v-textarea::placeholder { color: var(--vie-ink-muted); }
-.v-input-error { border-color: var(--vie-error); }
-.v-input-error:focus { box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.18); }
 
 .v-label {
   display: block;

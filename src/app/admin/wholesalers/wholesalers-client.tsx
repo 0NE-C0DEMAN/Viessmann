@@ -34,7 +34,7 @@ export function WholesalersClient({ rows }: { rows: Row[] }) {
 
       <div className="relative max-w-md">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--vie-ink-muted)]" />
-        <input className="v-input pl-9" placeholder="Search wholesaler or OIB…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input className="v-input pl-10" placeholder="Search wholesaler or OIB…" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
 
       {filtered.length === 0 ? (

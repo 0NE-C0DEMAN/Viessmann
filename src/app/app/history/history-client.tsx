@@ -42,7 +42,7 @@ export function HistoryClient({ rows }: { rows: Receipt[] }) {
       <div className="relative">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--vie-ink-muted)]" />
         <input
-          className="v-input pl-9"
+          className="v-input pl-10"
           placeholder="Search wholesaler, invoice, OIB…"
           value={q}
           onChange={(e) => setQ(e.target.value)}

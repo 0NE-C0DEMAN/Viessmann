@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.2.16 — 2026-05-07
+
+### Fix: search icon was colliding with the placeholder text
+
+Six search bars across the app (history, audit, fulfillment, queue, installers, wholesalers) had the magnifier icon overlapping the input text. Two compounding causes:
+
+1. **`.v-input` was defined outside `@layer components`** in `globals.css`, so its shorthand `padding: 0.7rem 0.95rem` (15.2 px left) beat the Tailwind `pl-9` utility on specificity. Text was actually starting at 15 px while the 16-px icon spanned 12–28 px → direct overlap.
+2. Even when the layer is fixed, `pl-9` (36 px) leaves only 8 px clearance after the icon, which is too tight on a 16-px glyph.
+
+Fixes:
+
+- Wrapped `.v-input / .v-select / .v-textarea` rules in `@layer components` so utility classes like `pl-10` actually win.
+- Bumped the search inputs from `pl-9` to `pl-10` (40 px) for a clean 12 px gap between icon and text.
+
 ## v0.2.15 — 2026-05-07
 
 ### Fix: list-row content overflowing the card edge on narrow phones

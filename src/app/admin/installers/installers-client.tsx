@@ -75,7 +75,7 @@ export function InstallersClient({ installers }: { installers: Installer[] }) {
 
       <div className="relative max-w-md">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--vie-ink-muted)]" />
-        <input className="v-input pl-9" placeholder="Search company, email, OIB…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input className="v-input pl-10" placeholder="Search company, email, OIB…" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
 
       <div className="v-card v-scroll-x">
