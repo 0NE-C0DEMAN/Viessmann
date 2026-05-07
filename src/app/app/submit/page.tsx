@@ -101,12 +101,10 @@ export default function SubmitPage() {
   }
 
   function handleResult(json: PipelineResponse) {
+    // The Result screen renders a giant icon + headline + points pill, so
+    // we don't fire an additional toast on top of it.
     setResponse(json);
     setStage("result");
-    if (json.status === "approved") toast.success(`+${json.pointsAwarded} pts credited!`);
-    else if (json.status === "needs_review") toast.info("Submitted for manual review.");
-    else if (json.status === "rejected") toast.error("Rejected.");
-    else if (json.status === "duplicate") toast.warning("This invoice was already submitted.");
   }
 
   async function uploadNow() {

@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LogOut, Settings, User } from "lucide-react";
-import { toast } from "sonner";
 
 export function ProfileMenu({ email, companyName }: { email: string; companyName: string }) {
   const [open, setOpen] = useState(false);
@@ -20,7 +19,6 @@ export function ProfileMenu({ email, companyName }: { email: string; companyName
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    toast.success("Signed out");
     router.push("/");
     router.refresh();
   }

@@ -1,13 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
-import { toast } from "sonner";
 
 export function LogoutButton({ variant = "header" }: { variant?: "header" | "danger" }) {
   const router = useRouter();
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    toast.success("Signed out");
     router.push("/");
     router.refresh();
   }

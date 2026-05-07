@@ -135,6 +135,7 @@ public/
 
 ## Releases
 
+- **v0.2.5** — dropped redundant toasts: the submit-result screen no longer fires a toast on top of itself, and `Signed out` toasts replaced by the redirect to the landing page.
 - **v0.2.4** — toast notifications restyled (bottom-center, white card with brand-coloured 3px accent strip, no `richColors` / `closeButton`); dropped two decorative welcome toasts.
 - **v0.2.3** — removed GitHub link from the landing-page footer.
 - **v0.2.2** — brand alignment to Viessmann red `#ff3e17` (sampled from viessmann.com / viessmann-us.com), CSS vars renamed `--vie-orange*` → `--vie-red*`, logo mark + PWA icons regenerated.

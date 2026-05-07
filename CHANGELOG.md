@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.2.5 — 2026-05-07
+
+### Trim redundant toasts
+
+Following the v0.2.4 toast restyle, swept the remaining toast.* call-sites and dropped the ones that fire on top of pages that already display the same information prominently.
+
+- **Submit result**: dropped `+N pts credited! / Submitted for manual review / Rejected / Already submitted` toasts. The Result screen renders a large icon + headline + points pill, so the toast was duplicate noise. Errors and OCR-couldn't-read messages still toast as before — those need attention.
+- **"Signed out"** toasts in both `LogoutButton` and the `ProfileMenu` dropdown — the redirect back to the landing page is the feedback.
+
+All remaining toasts (admin actions, profile/password updates, redemptions, errors, copy-to-clipboard) inherit the v0.2.4 compact white-card style globally — no per-call styling needed.
+
 ## v0.2.4 — 2026-05-07
 
 ### Toast notifications restyled (Linear / Vercel style)
