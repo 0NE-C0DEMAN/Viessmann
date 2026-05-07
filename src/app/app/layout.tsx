@@ -26,14 +26,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <header className="sticky top-0 z-30 bg-[var(--vie-paper-elev)]/95 backdrop-blur border-b border-[var(--vie-line)]">
         <div className="max-w-md w-full mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/app" prefetch className="flex items-center gap-2.5">
-            <span className="v-logo">V+</span>
-            <span className="font-bold tracking-tight">Viessmann <span className="text-[var(--vie-orange)]">Loyalty</span></span>
+            <span className="v-logo">V</span>
+            <span className="font-bold tracking-tight">Viessmann <span className="text-[var(--vie-red)]">Loyalty</span></span>
           </Link>
           <div className="flex items-center gap-1">
             <Link href="/app/notifications" prefetch className="relative p-2 rounded-lg hover:bg-[var(--vie-line)] text-[var(--vie-ink-soft)] hover:text-[var(--vie-ink)] transition-colors" title={pendingCount > 0 ? `${pendingCount} pending` : "Notifications"}>
               <Bell size={18} />
               {pendingCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--vie-orange)] text-white text-[10px] font-bold flex items-center justify-center v-numeric">
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--vie-red)] text-white text-[10px] font-bold flex items-center justify-center v-numeric">
                   {pendingCount > 9 ? "9+" : pendingCount}
                 </span>
               )}
@@ -68,7 +68,7 @@ function BottomNav() {
 
 function NavLink({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) {
   return (
-    <Link href={href} prefetch className="relative flex flex-col items-center justify-center py-2.5 gap-0.5 text-[var(--vie-ink-soft)] hover:text-[var(--vie-orange)] transition-colors">
+    <Link href={href} prefetch className="relative flex flex-col items-center justify-center py-2.5 gap-0.5 text-[var(--vie-ink-soft)] hover:text-[var(--vie-red)] transition-colors">
       {icon}
       <span className="text-[10px] font-semibold">{label}</span>
     </Link>
@@ -81,7 +81,7 @@ function NavSubmit() {
       <Link
         href="/app/submit"
         prefetch
-        className="-mt-6 w-14 h-14 rounded-full bg-[var(--vie-orange)] text-white flex items-center justify-center shadow-[0_8px_20px_rgba(255,111,0,0.35)] hover:scale-105 active:scale-95 transition-transform"
+        className="-mt-6 w-14 h-14 rounded-full bg-[var(--vie-red)] text-white flex items-center justify-center shadow-[0_8px_20px_rgba(255,111,0,0.35)] hover:scale-105 active:scale-95 transition-transform"
         aria-label="Submit invoice"
       >
         <Upload size={22} />

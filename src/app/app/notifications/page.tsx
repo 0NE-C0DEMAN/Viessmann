@@ -174,7 +174,7 @@ function NotifRow({ icon, title, body, href, tone, when }: {
     warn: "bg-[var(--vie-warn-bg)] text-[var(--vie-warn)]",
     error: "bg-[var(--vie-error-bg)] text-[var(--vie-error)]",
     info: "bg-[var(--vie-info-bg)] text-[var(--vie-info)]",
-    brand: "bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)]",
+    brand: "bg-[var(--vie-red-light)] text-[var(--vie-red-dark)]",
   };
   const Wrapper: React.ElementType = href ? Link : "div";
   return (

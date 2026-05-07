@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --vie-orange: #ff6f00;
-  --vie-orange-dark: #d05500;
-  --vie-orange-light: #ffe9d5;
+  /* Viessmann brand red — sampled from viessmann.com / viessmann-us.com */
+  --vie-red: #ff3e17;
+  --vie-red-dark: #cc2900;
+  --vie-red-light: #ffe2db;
   --vie-ink: #0d0d0d;
   --vie-ink-soft: #5a5a5a;
   --vie-ink-muted: #9a9a9a;
@@ -25,14 +26,14 @@
   --shadow-sm: 0 1px 2px rgba(15, 15, 15, 0.04);
   --shadow-md: 0 4px 12px rgba(15, 15, 15, 0.06);
   --shadow-lg: 0 12px 32px rgba(15, 15, 15, 0.08);
-  --shadow-glow: 0 8px 24px rgba(255, 111, 0, 0.18);
+  --shadow-glow: 0 8px 24px rgba(255, 62, 23, 0.18);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-brand: var(--vie-orange);
-  --color-brand-dark: var(--vie-orange-dark);
+  --color-brand: var(--vie-red);
+  --color-brand-dark: var(--vie-red-dark);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -91,11 +92,11 @@ body {
 .v-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .v-btn-primary {
-  background: var(--vie-orange);
+  background: var(--vie-red);
   color: white;
   box-shadow: var(--shadow-sm);
 }
-.v-btn-primary:hover:not(:disabled) { background: var(--vie-orange-dark); box-shadow: var(--shadow-glow); }
+.v-btn-primary:hover:not(:disabled) { background: var(--vie-red-dark); box-shadow: var(--shadow-glow); }
 
 .v-btn-ghost {
   background: var(--vie-paper-elev);
@@ -105,8 +106,8 @@ body {
 .v-btn-ghost:hover:not(:disabled) { background: #fafafa; border-color: var(--vie-line-strong); }
 
 .v-btn-soft {
-  background: var(--vie-orange-light);
-  color: var(--vie-orange-dark);
+  background: var(--vie-red-light);
+  color: var(--vie-red-dark);
 }
 .v-btn-soft:hover:not(:disabled) { background: #ffd9b8; }
 
@@ -142,8 +143,8 @@ body {
   color: var(--vie-ink);
 }
 .v-input:focus, .v-select:focus, .v-textarea:focus {
-  border-color: var(--vie-orange);
-  box-shadow: 0 0 0 3px rgba(255, 111, 0, 0.18);
+  border-color: var(--vie-red);
+  box-shadow: 0 0 0 3px rgba(255, 62, 23, 0.18);
 }
 .v-input::placeholder, .v-textarea::placeholder { color: var(--vie-ink-muted); }
 .v-input-error { border-color: var(--vie-error); }
@@ -185,7 +186,7 @@ body {
 .v-pill-info { background: var(--vie-info-bg); color: var(--vie-info); }
 .v-pill-warn { background: var(--vie-warn-bg); color: var(--vie-warn); }
 .v-pill-success { background: var(--vie-success-bg); color: var(--vie-success); }
-.v-pill-brand { background: var(--vie-orange-light); color: var(--vie-orange-dark); }
+.v-pill-brand { background: var(--vie-red-light); color: var(--vie-red-dark); }
 .v-pill-muted { background: #ececea; color: var(--vie-ink-soft); }
 
 /* ============================================================ */
@@ -217,27 +218,27 @@ body {
 .v-scroll-x::-webkit-scrollbar { height: 6px; }
 .v-scroll-x::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
 
-/* Logo mark */
+/* Logo mark — solid red square (Viessmann uses solid red, not gradients). */
 .v-logo {
   width: 28px;
   height: 28px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #ff6f00, #ff8a3d);
+  border-radius: 6px;
+  background: var(--vie-red);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-weight: 800;
-  font-size: 14px;
+  font-weight: 900;
+  font-size: 16px;
   letter-spacing: -0.04em;
-  box-shadow: 0 1px 3px rgba(255, 111, 0, 0.3);
+  box-shadow: 0 1px 2px rgba(255, 62, 23, 0.25);
 }
 
-.v-logo-lg { width: 48px; height: 48px; font-size: 24px; border-radius: 14px; }
+.v-logo-lg { width: 48px; height: 48px; font-size: 28px; border-radius: 10px; }
 
-/* Animated gradient for primary cards */
+/* Hero background — deep, neutral dark with a red accent glow. */
 .v-card-hero {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2c1a0d 60%, #4a2400 100%);
+  background: linear-gradient(135deg, #0a0a0a 0%, #2a0d09 60%, #4a1810 100%);
   color: white;
   border: 0;
   position: relative;
@@ -247,7 +248,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(80% 60% at 80% 0%, rgba(255, 111, 0, 0.35), transparent 60%);
+  background: radial-gradient(80% 60% at 80% 0%, rgba(255, 62, 23, 0.35), transparent 60%);
   pointer-events: none;
 }
 
@@ -270,7 +271,7 @@ body {
 
 /* Mobile bottom nav active indicator */
 .v-nav-active {
-  color: var(--vie-orange);
+  color: var(--vie-red);
 }
 .v-nav-active::after {
   content: "";
@@ -280,7 +281,7 @@ body {
   transform: translateX(-50%);
   width: 24px;
   height: 2px;
-  background: var(--vie-orange);
+  background: var(--vie-red);
   border-radius: 0 0 2px 2px;
 }
 

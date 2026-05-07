@@ -33,7 +33,7 @@ export default async function SettingsPage() {
         <div className="text-sm font-bold mb-2 flex items-center gap-2"><Shield size={14} /> Privacy</div>
         <p className="text-sm text-[var(--vie-ink-soft)]">
           Your data is hosted in the EU and processed under our GDPR DPIA. To request data export or erasure, email{" "}
-          <a className="text-[var(--vie-orange)] font-semibold" href="mailto:loyalty@viessmann.hr">loyalty@viessmann.hr</a>.
+          <a className="text-[var(--vie-red)] font-semibold" href="mailto:loyalty@viessmann.hr">loyalty@viessmann.hr</a>.
         </p>
       </div>
     </div>

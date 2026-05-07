@@ -31,7 +31,7 @@ export function ProfileMenu({ email, companyName }: { email: string; companyName
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-9 h-9 rounded-full bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] font-bold text-sm flex items-center justify-center hover:scale-105 transition-transform"
+        className="w-9 h-9 rounded-full bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] font-bold text-sm flex items-center justify-center hover:scale-105 transition-transform"
         title={companyName}
       >
         {initial}

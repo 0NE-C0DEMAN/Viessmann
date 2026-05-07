@@ -284,7 +284,7 @@ function ChooseStage({ onCamera, onFile, onShowHelp }: { onCamera: () => void; o
 
       <div className="grid gap-3">
         <button onClick={onFile} className="v-card v-card-interactive text-left flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center">
             <FileText size={22} />
           </div>
           <div className="flex-1">
@@ -296,7 +296,7 @@ function ChooseStage({ onCamera, onFile, onShowHelp }: { onCamera: () => void; o
           </div>
         </button>
         <button onClick={onCamera} className="v-card v-card-interactive text-left flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center">
             <Camera size={22} />
           </div>
           <div className="flex-1">
@@ -326,7 +326,7 @@ function OcrStage({ status, progress, previewUrl }: { status: string; progress: 
   return (
     <div className="space-y-4 pt-2 v-fade-in">
       <div className="text-center">
-        <Loader2 className="mx-auto animate-spin text-[var(--vie-orange)]" size={36} />
+        <Loader2 className="mx-auto animate-spin text-[var(--vie-red)]" size={36} />
         <h2 className="text-xl font-bold mt-3">{status}…</h2>
         <p className="text-sm text-[var(--vie-ink-muted)] mt-1">
           Reading the invoice on your device. First photo can take ~30s while the language model loads — subsequent ones are faster.
@@ -334,7 +334,7 @@ function OcrStage({ status, progress, previewUrl }: { status: string; progress: 
       </div>
       <div className="v-card v-card-tight">
         <div className="h-2 rounded-full bg-[var(--vie-line)] overflow-hidden">
-          <div className="h-full bg-[var(--vie-orange)] transition-all duration-200" style={{ width: `${pct}%` }} />
+          <div className="h-full bg-[var(--vie-red)] transition-all duration-200" style={{ width: `${pct}%` }} />
         </div>
         <div className="text-[11px] text-[var(--vie-ink-muted)] mt-1.5 text-right v-numeric">{pct}%</div>
       </div>
@@ -358,7 +358,7 @@ function ImageHelpStage({ onChooseFile, onBack }: { onChooseFile: () => void; on
 
       <div className="v-card">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center flex-shrink-0">
             <ScanLine size={20} />
           </div>
           <div>
@@ -375,7 +375,7 @@ function ImageHelpStage({ onChooseFile, onBack }: { onChooseFile: () => void; on
 
       <div className="v-card">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center flex-shrink-0">
             <Smartphone size={20} />
           </div>
           <div>
@@ -438,7 +438,7 @@ function UploadingStage({ step }: { step: number }) {
   return (
     <div className="space-y-5 pt-6">
       <div className="text-center">
-        <Loader2 className="mx-auto animate-spin text-[var(--vie-orange)]" size={40} />
+        <Loader2 className="mx-auto animate-spin text-[var(--vie-red)]" size={40} />
         <h2 className="text-xl font-bold mt-3">Processing your invoice</h2>
         <p className="text-sm text-[var(--vie-ink-muted)] mt-1">This usually takes 10–20 seconds.</p>
       </div>
@@ -446,7 +446,7 @@ function UploadingStage({ step }: { step: number }) {
         {PROGRESS_STEPS.map((s, i) => (
           <div key={s} className="flex items-center gap-3 text-sm">
             <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
-              i < step ? "bg-[var(--vie-success)] text-white" : i === step ? "bg-[var(--vie-orange)] text-white" : "bg-[var(--vie-line)] text-[var(--vie-ink-muted)]"
+              i < step ? "bg-[var(--vie-success)] text-white" : i === step ? "bg-[var(--vie-red)] text-white" : "bg-[var(--vie-line)] text-[var(--vie-ink-muted)]"
             }`}>
               {i < step ? <CheckCircle2 size={12} /> : i === step ? <Loader2 size={12} className="animate-spin" /> : <span className="text-[10px] font-bold">{i + 1}</span>}
             </div>
@@ -488,7 +488,7 @@ function ResultStage({ response, onAnother, onView }: { response: PipelineRespon
         <div className="mt-4 text-xl font-bold">{titles[status]}</div>
         <div className="text-sm text-[var(--vie-ink-soft)] mt-1 max-w-xs mx-auto">{response.message}</div>
         {ok && response.pointsAwarded != null && (
-          <div className="mt-4 inline-flex items-center px-5 py-2 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] font-bold text-2xl v-numeric">
+          <div className="mt-4 inline-flex items-center px-5 py-2 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] font-bold text-2xl v-numeric">
             +{formatPoints(response.pointsAwarded)} pts
           </div>
         )}

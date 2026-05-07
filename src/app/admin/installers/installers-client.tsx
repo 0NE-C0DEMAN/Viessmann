@@ -108,7 +108,7 @@ export function InstallersClient({ installers }: { installers: Installer[] }) {
                 <td className="py-2.5 text-right whitespace-nowrap">
                   <button onClick={() => setAdjusting(r)} className="text-[var(--vie-ink-soft)] font-semibold text-xs hover:text-[var(--vie-ink)]">Adjust pts</button>
                   <span className="mx-2 text-[var(--vie-line-strong)]">·</span>
-                  <Link href={`/admin/installers/${r.id}`} className="text-[var(--vie-orange)] font-semibold text-xs">Open →</Link>
+                  <Link href={`/admin/installers/${r.id}`} className="text-[var(--vie-red)] font-semibold text-xs">Open →</Link>
                 </td>
               </tr>
             ))}

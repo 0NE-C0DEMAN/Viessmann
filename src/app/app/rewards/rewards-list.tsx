@@ -96,7 +96,7 @@ export function RewardsList({
             const requiredTier = r.tierRequired as Tier;
             return (
               <div key={r.id} className={`v-card flex items-center gap-3 ${!tierOk ? "opacity-75" : ""}`}>
-                <div className="w-14 h-14 rounded-2xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center flex-shrink-0">
+                <div className="w-14 h-14 rounded-2xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center flex-shrink-0">
                   <Gift size={22} />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -108,7 +108,7 @@ export function RewardsList({
                   </div>
                   <div className="text-xs text-[var(--vie-ink-muted)] truncate">{r.description}</div>
                   <div className="text-xs mt-1.5 flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-[var(--vie-orange-dark)] v-numeric">{formatPoints(r.pointCost)} pts</span>
+                    <span className="font-bold text-[var(--vie-red-dark)] v-numeric">{formatPoints(r.pointCost)} pts</span>
                     {!inStock ? (
                       <span className="v-pill v-pill-muted">Out of stock</span>
                     ) : stockLow ? (
@@ -139,7 +139,7 @@ export function RewardsList({
         description={
           pending ? (
             <>
-              <strong className="text-[var(--vie-orange-dark)]">{formatPoints(pending.pointCost)} pts</strong> will be deducted from your balance.
+              <strong className="text-[var(--vie-red-dark)]">{formatPoints(pending.pointCost)} pts</strong> will be deducted from your balance.
               You&apos;ll be left with <strong>{formatPoints(balance - pending.pointCost)} pts</strong>. Viessmann ships within 5 business days.
             </>
           ) : null

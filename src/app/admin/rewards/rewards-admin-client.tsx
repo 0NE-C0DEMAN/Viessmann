@@ -168,7 +168,7 @@ export function RewardsAdminClient({ rewards: initial }: { rewards: Reward[] }) 
             return (
               <div key={r.id} className={`v-card ${!r.active ? "opacity-60" : ""}`}>
                 <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-2xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center flex-shrink-0">
                     <Gift size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -178,7 +178,7 @@ export function RewardsAdminClient({ rewards: initial }: { rewards: Reward[] }) 
                     </div>
                     <div className="text-xs text-[var(--vie-ink-muted)] truncate">{r.description ?? "—"}</div>
                     <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
-                      <span className="font-bold v-numeric text-[var(--vie-orange-dark)]">{formatPoints(r.pointCost)} pts</span>
+                      <span className="font-bold v-numeric text-[var(--vie-red-dark)]">{formatPoints(r.pointCost)} pts</span>
                       <span className={`v-pill text-[10px] ${TIER_BADGE[tier]}`}>{tier}+</span>
                       <span className="v-pill v-pill-muted text-[10px]">Stock {r.inventory}</span>
                     </div>

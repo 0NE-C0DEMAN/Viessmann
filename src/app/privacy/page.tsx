@@ -7,8 +7,8 @@ export default function PrivacyPage() {
     <div className="min-h-screen flex flex-col">
       <header className="px-6 py-5 max-w-3xl w-full mx-auto">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="v-logo">V+</span>
-          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-orange)]">Loyalty</span></span>
+          <span className="v-logo">V</span>
+          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-red)]">Loyalty</span></span>
         </Link>
       </header>
       <main className="flex-1 px-6 max-w-3xl w-full mx-auto pb-12">
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-bold mt-6">Your rights</h2>
           <p className="text-sm text-[var(--vie-ink-soft)]">
             For data export or erasure requests, email{" "}
-            <a className="text-[var(--vie-orange)] font-semibold" href="mailto:loyalty@viessmann.hr">loyalty@viessmann.hr</a>.
+            <a className="text-[var(--vie-red)] font-semibold" href="mailto:loyalty@viessmann.hr">loyalty@viessmann.hr</a>.
           </p>
         </div>
       </main>

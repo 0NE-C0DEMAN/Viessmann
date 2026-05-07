@@ -89,7 +89,7 @@ export function HistoryClient({ rows }: { rows: Receipt[] }) {
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
                   <StatusPill status={r.status} />
-                  {r.pointsAwarded > 0 && <div className="text-sm font-bold v-numeric text-[var(--vie-orange)]">+{formatPoints(r.pointsAwarded)}</div>}
+                  {r.pointsAwarded > 0 && <div className="text-sm font-bold v-numeric text-[var(--vie-red)]">+{formatPoints(r.pointsAwarded)}</div>}
                 </div>
               </div>
             </Link>

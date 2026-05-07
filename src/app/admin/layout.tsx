@@ -14,9 +14,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <header className="sticky top-0 z-30 bg-[var(--vie-paper-elev)]/95 backdrop-blur border-b border-[var(--vie-line)]">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/admin" className="flex items-center gap-2.5">
-            <span className="v-logo">V+</span>
+            <span className="v-logo">V</span>
             <div>
-              <div className="font-bold tracking-tight leading-tight">Viessmann <span className="text-[var(--vie-orange)]">Admin</span></div>
+              <div className="font-bold tracking-tight leading-tight">Viessmann <span className="text-[var(--vie-red)]">Admin</span></div>
               <div className="text-[10px] text-[var(--vie-ink-muted)] uppercase tracking-wider">Croatia · Pilot</div>
             </div>
           </Link>

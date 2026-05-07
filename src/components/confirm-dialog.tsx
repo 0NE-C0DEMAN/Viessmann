@@ -24,7 +24,7 @@ const TONE_BTN: Record<ConfirmTone, string> = {
 };
 
 const TONE_ICON: Record<ConfirmTone, string> = {
-  default: "bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)]",
+  default: "bg-[var(--vie-red-light)] text-[var(--vie-red-dark)]",
   danger: "bg-[var(--vie-error-bg)] text-[var(--vie-error)]",
   success: "bg-[var(--vie-success-bg)] text-[var(--vie-success)]",
 };

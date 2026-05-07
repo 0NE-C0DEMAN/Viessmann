@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.2.2 — 2026-05-07
+
+### Brand alignment — Viessmann red
+
+- Sampled the actual brand red from `viessmann.com` and `viessmann-us.com` (`#ff3e17`) and adopted it everywhere. The previous `#ff7c1c` was an orange placeholder.
+- Renamed all `--vie-orange*` CSS variables to `--vie-red*` across 24 files. Same semantics, accurate name.
+- Logo mark now uses solid Viessmann red (no gradient — Viessmann's brand uses solid red), bolder typography, single `V` letter instead of `V+`.
+- PWA `theme_color` and `themeColor` viewport metadata updated to the new red — phones tinting their status bar will now match Viessmann's brand.
+- Regenerated `icon-192.png`, `icon-512.png`, `apple-icon.png`, `icon.svg` in the new red.
+- Hero card background tweaked away from a brown/orange-tinted dark to a neutral dark with a red accent glow.
+
 ## v0.2.1 — 2026-05-07
 
 ### Closing remaining account / admin / observability gaps

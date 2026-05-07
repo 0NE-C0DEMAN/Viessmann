@@ -8,8 +8,8 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen flex flex-col">
       <header className="px-6 py-5 max-w-md w-full mx-auto">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="v-logo">V+</span>
-          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-orange)]">Loyalty</span></span>
+          <span className="v-logo">V</span>
+          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-red)]">Loyalty</span></span>
         </Link>
       </header>
       <main className="flex-1 px-6 max-w-md w-full mx-auto pt-2 v-fade-in">
@@ -18,14 +18,14 @@ export default function ForgotPasswordPage() {
 
         <div className="v-card mt-6 space-y-3">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center flex-shrink-0">
               <Mail size={18} />
             </div>
             <div>
               <div className="font-semibold text-sm">Email Viessmann support</div>
               <div className="text-xs text-[var(--vie-ink-soft)] mt-1">
                 Send a message from your registered email address to{" "}
-                <a href="mailto:loyalty@viessmann.hr" className="text-[var(--vie-orange)] font-semibold">loyalty@viessmann.hr</a>{" "}
+                <a href="mailto:loyalty@viessmann.hr" className="text-[var(--vie-red)] font-semibold">loyalty@viessmann.hr</a>{" "}
                 including your company OIB. Our team verifies the request and issues a temporary password within one business day.
               </div>
             </div>

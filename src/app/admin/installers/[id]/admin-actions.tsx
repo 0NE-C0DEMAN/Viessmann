@@ -99,8 +99,8 @@ export function AdminInstallerActions({ installerId, companyName, email, disable
         </div>
 
         {issuedPassword && (
-          <div className="v-card v-card-tight bg-[var(--vie-orange-light)]/40 border-[var(--vie-orange-light)] mt-3">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--vie-orange-dark)]">Temporary password issued</div>
+          <div className="v-card v-card-tight bg-[var(--vie-red-light)]/40 border-[var(--vie-red-light)] mt-3">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--vie-red-dark)]">Temporary password issued</div>
             <div className="flex items-center justify-between gap-2 mt-1">
               <code className="text-sm font-mono">{issuedPassword}</code>
               <button onClick={copyPassword} className="v-btn v-btn-ghost v-btn-sm v-btn-icon"><Copy size={14} /></button>

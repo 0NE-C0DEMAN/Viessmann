@@ -69,7 +69,7 @@ export function WholesalersClient({ rows }: { rows: Row[] }) {
                   <td className="py-2.5 v-numeric">{formatPoints(r.pointsAwarded)}</td>
                   <td className="py-2.5 text-xs text-[var(--vie-ink-muted)]">{relativeDate(r.lastSeen)}</td>
                   <td className="py-2.5 text-right">
-                    <Link href={`/admin?wholesaler=${encodeURIComponent(r.oib)}`} className="text-[var(--vie-orange)] font-semibold text-xs">View receipts →</Link>
+                    <Link href={`/admin?wholesaler=${encodeURIComponent(r.oib)}`} className="text-[var(--vie-red)] font-semibold text-xs">View receipts →</Link>
                   </td>
                 </tr>
               ))}

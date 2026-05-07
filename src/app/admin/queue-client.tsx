@@ -111,7 +111,7 @@ export function AdminQueueClient({
                   <td className="py-2.5 font-semibold v-numeric">{formatPoints(r.pointsAwarded)}</td>
                   <td className="py-2.5"><StatusPill status={r.status} /></td>
                   <td className="py-2.5 text-right">
-                    <Link href={`/admin/receipts/${r.id}`} className="text-[var(--vie-orange)] font-semibold text-xs">Open →</Link>
+                    <Link href={`/admin/receipts/${r.id}`} className="text-[var(--vie-red)] font-semibold text-xs">Open →</Link>
                   </td>
                 </tr>
               ))}
@@ -130,7 +130,7 @@ function Stat({ label, value, tone }: { label: string; value: number | string; t
     warn: "text-[var(--vie-warn)]",
     error: "text-[var(--vie-error)]",
     info: "text-[var(--vie-info)]",
-    brand: "text-[var(--vie-orange)]",
+    brand: "text-[var(--vie-red)]",
   };
   return (
     <div className="v-card">

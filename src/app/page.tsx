@@ -13,8 +13,8 @@ export default async function Home() {
     <div className="flex flex-col flex-1 min-h-screen">
       <header className="px-6 py-5 max-w-6xl w-full mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <span className="v-logo">V+</span>
-          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-orange)]">Loyalty</span></span>
+          <span className="v-logo">V</span>
+          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-red)]">Loyalty</span></span>
         </div>
         <div className="flex items-center gap-2">
           <Link href="/login" className="v-btn v-btn-ghost v-btn-sm">Sign in</Link>
@@ -72,8 +72,8 @@ export default async function Home() {
           />
         </section>
 
-        <section className="v-card mb-12 bg-[var(--vie-orange-light)] border-[var(--vie-orange-light)]">
-          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-orange-dark)] mb-2">Demo accounts</div>
+        <section className="v-card mb-12 bg-[var(--vie-red-light)] border-[var(--vie-red-light)]">
+          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-red-dark)] mb-2">Demo accounts</div>
           <div className="text-sm text-[var(--vie-ink)]">
             Try it live — sign in as <code className="px-1.5 py-0.5 bg-white rounded text-xs">ivo@instalaterm.hr</code>, <code className="px-1.5 py-0.5 bg-white rounded text-xs">marko@energomont.hr</code>, or <code className="px-1.5 py-0.5 bg-white rounded text-xs">ana@termoprojekt.hr</code> (password <code className="px-1.5 py-0.5 bg-white rounded text-xs">demo1234</code>).
             Admin: <code className="px-1.5 py-0.5 bg-white rounded text-xs">admin@viessmann.com</code> / <code className="px-1.5 py-0.5 bg-white rounded text-xs">admin1234</code>.
@@ -98,7 +98,7 @@ export default async function Home() {
 function Step({ n, title, desc, icon }: { n: number; title: string; desc: string; icon: React.ReactNode }) {
   return (
     <li className="flex gap-3">
-      <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center font-bold text-sm">
+      <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center font-bold text-sm">
         {icon}
       </div>
       <div>
@@ -115,7 +115,7 @@ function Step({ n, title, desc, icon }: { n: number; title: string; desc: string
 function Feature({ title, desc, icon }: { title: string; desc: string; icon: React.ReactNode }) {
   return (
     <div className="v-card">
-      <div className="w-10 h-10 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center mb-3">
+      <div className="w-10 h-10 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center mb-3">
         {icon}
       </div>
       <div className="font-bold tracking-tight">{title}</div>

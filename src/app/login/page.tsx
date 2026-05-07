@@ -51,8 +51,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col">
       <header className="px-6 py-5 max-w-md w-full mx-auto">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="v-logo">V+</span>
-          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-orange)]">Loyalty</span></span>
+          <span className="v-logo">V</span>
+          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-red)]">Loyalty</span></span>
         </Link>
       </header>
       <main className="flex-1 px-6 max-w-md w-full mx-auto pt-2 v-fade-in">
@@ -73,7 +73,7 @@ export default function LoginPage() {
           </button>
           <div className="flex items-center justify-between text-sm">
             <Link href="/forgot-password" className="text-[var(--vie-ink-muted)] hover:text-[var(--vie-ink)]">Forgot password?</Link>
-            <Link href="/signup" className="text-[var(--vie-orange)] font-semibold">Register</Link>
+            <Link href="/signup" className="text-[var(--vie-red)] font-semibold">Register</Link>
           </div>
         </form>
 
@@ -89,7 +89,7 @@ export default function LoginPage() {
                 onClick={() => quick(u.email)}
                 className="v-card v-card-tight v-card-interactive text-left flex items-center gap-3"
               >
-                <div className="w-9 h-9 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] font-bold text-sm flex items-center justify-center flex-shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] font-bold text-sm flex items-center justify-center flex-shrink-0">
                   {u.company[0]}
                 </div>
                 <div className="min-w-0 flex-1">

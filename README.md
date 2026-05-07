@@ -135,6 +135,7 @@ public/
 
 ## Releases
 
+- **v0.2.2** — brand alignment to Viessmann red `#ff3e17` (sampled from viessmann.com / viessmann-us.com), CSS vars renamed `--vie-orange*` → `--vie-red*`, logo mark + PWA icons regenerated.
 - **v0.2.1** — account lifecycle (disable + admin password reset), forgot-password explainer, VIES EU VAT validation on signup, bell badge counter for pending reviews, wholesalers admin tab, CSV export from queue + installers, audit log filters/search, resubmit CTA on rejected/duplicate receipts.
 - **v0.2.0** — admin completeness: rewards CRUD at /admin/rewards, installer drill-down at /admin/installers/[id], reusable ConfirmDialog replacing native browser confirms across rewards / campaigns / fulfillment, login demo-accounts polished.
 - **v0.1.9** — loyalty engine edge-case pass: tier-gated rewards (Bronze/Silver/Gold/Platinum), admin reversals/adjustments + tier-ups now generate notifications, negative-balance banner, currency validation, submission velocity rate-limit, campaign per-installer cap, audit log viewer at /admin/audit.

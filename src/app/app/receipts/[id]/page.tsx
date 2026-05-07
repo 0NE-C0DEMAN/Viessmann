@@ -92,7 +92,7 @@ export default async function ReceiptDetail({ params }: { params: Promise<{ id: 
                 <div className="text-right flex-shrink-0">
                   <div className="text-sm font-semibold v-numeric">{formatEur(line.amountCents)}</div>
                   {line.pointsAwarded > 0 && (
-                    <div className="text-xs font-bold text-[var(--vie-orange)] v-numeric">+{formatPoints(line.pointsAwarded)}</div>
+                    <div className="text-xs font-bold text-[var(--vie-red)] v-numeric">+{formatPoints(line.pointsAwarded)}</div>
                   )}
                   {line.campaignName && line.pointsAwarded > line.pointsBase && (
                     <div className="text-[10px] text-[var(--vie-success)] font-semibold mt-0.5">
@@ -118,8 +118,8 @@ export default async function ReceiptDetail({ params }: { params: Promise<{ id: 
       </div>
 
       {r.reviewerNote && (
-        <div className="v-card border-[var(--vie-orange-light)] bg-[var(--vie-orange-light)]/30">
-          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-orange-dark)] mb-1.5">Note from Viessmann</div>
+        <div className="v-card border-[var(--vie-red-light)] bg-[var(--vie-red-light)]/30">
+          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-red-dark)] mb-1.5">Note from Viessmann</div>
           <div className="text-sm">
             <ReviewerNote note={r.reviewerNote} />
           </div>
@@ -173,7 +173,7 @@ function ReviewerNote({ note }: { note: string }) {
   return (
     <>
       {before}
-      <Link href={`/app/receipts/${m[1]}`} className="text-[var(--vie-orange)] font-semibold underline">
+      <Link href={`/app/receipts/${m[1]}`} className="text-[var(--vie-red)] font-semibold underline">
         {m[1].slice(0, 8)}…
       </Link>
       {after}

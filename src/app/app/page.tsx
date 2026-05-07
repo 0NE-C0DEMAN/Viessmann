@@ -106,14 +106,14 @@ export default async function InstallerHome() {
         <div className="text-sm font-bold mb-2 mt-3">Quick actions</div>
         <div className="grid grid-cols-2 gap-3">
           <Link href="/app/submit?mode=upload" prefetch className="v-card v-card-interactive flex flex-col gap-1">
-            <div className="w-10 h-10 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center">
               <FileText size={18} />
             </div>
             <div className="font-semibold text-sm mt-1">Upload PDF / XML</div>
             <div className="text-xs text-[var(--vie-ink-muted)]">Fastest path</div>
           </Link>
           <Link href="/app/submit?mode=camera" prefetch className="v-card v-card-interactive flex flex-col gap-1">
-            <div className="w-10 h-10 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center">
               <Camera size={18} />
             </div>
             <div className="font-semibold text-sm mt-1">Scan with camera</div>
@@ -125,7 +125,7 @@ export default async function InstallerHome() {
       <div>
         <div className="flex items-center justify-between mb-2 mt-3">
           <div className="text-sm font-bold">Recent submissions</div>
-          <Link href="/app/history" prefetch className="text-xs text-[var(--vie-orange)] font-semibold flex items-center gap-0.5">View all <ArrowRight size={12} /></Link>
+          <Link href="/app/history" prefetch className="text-xs text-[var(--vie-red)] font-semibold flex items-center gap-0.5">View all <ArrowRight size={12} /></Link>
         </div>
         {recent.length === 0 ? (
           <EmptyState />
@@ -141,7 +141,7 @@ export default async function InstallerHome() {
                 </div>
                 <div className="flex flex-col items-end gap-1 flex-shrink-0">
                   <StatusPill status={r.status} />
-                  {r.pointsAwarded > 0 && <div className="text-xs font-bold text-[var(--vie-orange)]">+{formatPoints(r.pointsAwarded)}</div>}
+                  {r.pointsAwarded > 0 && <div className="text-xs font-bold text-[var(--vie-red)]">+{formatPoints(r.pointsAwarded)}</div>}
                 </div>
               </Link>
             ))}
@@ -165,7 +165,7 @@ function Stat({ label, value, accent }: { label: string; value: number; accent?:
 function EmptyState() {
   return (
     <div className="v-card text-center py-8">
-      <div className="w-12 h-12 mx-auto rounded-full bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center">
+      <div className="w-12 h-12 mx-auto rounded-full bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center">
         <TrendingUp size={20} />
       </div>
       <div className="font-semibold text-sm mt-3">No submissions yet</div>

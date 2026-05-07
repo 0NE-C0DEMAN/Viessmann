@@ -71,8 +71,8 @@ export default function SignupPage() {
     <div className="min-h-screen flex flex-col">
       <header className="px-6 py-5 max-w-lg w-full mx-auto">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="v-logo">V+</span>
-          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-orange)]">Loyalty</span></span>
+          <span className="v-logo">V</span>
+          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-red)]">Loyalty</span></span>
         </Link>
       </header>
       <main className="flex-1 px-6 max-w-lg w-full mx-auto pt-2 pb-10 v-fade-in">
@@ -157,7 +157,7 @@ export default function SignupPage() {
               </button>
             </div>
             <div className="text-sm text-center text-[var(--vie-ink-soft)] pt-1">
-              Already have an account? <Link href="/login" className="text-[var(--vie-orange)] font-semibold">Sign in</Link>
+              Already have an account? <Link href="/login" className="text-[var(--vie-red)] font-semibold">Sign in</Link>
             </div>
           </form>
         )}
