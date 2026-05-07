@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import {
@@ -67,6 +68,11 @@ export function AdminMobileNav({ email }: { email: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  // The drawer is portaled to document.body to escape `backdrop-filter` on
+  // ancestor elements (which otherwise creates a containing block for
+  // `position: fixed`, trapping the drawer inside the sticky header).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   // Lock page scroll while open + close on Esc.
   useEffect(() => {
@@ -95,34 +101,26 @@ export function AdminMobileNav({ email }: { email: string }) {
     router.refresh();
   }
 
-  return (
+  // Backdrop + drawer panel — portaled to document.body so they escape any
+  // ancestor that creates a containing block (sticky header has
+  // `backdrop-filter`, which would otherwise trap `position: fixed`).
+  const overlay = (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        aria-label="Open menu"
-        aria-expanded={open}
-        className="lg:hidden p-2 rounded-lg text-[var(--vie-ink-soft)] hover:bg-[var(--vie-paper)] hover:text-[var(--vie-ink)] active:bg-[var(--vie-line)] transition-colors"
-      >
-        <Menu size={22} />
-      </button>
-
-      {/* Backdrop — always rendered so it can fade smoothly */}
       <div
-        className={`lg:hidden fixed inset-0 z-50 bg-black/45 transition-opacity duration-200 ${
+        className={`lg:hidden fixed inset-0 z-[100] bg-black/45 transition-opacity duration-200 ${
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setOpen(false)}
         aria-hidden="true"
       />
-
-      {/* Drawer panel — slides in from the right */}
       <aside
-        className={`lg:hidden fixed top-0 right-0 bottom-0 z-50 w-[88%] max-w-[360px] bg-[var(--vie-paper-elev)] flex flex-col shadow-[0_0_30px_rgba(0,0,0,0.12)] transform transition-transform duration-200 ease-out ${
+        className={`lg:hidden fixed top-0 right-0 bottom-0 z-[101] w-[88%] max-w-[360px] h-screen bg-[var(--vie-paper-elev)] flex flex-col shadow-[0_0_30px_rgba(0,0,0,0.18)] transform transition-transform duration-200 ease-out ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
         aria-modal="true"
         aria-label="Admin menu"
+        aria-hidden={!open}
       >
         <div className="v-safe-top">
           <div className="flex items-start justify-between p-4 pb-3 border-b border-[var(--vie-line)]">
@@ -182,6 +180,20 @@ export function AdminMobileNav({ email }: { email: string }) {
           </button>
         </div>
       </aside>
+    </>
+  );
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        aria-label="Open menu"
+        aria-expanded={open}
+        className="lg:hidden p-2 rounded-lg text-[var(--vie-ink-soft)] hover:bg-[var(--vie-paper)] hover:text-[var(--vie-ink)] active:bg-[var(--vie-line)] transition-colors"
+      >
+        <Menu size={22} />
+      </button>
+      {mounted ? createPortal(overlay, document.body) : null}
     </>
   );
 }

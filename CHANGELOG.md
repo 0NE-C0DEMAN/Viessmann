@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.2.11 — 2026-05-07
+
+### Fix: admin drawer rendered as two stranded chunks on mobile
+
+The drawer in v0.2.10 was rendered inside `<header>`, which has `backdrop-filter` (from `backdrop-blur`). Per CSS spec, an ancestor with `backdrop-filter` creates a containing block for `position: fixed` descendants — so `top: 0; bottom: 0` was being scoped to the header element instead of the viewport, leaving the panel half-collapsed and showing the page through the middle.
+
+- Backdrop + drawer panel now render via `createPortal(..., document.body)` so they escape any ancestor's containing block.
+- Bumped portal layers to `z-[100]` (backdrop) and `z-[101]` (panel) for headroom over any future overlays.
+- Belt-and-braces explicit `h-screen` on the panel.
+- Mounted-flag gate prevents the portal from running during SSR (browser-only).
+
+The drawer now renders as one full-height panel sliding in from the right, with proper backdrop coverage behind it.
+
 ## v0.2.10 — 2026-05-07
 
 ### Admin mobile drawer rebuilt
