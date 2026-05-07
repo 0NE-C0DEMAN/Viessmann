@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.2.6 — 2026-05-07
+
+### Toast position fix on mobile
+
+The installer PWA has a sticky bottom nav (~58 px) with a floating Submit FAB protruding ~24 px above it, plus iOS safe-area inset. Sonner's `mobileOffset={20}` was placing the toast right inside that strip — covering the nav icons.
+
+- Bumped `mobileOffset` to 100 px so the toast floats clearly above the bottom-nav stack.
+- Toast width now responsive: `min(calc(100vw - 32px), 380px)` so on a 375 px-wide phone the toast keeps a 16 px gutter on each side instead of pinning to the viewport edge or overflowing.
+
 ## v0.2.5 — 2026-05-07
 
 ### Trim redundant toasts

@@ -56,7 +56,10 @@ export default function RootLayout({
           duration={3500}
           gap={8}
           offset={16}
-          mobileOffset={20}
+          // Mobile installer pages have a bottom nav (~58 px) with a floating
+          // Submit FAB protruding ~24 px above it, plus the iOS safe-area
+          // inset. Push the toast above the whole stack with breathing room.
+          mobileOffset={100}
           visibleToasts={3}
           toastOptions={{
             classNames: {

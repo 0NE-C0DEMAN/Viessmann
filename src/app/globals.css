@@ -301,7 +301,9 @@ body {
 /* no border-flood, no close button. Linear / Vercel style.     */
 /* ============================================================ */
 [data-sonner-toaster] {
-  --width: 360px !important;
+  /* Always leave at least 16 px breathing room from the viewport edge.
+     Caps at 380 px on wide screens. */
+  --width: min(calc(100vw - 32px), 380px) !important;
   --border-radius: 12px !important;
   font-family: inherit !important;
 }
