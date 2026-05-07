@@ -4,7 +4,7 @@ import { useState, useRef, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Camera, FileText, Loader2, CheckCircle2, AlertTriangle, XCircle, FileImage, ArrowLeft, RefreshCw } from "lucide-react";
+import { Camera, FileText, Loader2, CheckCircle2, AlertTriangle, XCircle, FileImage, ArrowLeft, RefreshCw, Smartphone, ScanLine } from "lucide-react";
 import { formatEur, formatPoints } from "@/lib/money";
 
 interface PipelineLine {
@@ -36,7 +36,7 @@ interface PipelineResponse {
   error?: string;
 }
 
-type Stage = "choose" | "preview" | "uploading" | "result";
+type Stage = "choose" | "preview" | "uploading" | "result" | "image_help";
 
 const PROGRESS_STEPS = [
   "Uploading the file",
@@ -81,13 +81,21 @@ export default function SubmitPage() {
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
-    setFile(f);
-    if (f.type.startsWith("image/")) {
-      const u = URL.createObjectURL(f);
-      setPreviewUrl(u);
-    } else {
-      setPreviewUrl(null);
+
+    const lower = f.name.toLowerCase();
+    const isPdf = f.type === "application/pdf" || lower.endsWith(".pdf");
+    const isXml = f.type === "text/xml" || f.type === "application/xml" || lower.endsWith(".xml");
+    const isImage = f.type.startsWith("image/") || /\.(jpe?g|png|webp|heic|heif)$/i.test(lower);
+
+    if (isImage && !isPdf && !isXml) {
+      // We don't run AI vision for the prototype — point users to scan-to-PDF.
+      setFile(null);
+      setStage("image_help");
+      return;
     }
+
+    setFile(f);
+    setPreviewUrl(null);
     setStage("preview");
   }
 
@@ -129,16 +137,14 @@ export default function SubmitPage() {
     setStage("choose");
   }
 
-  function pickCamera() {
-    const el = fileRef.current!;
-    el.accept = "image/*";
-    el.setAttribute("capture", "environment");
-    el.value = "";
-    el.click();
+  function showCameraHelp() {
+    // For the prototype we don't run AI vision, so a "camera" tap just shows
+    // the scan-to-PDF guide instead of capturing a useless image.
+    setStage("image_help");
   }
   function pickFile() {
     const el = fileRef.current!;
-    el.accept = "application/pdf,image/*,text/xml,application/xml,.xml";
+    el.accept = "application/pdf,text/xml,application/xml,.xml";
     el.removeAttribute("capture");
     el.value = "";
     el.click();
@@ -147,7 +153,7 @@ export default function SubmitPage() {
   // Auto-trigger based on URL param on first render
   useMemo(() => {
     if (typeof window === "undefined") return;
-    if (initialMode === "camera") setTimeout(pickCamera, 100);
+    if (initialMode === "camera") setTimeout(showCameraHelp, 100);
     else if (initialMode === "upload") setTimeout(pickFile, 100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -164,7 +170,11 @@ export default function SubmitPage() {
       </div>
 
       {stage === "choose" && (
-        <ChooseStage onCamera={pickCamera} onFile={pickFile} />
+        <ChooseStage onCamera={showCameraHelp} onFile={pickFile} />
+      )}
+
+      {stage === "image_help" && (
+        <ImageHelpStage onChooseFile={pickFile} onBack={() => setStage("choose")} />
       )}
 
       {stage === "preview" && file && (
@@ -189,26 +199,29 @@ function ChooseStage({ onCamera, onFile }: { onCamera: () => void; onFile: () =>
     <>
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Submit invoice</h1>
-        <p className="text-sm text-[var(--vie-ink-soft)] mt-1">PDF, photo, or e-invoice XML.</p>
+        <p className="text-sm text-[var(--vie-ink-soft)] mt-1">PDF or e-invoice XML.</p>
       </div>
 
       <div className="grid gap-3">
-        <button onClick={onCamera} className="v-card v-card-interactive text-left flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center">
-            <Camera size={22} />
-          </div>
-          <div className="flex-1">
-            <div className="font-semibold text-sm">Scan with camera</div>
-            <div className="text-xs text-[var(--vie-ink-muted)]">Take a photo of the printed invoice</div>
-          </div>
-        </button>
         <button onClick={onFile} className="v-card v-card-interactive text-left flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center">
             <FileText size={22} />
           </div>
           <div className="flex-1">
-            <div className="font-semibold text-sm">Upload file</div>
-            <div className="text-xs text-[var(--vie-ink-muted)]">PDF or e-invoice XML from your device</div>
+            <div className="font-semibold text-sm">Upload PDF or XML</div>
+            <div className="text-xs text-[var(--vie-ink-muted)]">From your device — fastest path</div>
+          </div>
+        </button>
+        <button onClick={onCamera} className="v-card v-card-interactive text-left flex items-center gap-3 opacity-90">
+          <div className="w-12 h-12 rounded-xl bg-[var(--vie-line)] text-[var(--vie-ink-soft)] flex items-center justify-center">
+            <Camera size={22} />
+          </div>
+          <div className="flex-1">
+            <div className="font-semibold text-sm flex items-center gap-2">
+              Scan with camera
+              <span className="v-pill v-pill-muted text-[10px]">scan-to-PDF</span>
+            </div>
+            <div className="text-xs text-[var(--vie-ink-muted)]">We&apos;ll show you how to capture as PDF on your phone</div>
           </div>
         </button>
       </div>
@@ -219,6 +232,64 @@ function ChooseStage({ onCamera, onFile }: { onCamera: () => void; onFile: () =>
         <p>2. We verify the buyer OIB matches your account.</p>
         <p>3. Only Viessmann lines earn points. Competitor lines stay on the invoice but at 0 pts.</p>
         <p>4. If everything checks out, points hit your balance immediately.</p>
+      </div>
+    </>
+  );
+}
+
+function ImageHelpStage({ onChooseFile, onBack }: { onChooseFile: () => void; onBack: () => void }) {
+  return (
+    <>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Photo upload — coming later</h1>
+        <p className="text-sm text-[var(--vie-ink-soft)] mt-1">
+          We don&apos;t process raw photos yet. The good news: your phone can scan an invoice straight to PDF in two taps.
+        </p>
+      </div>
+
+      <div className="v-card">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center flex-shrink-0">
+            <ScanLine size={20} />
+          </div>
+          <div>
+            <div className="font-semibold text-sm">iPhone &amp; iPad</div>
+            <ol className="text-xs text-[var(--vie-ink-soft)] mt-1 space-y-0.5 list-decimal pl-4">
+              <li>Open the <strong>Files</strong> or <strong>Notes</strong> app</li>
+              <li>Tap the <strong>camera</strong> icon → <strong>Scan Documents</strong></li>
+              <li>Frame the invoice — iOS auto-captures and corrects perspective</li>
+              <li>Tap <strong>Save</strong>, then share the PDF back to this app</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div className="v-card">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center flex-shrink-0">
+            <Smartphone size={20} />
+          </div>
+          <div>
+            <div className="font-semibold text-sm">Android</div>
+            <ol className="text-xs text-[var(--vie-ink-soft)] mt-1 space-y-0.5 list-decimal pl-4">
+              <li>Open <strong>Google Drive</strong></li>
+              <li>Tap the <strong>+ button</strong> → <strong>Scan</strong></li>
+              <li>Capture the invoice and save as PDF</li>
+              <li>Open the saved PDF and share it back here</li>
+            </ol>
+            <div className="text-[11px] text-[var(--vie-ink-muted)] mt-2">No Drive? Apps like <em>Adobe Scan</em> and <em>Microsoft Lens</em> work the same way.</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="v-card text-xs text-[var(--vie-ink-soft)] space-y-1">
+        <div className="font-semibold text-[var(--vie-ink)] flex items-center gap-1.5"><AlertTriangle size={12} className="text-[var(--vie-warn)]" /> Why not direct photos?</div>
+        <p>The prototype reads <strong>digital PDFs</strong> directly — instant, free, and 100% accurate. Image-OCR adds a paid AI step we&apos;re holding off on. The production app will accept photos directly.</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <button onClick={onBack} className="v-btn v-btn-ghost">Back</button>
+        <button onClick={onChooseFile} className="v-btn v-btn-primary">I have a PDF</button>
       </div>
     </>
   );

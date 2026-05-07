@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.1.4 — 2026-05-07
+
+### Image uploads → friendly scan-to-PDF guide (no AI)
+
+The prototype intentionally doesn't run AI vision. Previously a photo upload returned a generic 422 from the server. Now:
+
+- The submit page detects image MIME types client-side and shows a dedicated **scan-to-PDF guide** with step-by-step instructions for iOS (Files / Notes → Scan Documents) and Android (Google Drive → + → Scan), plus mentions of Adobe Scan and Microsoft Lens.
+- The dashboard "Scan with camera" quick-action now reads "Scan to PDF" and routes to the same guide instead of opening a useless camera capture.
+- The submit-page choose stage no longer offers an image picker — only PDF / XML.
+- Server-side 422 message rewritten to match the new guidance (defense in depth, in case anyone bypasses the client check).
+
+When you eventually flip on AI vision (set `ANTHROPIC_API_KEY` on Vercel) the photo path will work directly — no UI rollback needed at that point.
+
 ## v0.1.3 — 2026-05-07
 
 ### Performance pass #2 + parser visibility

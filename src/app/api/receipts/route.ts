@@ -101,7 +101,9 @@ export async function POST(req: Request) {
       // Image upload → vision required
       if (!process.env.ANTHROPIC_API_KEY) {
         return NextResponse.json(
-          { error: "Image uploads require vision OCR. Please upload a digital PDF or e-invoice XML, or ask the admin to configure ANTHROPIC_API_KEY." },
+          {
+            error: "Photo upload isn't enabled yet. Please use your phone's built-in scanner (iOS Files or Notes → Scan Documents; Android Google Drive → +  → Scan) to capture as PDF, then upload that.",
+          },
           { status: 422 },
         );
       }

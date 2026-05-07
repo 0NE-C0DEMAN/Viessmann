@@ -134,6 +134,7 @@ public/
 
 ## Releases
 
+- **v0.1.4** — image uploads now show a friendly scan-to-PDF guide for iOS / Android instead of trying to OCR (the prototype is AI-free for now).
 - **v0.1.3** — perf pass #2: memoised session reads, tree-shaken icon/chart bundles, long-cache PWA assets, parser-used badge on result screen, two unused deps removed.
 - **v0.1.2** — performance pass: loading-skeleton fallbacks, prefetched links, fewer DB round-trips per page, dead routes removed.
 - **v0.1.1** — light PDF text parser (no API key needed for digital PDFs); 9/9 of Frane's demo invoices parsed end-to-end with zero external cost. Vision LLM kept as fallback for image / scanned-PDF uploads only.
