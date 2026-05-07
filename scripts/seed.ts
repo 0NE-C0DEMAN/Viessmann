@@ -1,4 +1,6 @@
-import "dotenv/config";
+import { config } from "dotenv";
+config({ path: ".env.local" });
+config({ path: ".env", override: false });
 import { db } from "../src/db";
 import { installers, wholesalers, products, rewards } from "../src/db/schema";
 import { hashPassword } from "../src/lib/password";

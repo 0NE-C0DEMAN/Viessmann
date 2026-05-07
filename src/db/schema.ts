@@ -133,6 +133,19 @@ export const redemptions = pgTable("redemptions", {
   index("redemptions_installer_idx").on(t.installerId),
 ]);
 
+export const campaigns = pgTable("campaigns", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  description: text("description"),
+  productFamily: text("product_family"),
+  bonusMultiplier: integer("bonus_multiplier").notNull().default(100), // percent: 200 = 2x
+  bonusFlatPerUnit: integer("bonus_flat_per_unit").notNull().default(0),
+  startsAt: timestamp("starts_at", { withTimezone: true }).notNull().defaultNow(),
+  endsAt: timestamp("ends_at", { withTimezone: true }),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const auditLog = pgTable("audit_log", {
   id: uuid("id").primaryKey().defaultRandom(),
   actorId: uuid("actor_id"),
@@ -150,3 +163,4 @@ export type ReceiptLineItem = typeof receiptLineItems.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type Reward = typeof rewards.$inferSelect;
 export type Redemption = typeof redemptions.$inferSelect;
+export type Campaign = typeof campaigns.$inferSelect;

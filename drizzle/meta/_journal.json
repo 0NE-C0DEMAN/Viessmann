@@ -8,6 +8,13 @@
       "when": 1778138614218,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778140469488,
+      "tag": "0001_v0_1_0_campaigns_profile",
+      "breakpoints": true
     }
   ]
 }

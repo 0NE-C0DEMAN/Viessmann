@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
+import { Camera, FileText, ShieldCheck, TrendingUp, Trophy, ArrowRight } from "lucide-react";
 
 export default async function Home() {
   const s = await getSession();
@@ -9,61 +10,116 @@ export default async function Home() {
   }
 
   return (
-    <div className="flex flex-col flex-1 min-h-screen bg-[var(--vie-paper)]">
-      <header className="px-6 py-5 flex items-center justify-between max-w-5xl w-full mx-auto">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-md bg-[var(--vie-orange)]" />
-          <span className="font-bold tracking-tight">Viessmann <span className="text-[var(--vie-orange)]">B2B</span></span>
+    <div className="flex flex-col flex-1 min-h-screen">
+      <header className="px-6 py-5 max-w-6xl w-full mx-auto flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <span className="v-logo">V+</span>
+          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-orange)]">Loyalty</span></span>
         </div>
-        <Link href="/login" className="v-btn v-btn-ghost text-sm">Sign in</Link>
+        <div className="flex items-center gap-2">
+          <Link href="/login" className="v-btn v-btn-ghost v-btn-sm">Sign in</Link>
+          <Link href="/signup" className="v-btn v-btn-primary v-btn-sm hidden sm:inline-flex">Register</Link>
+        </div>
       </header>
 
-      <main className="flex-1 px-6 max-w-5xl w-full mx-auto">
-        <section className="pt-10 pb-12 grid md:grid-cols-2 gap-8 items-center">
+      <main className="flex-1 px-6 max-w-6xl w-full mx-auto">
+        <section className="pt-10 sm:pt-16 pb-12 grid md:grid-cols-2 gap-10 items-center v-fade-in">
           <div>
-            <span className="v-pill v-pill-processing mb-4">Loyalty programme · pilot</span>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-              Scan an invoice.<br />
-              <span className="text-[var(--vie-orange)]">Earn points.</span>
+            <span className="v-pill v-pill-brand mb-5">Croatia pilot · 2026</span>
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.05]">
+              Get rewarded for every Viessmann install.
             </h1>
-            <p className="mt-4 text-[var(--vie-ink-soft)] text-lg max-w-md">
-              The B2B loyalty programme for Viessmann installers in Croatia. Submit your wholesaler invoice — we read it, match the products, and credit your account.
+            <p className="mt-5 text-[var(--vie-ink-soft)] text-lg max-w-md">
+              Submit your wholesaler invoice — photo or e-invoice XML — and earn loyalty points instantly. Redeem for tools, training, and exclusive rewards.
             </p>
-            <div className="mt-6 flex gap-3">
-              <Link href="/signup" className="v-btn v-btn-primary">Become a member</Link>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link href="/signup" className="v-btn v-btn-primary">
+                Become a member <ArrowRight size={16} />
+              </Link>
               <Link href="/login" className="v-btn v-btn-ghost">I already have an account</Link>
             </div>
-            <p className="mt-3 text-xs text-[var(--vie-ink-soft)]">Demo: any installer in <code>Instalaterm</code>, <code>Energo-Mont</code>, <code>Termo-Projekt</code> can sign in with password <code>demo1234</code>.</p>
+            <div className="mt-5 flex items-center gap-6 text-xs text-[var(--vie-ink-muted)]">
+              <span className="flex items-center gap-1.5"><ShieldCheck size={14} /> GDPR · EU hosted</span>
+              <span className="flex items-center gap-1.5"><Trophy size={14} /> 4 tier ladder</span>
+            </div>
           </div>
+
           <div className="v-card relative overflow-hidden">
-            <div className="text-xs text-[var(--vie-ink-soft)] mb-3">How it works</div>
-            <ol className="space-y-3 text-sm">
-              <li className="flex gap-3"><span className="w-6 h-6 rounded-full bg-[var(--vie-orange)] text-white flex items-center justify-center font-bold text-xs">1</span> Take a photo of your wholesaler receipt or upload an e-invoice XML.</li>
-              <li className="flex gap-3"><span className="w-6 h-6 rounded-full bg-[var(--vie-orange)] text-white flex items-center justify-center font-bold text-xs">2</span> The app reads it, finds Viessmann products, calculates points.</li>
-              <li className="flex gap-3"><span className="w-6 h-6 rounded-full bg-[var(--vie-orange)] text-white flex items-center justify-center font-bold text-xs">3</span> Points hit your balance. Redeem for tools, training, and rewards.</li>
+            <div className="text-xs font-semibold text-[var(--vie-ink-muted)] uppercase tracking-wider mb-4">How it works</div>
+            <ol className="space-y-4">
+              <Step n={1} title="Capture" desc="Snap your wholesaler receipt or upload an e-invoice XML." icon={<Camera size={18} />} />
+              <Step n={2} title="Auto-parse" desc="AI reads the Croatian invoice, finds Viessmann lines, validates OIB." icon={<FileText size={18} />} />
+              <Step n={3} title="Earn & redeem" desc="Points hit your balance instantly. Browse the rewards catalog." icon={<Trophy size={18} />} />
             </ol>
           </div>
         </section>
 
         <section className="grid md:grid-cols-3 gap-4 pb-12">
-          <div className="v-card">
-            <div className="text-2xl font-bold">OCR + e-Invoice</div>
-            <p className="text-sm text-[var(--vie-ink-soft)] mt-1">Photos today, XML from 01.01.2026 — both flow into the same pipeline.</p>
-          </div>
-          <div className="v-card">
-            <div className="text-2xl font-bold">OIB-verified</div>
-            <p className="text-sm text-[var(--vie-ink-soft)] mt-1">We validate the buyer&apos;s OIB checksum and match it to your account.</p>
-          </div>
-          <div className="v-card">
-            <div className="text-2xl font-bold">Tier rewards</div>
-            <p className="text-sm text-[var(--vie-ink-soft)] mt-1">Bronze → Silver → Gold → Platinum. More points, better catalog.</p>
+          <Feature
+            title="OCR + e-Invoice"
+            desc="Photos today, XML from 01.01.2026. Both flow through the same pipeline."
+            icon={<FileText size={20} />}
+          />
+          <Feature
+            title="OIB-verified"
+            desc="Croatian VAT checksum validated on every submission. No double-claims."
+            icon={<ShieldCheck size={20} />}
+          />
+          <Feature
+            title="Tier rewards"
+            desc="Bronze → Silver → Gold → Platinum. Bigger balances unlock bigger rewards."
+            icon={<TrendingUp size={20} />}
+          />
+        </section>
+
+        <section className="v-card mb-12 bg-[var(--vie-orange-light)] border-[var(--vie-orange-light)]">
+          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-orange-dark)] mb-2">Demo accounts</div>
+          <div className="text-sm text-[var(--vie-ink)]">
+            Try it live — sign in as <code className="px-1.5 py-0.5 bg-white rounded text-xs">ivo@instalaterm.hr</code>, <code className="px-1.5 py-0.5 bg-white rounded text-xs">marko@energomont.hr</code>, or <code className="px-1.5 py-0.5 bg-white rounded text-xs">ana@termoprojekt.hr</code> (password <code className="px-1.5 py-0.5 bg-white rounded text-xs">demo1234</code>).
+            Admin: <code className="px-1.5 py-0.5 bg-white rounded text-xs">admin@viessmann.com</code> / <code className="px-1.5 py-0.5 bg-white rounded text-xs">admin1234</code>.
           </div>
         </section>
       </main>
 
-      <footer className="px-6 py-6 text-xs text-[var(--vie-ink-soft)] max-w-5xl w-full mx-auto">
-        Viessmann B2B Loyalty · Prototype · {new Date().getFullYear()}
+      <footer className="px-6 py-8 text-xs text-[var(--vie-ink-muted)] max-w-6xl w-full mx-auto border-t border-[var(--vie-line)]">
+        <div className="flex flex-wrap gap-4 items-center justify-between">
+          <span>Viessmann B2B Loyalty · Prototype · {new Date().getFullYear()}</span>
+          <span className="flex gap-4">
+            <a href="#" className="hover:text-[var(--vie-ink)]">Privacy</a>
+            <a href="#" className="hover:text-[var(--vie-ink)]">Terms</a>
+            <a href="https://github.com/0NE-C0DEMAN/Viessmann" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--vie-ink)]">GitHub</a>
+          </span>
+        </div>
       </footer>
+    </div>
+  );
+}
+
+function Step({ n, title, desc, icon }: { n: number; title: string; desc: string; icon: React.ReactNode }) {
+  return (
+    <li className="flex gap-3">
+      <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center font-bold text-sm">
+        {icon}
+      </div>
+      <div>
+        <div className="font-semibold flex items-center gap-2">
+          <span className="text-xs text-[var(--vie-ink-muted)]">Step {n}</span>
+          <span>{title}</span>
+        </div>
+        <div className="text-sm text-[var(--vie-ink-soft)]">{desc}</div>
+      </div>
+    </li>
+  );
+}
+
+function Feature({ title, desc, icon }: { title: string; desc: string; icon: React.ReactNode }) {
+  return (
+    <div className="v-card">
+      <div className="w-10 h-10 rounded-xl bg-[var(--vie-orange-light)] text-[var(--vie-orange-dark)] flex items-center justify-center mb-3">
+        {icon}
+      </div>
+      <div className="font-bold tracking-tight">{title}</div>
+      <p className="text-sm text-[var(--vie-ink-soft)] mt-1">{desc}</p>
     </div>
   );
 }
