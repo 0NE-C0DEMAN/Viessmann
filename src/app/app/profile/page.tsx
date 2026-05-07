@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { installers, redemptions, rewards, pointsLedger } from "@/db/schema";
+import { redemptions, rewards, pointsLedger } from "@/db/schema";
 import { eq, sql, desc } from "drizzle-orm";
 import { getSession } from "@/lib/session";
 import { ProfileForm } from "./profile-form";
@@ -8,79 +8,95 @@ import { LogoutButton } from "@/components/logout-button";
 import { formatPoints } from "@/lib/money";
 import { Calendar, MapPin, Phone, Mail, Hash } from "lucide-react";
 
+interface ProfileAggregate {
+  id: string;
+  email: string;
+  oib: string;
+  company_name: string;
+  address: string | null;
+  city: string | null;
+  postal_code: string | null;
+  phone: string | null;
+  created_at: string;
+  balance: number;
+  lifetime_earned: number;
+}
+
 export default async function ProfilePage() {
   const s = await getSession();
   if (!s.installerId) redirect("/login");
 
-  const me = (await db.select().from(installers).where(eq(installers.id, s.installerId)).limit(1))[0];
+  // One round trip for installer + balance + lifetime earned.
+  const aggRows = (await db.execute(sql`
+    SELECT
+      i.id, i.email, i.oib, i.company_name, i.address, i.city, i.postal_code, i.phone, i.created_at,
+      COALESCE((SELECT SUM(delta) FROM points_ledger WHERE installer_id = i.id), 0)::int AS balance,
+      COALESCE((SELECT SUM(delta) FROM points_ledger WHERE installer_id = i.id AND reason = 'accrual'), 0)::int AS lifetime_earned
+    FROM installers i
+    WHERE i.id = ${s.installerId}
+  `)) as unknown as ProfileAggregate[];
+  const me = aggRows[0];
+  if (!me) redirect("/login");
 
-  const balanceRows = (await db.execute(
-    sql`SELECT COALESCE(SUM(delta), 0)::int AS balance FROM points_ledger WHERE installer_id = ${s.installerId}`,
-  )) as unknown as Array<{ balance: number }>;
-  const balance = balanceRows[0]?.balance ?? 0;
+  // Redemptions and ledger run in parallel.
+  const [myRedemptions, recentLedger] = await Promise.all([
+    db
+      .select({ r: redemptions, reward: rewards })
+      .from(redemptions)
+      .leftJoin(rewards, eq(rewards.id, redemptions.rewardId))
+      .where(eq(redemptions.installerId, s.installerId))
+      .orderBy(desc(redemptions.createdAt))
+      .limit(20),
+    db
+      .select()
+      .from(pointsLedger)
+      .where(eq(pointsLedger.installerId, s.installerId))
+      .orderBy(desc(pointsLedger.createdAt))
+      .limit(10),
+  ]);
 
-  const lifetimeEarnedRows = (await db.execute(
-    sql`SELECT COALESCE(SUM(delta), 0)::int AS pts FROM points_ledger WHERE installer_id = ${s.installerId} AND reason = 'accrual'`,
-  )) as unknown as Array<{ pts: number }>;
-  const lifetimeEarned = lifetimeEarnedRows[0]?.pts ?? 0;
-
-  const myRedemptions = await db
-    .select({ r: redemptions, reward: rewards })
-    .from(redemptions)
-    .leftJoin(rewards, eq(rewards.id, redemptions.rewardId))
-    .where(eq(redemptions.installerId, s.installerId))
-    .orderBy(desc(redemptions.createdAt))
-    .limit(20);
-
-  const recentLedger = await db
-    .select()
-    .from(pointsLedger)
-    .where(eq(pointsLedger.installerId, s.installerId))
-    .orderBy(desc(pointsLedger.createdAt))
-    .limit(10);
-
-  const tier = balance >= 25000 ? "Platinum" : balance >= 8000 ? "Gold" : balance >= 2000 ? "Silver" : "Bronze";
+  const tier = me.balance >= 25000 ? "Platinum" : me.balance >= 8000 ? "Gold" : me.balance >= 2000 ? "Silver" : "Bronze";
 
   return (
-    <div className="space-y-4 v-fade-in">
+    <div className="space-y-4">
       <h1 className="text-2xl font-bold tracking-tight">Profile</h1>
 
       <div className="v-card text-center">
-        <div className="v-logo v-logo-lg mx-auto">{(me.companyName?.[0] ?? "?").toUpperCase()}</div>
-        <div className="font-bold text-lg mt-3">{me.companyName}</div>
+        <div className="v-logo v-logo-lg mx-auto">{(me.company_name?.[0] ?? "?").toUpperCase()}</div>
+        <div className="font-bold text-lg mt-3">{me.company_name}</div>
         <div className="text-xs text-[var(--vie-ink-muted)] flex items-center justify-center gap-1 mt-0.5"><Hash size={11} /> OIB {me.oib}</div>
         <div className="mt-3 flex items-center justify-center gap-2">
           <span className="v-pill v-pill-brand">{tier} tier</span>
-          <span className="v-pill v-pill-muted">Member since {new Date(me.createdAt).toLocaleDateString("hr-HR", { month: "short", year: "numeric" })}</span>
+          <span className="v-pill v-pill-muted">Member since {new Date(me.created_at).toLocaleDateString("hr-HR", { month: "short", year: "numeric" })}</span>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="v-card v-card-tight">
           <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--vie-ink-muted)]">Current balance</div>
-          <div className="text-xl font-bold v-numeric mt-1">{formatPoints(balance)}</div>
+          <div className="text-xl font-bold v-numeric mt-1">{formatPoints(me.balance)}</div>
         </div>
         <div className="v-card v-card-tight">
           <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--vie-ink-muted)]">Lifetime earned</div>
-          <div className="text-xl font-bold v-numeric mt-1">{formatPoints(lifetimeEarned)}</div>
+          <div className="text-xl font-bold v-numeric mt-1">{formatPoints(me.lifetime_earned)}</div>
         </div>
       </div>
 
       <div className="v-card">
         <div className="text-sm font-bold mb-3">Business details</div>
         <div className="space-y-2 text-sm">
-          <Row icon={<MapPin size={14} />} label="Address">{me.address ?? "—"}{me.city ? `, ${me.postalCode ?? ""} ${me.city}` : ""}</Row>
+          <Row icon={<MapPin size={14} />} label="Address">{me.address ?? "—"}{me.city ? `, ${me.postal_code ?? ""} ${me.city}` : ""}</Row>
           <Row icon={<Mail size={14} />} label="Email">{me.email}</Row>
           <Row icon={<Phone size={14} />} label="Phone">{me.phone ?? "—"}</Row>
-          <Row icon={<Calendar size={14} />} label="Joined">{new Date(me.createdAt).toLocaleDateString("hr-HR")}</Row>
+          <Row icon={<Calendar size={14} />} label="Joined">{new Date(me.created_at).toLocaleDateString("hr-HR")}</Row>
         </div>
       </div>
 
       <ProfileForm installer={{
-        companyName: me.companyName,
+        companyName: me.company_name,
         address: me.address ?? "",
         city: me.city ?? "",
-        postalCode: me.postalCode ?? "",
+        postalCode: me.postal_code ?? "",
         phone: me.phone ?? "",
       }} />
 

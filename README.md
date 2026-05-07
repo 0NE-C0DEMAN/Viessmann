@@ -134,5 +134,6 @@ public/
 
 ## Releases
 
+- **v0.1.2** — performance pass: loading-skeleton fallbacks, prefetched links, fewer DB round-trips per page, dead routes removed.
 - **v0.1.1** — light PDF text parser (no API key needed for digital PDFs); 9/9 of Frane's demo invoices parsed end-to-end with zero external cost. Vision LLM kept as fallback for image / scanned-PDF uploads only.
 - **v0.1.0** — first end-to-end prototype: installer PWA + admin web with full demo flow, OCR + XML, points ledger, campaigns, fulfillment, charts, OIB validation, audit log.

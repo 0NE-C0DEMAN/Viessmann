@@ -67,6 +67,7 @@ export async function POST(req: Request) {
   const session = await getSession();
   session.installerId = inserted[0].id;
   session.email = emailLc;
+  session.companyName = companyName;
   session.role = "installer";
   await session.save();
 

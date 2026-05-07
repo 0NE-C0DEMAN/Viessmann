@@ -28,6 +28,7 @@ export async function POST(req: Request) {
   const session = await getSession();
   session.installerId = u.id;
   session.email = u.email;
+  session.companyName = u.companyName;
   session.role = (u.role === "admin" ? "admin" : "installer");
   await session.save();
 

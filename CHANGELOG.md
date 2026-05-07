@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.1.2 — 2026-05-07
+
+### Performance + dead code
+
+**Faster perceived load on every page:**
+- Added `loading.tsx` skeleton fallbacks for `/app`, `/app/history`, `/app/rewards`, `/app/profile`, `/app/notifications`, `/app/receipts/[id]`, and `/admin`. Page transitions now show an instant skeleton instead of a blank screen while data loads.
+- `<Link prefetch>` on every nav target so the JS chunk is hot before the user taps.
+
+**Fewer DB round-trips:**
+- Stripped the per-render `installers` lookup from `/app` layout — header now reads `companyName` directly from the iron-session cookie. **Saves one query on every navigation in the installer PWA.** Login / signup / profile-update writes the name into the session.
+- Combined dashboard's 4 sequential queries (balance, month-pts, status counts, recent) into a single SQL CTE.
+- Combined profile's installer + balance + lifetime-earned into one query; redemptions and ledger now run in `Promise.all`.
+- Notifications page queries now run in `Promise.all`.
+
+**Removed dead code:**
+- Deleted unused API routes: `/api/auth/me`, `/api/me/summary`, `/api/admin/queue`, `/api/receipts/[id]`. The UI was using direct server-component DB queries on those paths.
+- Removed `getInstallerBalance` from `receipt-pipeline.ts` (no callers).
+- Cleaned unused imports.
+
+Routes: 33 → 30. Build still ~10s.
+
 ## v0.1.1 — 2026-05-07
 
 ### Light PDF parser (no API key)

@@ -4,6 +4,7 @@ import { getIronSession, type SessionOptions } from "iron-session";
 export interface SessionData {
   installerId?: string;
   email?: string;
+  companyName?: string;
   role?: "installer" | "admin";
 }
 

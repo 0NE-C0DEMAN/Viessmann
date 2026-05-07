@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { installers, auditLog } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { requireInstaller } from "@/lib/session";
+import { requireInstaller, getSession } from "@/lib/session";
 import { z } from "zod";
 
 const Body = z.object({
@@ -31,6 +31,10 @@ export async function PATCH(req: Request) {
     postalCode: parsed.data.postalCode || null,
     phone: parsed.data.phone || null,
   }).where(eq(installers.id, user.installerId));
+
+  const session = await getSession();
+  session.companyName = parsed.data.companyName;
+  await session.save();
 
   await db.insert(auditLog).values({
     actorId: user.installerId,

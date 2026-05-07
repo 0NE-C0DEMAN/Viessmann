@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Viessmann B2B Loyalty — installer-side PWA + admin web for receipt-driven loyalty in Croatia.",
   "license": "UNLICENSED",
   "repository": {
@@ -49,6 +49,7 @@
     "eslint-config-next": "16.2.5",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.5"
   }
 }

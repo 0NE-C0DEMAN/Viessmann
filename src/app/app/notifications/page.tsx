@@ -12,20 +12,21 @@ export default async function NotificationsPage() {
   const s = await getSession();
   if (!s.installerId) redirect("/login");
 
-  const recentReceipts = await db
-    .select()
-    .from(receipts)
-    .where(eq(receipts.installerId, s.installerId))
-    .orderBy(desc(receipts.createdAt))
-    .limit(20);
-
-  const recentRedemptions = await db
-    .select({ r: redemptions, reward: rewards })
-    .from(redemptions)
-    .leftJoin(rewards, eq(rewards.id, redemptions.rewardId))
-    .where(eq(redemptions.installerId, s.installerId))
-    .orderBy(desc(redemptions.createdAt))
-    .limit(10);
+  const [recentReceipts, recentRedemptions] = await Promise.all([
+    db
+      .select()
+      .from(receipts)
+      .where(eq(receipts.installerId, s.installerId))
+      .orderBy(desc(receipts.createdAt))
+      .limit(20),
+    db
+      .select({ r: redemptions, reward: rewards })
+      .from(redemptions)
+      .leftJoin(rewards, eq(rewards.id, redemptions.rewardId))
+      .where(eq(redemptions.installerId, s.installerId))
+      .orderBy(desc(redemptions.createdAt))
+      .limit(10),
+  ]);
 
   type Notif = {
     id: string;

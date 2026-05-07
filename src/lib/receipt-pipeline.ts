@@ -7,9 +7,9 @@
 //   6. Decide status: approved | needs_review | rejected.
 //   7. Persist receipt + line items, append points to ledger if approved.
 
-import { db, schema } from "@/db";
+import { db } from "@/db";
 import { receipts, receiptLineItems, products, pointsLedger, auditLog, wholesalers, installers } from "@/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { matchLine } from "@/lib/sku-matcher";
 import { parseCroatianAmountToCents, parseQuantity } from "@/lib/money";
 import { isValidOib, normaliseOib } from "@/lib/oib";
@@ -261,12 +261,3 @@ function messageFor(status: PipelineResult["status"], flags: string[]): string {
   return "Submitted for manual review by Viessmann.";
 }
 
-export async function getInstallerBalance(installerId: string): Promise<number> {
-  const result = await db.execute<{ balance: number }>(
-    sql`SELECT COALESCE(SUM(delta), 0)::int AS balance FROM points_ledger WHERE installer_id = ${installerId}`,
-  );
-  // postgres-js returns rows directly; drizzle execute returns an iterable — adapt:
-  type Row = { balance: number };
-  const rows = result as unknown as Row[];
-  return rows?.[0]?.balance ?? 0;
-}
