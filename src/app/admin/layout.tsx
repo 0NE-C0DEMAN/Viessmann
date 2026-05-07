@@ -58,9 +58,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
           <div className="flex items-center gap-2">
             <AdminProfileMenu email={s.email!} />
-            <span className="hidden lg:inline-flex items-center pl-2 ml-1 border-l border-[var(--vie-line)]">
-              <LogoutButton />
-            </span>
+            <LogoutButton />
             <AdminMobileNav email={s.email!} />
           </div>
         </div>

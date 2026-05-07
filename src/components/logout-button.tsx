@@ -17,7 +17,11 @@ export function LogoutButton({ variant = "header" }: { variant?: "header" | "dan
     );
   }
   return (
-    <button onClick={logout} className="text-[var(--vie-ink-soft)] hover:text-[var(--vie-error)] flex items-center gap-1 text-sm" title="Sign out">
+    <button
+      onClick={logout}
+      title="Sign out"
+      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-[var(--vie-ink-soft)] hover:text-[var(--vie-error)] hover:bg-[var(--vie-error-bg)] active:bg-[var(--vie-error-bg)] transition-colors"
+    >
       <LogOut size={16} />
       <span className="hidden sm:inline">Sign out</span>
     </button>
