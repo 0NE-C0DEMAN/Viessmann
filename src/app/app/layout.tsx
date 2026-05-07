@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { Home, Upload, Gift, History as HistoryIcon, Bell, User } from "lucide-react";
 import { ProfileMenu } from "@/components/profile-menu";
+import { Brand } from "@/components/brand";
 import { db } from "@/db";
 import { receipts } from "@/db/schema";
 import { and, eq, gt, sql } from "drizzle-orm";
@@ -25,9 +26,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen flex flex-col bg-[var(--vie-paper)]">
       <header className="sticky top-0 z-30 bg-[var(--vie-paper-elev)]/95 backdrop-blur border-b border-[var(--vie-line)]">
         <div className="max-w-md w-full mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href="/app" prefetch className="flex items-center gap-2.5">
-            <span className="v-logo">V</span>
-            <span className="font-bold tracking-tight">Viessmann <span className="text-[var(--vie-red)]">Loyalty</span></span>
+          <Link href="/app" prefetch className="flex items-center">
+            <Brand size="sm" subtitle="Loyalty" />
           </Link>
           <div className="flex items-center gap-1">
             <Link href="/app/notifications" prefetch className="relative p-2 rounded-lg hover:bg-[var(--vie-line)] text-[var(--vie-ink-soft)] hover:text-[var(--vie-ink)] transition-colors" title={pendingCount > 0 ? `${pendingCount} pending` : "Notifications"}>

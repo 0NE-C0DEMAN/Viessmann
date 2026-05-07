@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Brand } from "@/components/brand";
 import { toast } from "sonner";
 import { Loader2, ArrowRight } from "lucide-react";
 
@@ -50,8 +51,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col">
       <header className="px-6 py-5 max-w-md w-full mx-auto">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="v-logo">V</span>
-          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-red)]">Loyalty</span></span>
+          <Brand size="md" subtitle="Loyalty" />
         </Link>
       </header>
       <main className="flex-1 px-6 max-w-md w-full mx-auto pt-2 v-fade-in">

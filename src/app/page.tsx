@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Brand } from "@/components/brand";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { Camera, FileText, ShieldCheck, TrendingUp, Trophy, ArrowRight } from "lucide-react";
@@ -13,8 +14,7 @@ export default async function Home() {
     <div className="flex flex-col flex-1 min-h-screen">
       <header className="px-6 py-5 max-w-6xl w-full mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <span className="v-logo">V</span>
-          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-red)]">Loyalty</span></span>
+          <Brand size="md" subtitle="Loyalty" />
         </div>
         <div className="flex items-center gap-2">
           <Link href="/login" className="v-btn v-btn-ghost v-btn-sm">Sign in</Link>

@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.2.7 — 2026-05-07
+
+### Wordmark logo + favicon fix
+
+- Adopted the **official Viessmann wordmark** as the in-app logo. The placeholder red-square "V" tile is gone from page headers; replaced everywhere with an inline SVG of the wordmark coloured `--vie-red` via `currentColor`.
+- New `<Brand>` component (`src/components/brand.tsx`) with three sizes (`sm` / `md` / `lg`) and a configurable subtitle (`Loyalty` on installer pages, `Admin` on admin pages). Single source of truth.
+- Eight page headers swapped over: installer layout, admin layout, landing, login, signup, privacy, terms, forgot-password.
+- **Favicon was orange in the browser tab** — the original `src/app/favicon.ico` from `create-next-app` was never replaced when the brand changed. Regenerated as a multi-size ICO (16 / 32 / 48 / 64) on a Viessmann-red background. Public PWA icons (192 / 512 / apple-icon) refreshed too to bust any browser cache.
+- The square "V" tile remains in the **PWA icons only** — square icons are required for the home-screen / install prompt and the wordmark's 4.74:1 aspect ratio doesn't fit there.
+
+If your browser still shows the old orange favicon after deploy, hard-refresh (Ctrl+Shift+R) — favicons are cached aggressively.
+
 ## v0.2.6 — 2026-05-07
 
 ### Toast position fix on mobile

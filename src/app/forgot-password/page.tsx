@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Brand } from "@/components/brand";
 import { Mail, ArrowLeft } from "lucide-react";
 
 export const metadata = { title: "Forgot password · Viessmann B2B Loyalty" };
@@ -8,8 +9,7 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen flex flex-col">
       <header className="px-6 py-5 max-w-md w-full mx-auto">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="v-logo">V</span>
-          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-red)]">Loyalty</span></span>
+          <Brand size="md" subtitle="Loyalty" />
         </Link>
       </header>
       <main className="flex-1 px-6 max-w-md w-full mx-auto pt-2 v-fade-in">

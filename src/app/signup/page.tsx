@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Brand } from "@/components/brand";
 import { toast } from "sonner";
 import { isValidOib, normaliseOib } from "@/lib/oib";
 import { Loader2, ArrowRight, Check, X } from "lucide-react";
@@ -70,8 +71,7 @@ export default function SignupPage() {
     <div className="min-h-screen flex flex-col">
       <header className="px-6 py-5 max-w-lg w-full mx-auto">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="v-logo">V</span>
-          <span className="font-bold tracking-tight text-lg">Viessmann <span className="text-[var(--vie-red)]">Loyalty</span></span>
+          <Brand size="md" subtitle="Loyalty" />
         </Link>
       </header>
       <main className="flex-1 px-6 max-w-lg w-full mx-auto pt-2 pb-10 v-fade-in">
