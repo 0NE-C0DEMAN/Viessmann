@@ -87,7 +87,6 @@ export default async function Home() {
           <span className="flex gap-4">
             <Link href="/privacy" className="hover:text-[var(--vie-ink)]">Privacy</Link>
             <Link href="/terms" className="hover:text-[var(--vie-ink)]">Terms</Link>
-            <a href="https://github.com/0NE-C0DEMAN/Viessmann" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--vie-ink)]">GitHub</a>
           </span>
         </div>
       </footer>

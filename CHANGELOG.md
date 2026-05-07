@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.3 — 2026-05-07
+
+- Removed GitHub link from the landing-page footer.
+
 ## v0.2.2 — 2026-05-07
 
 ### Brand alignment — Viessmann red
