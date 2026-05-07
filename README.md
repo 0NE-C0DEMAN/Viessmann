@@ -135,6 +135,7 @@ public/
 
 ## Releases
 
+- **v0.2.8** — admin header responsive: hamburger drawer on `<lg`, horizontal nav (8 operational tabs) + profile dropdown for Settings/Sign out on `≥lg`; "Croatia · Pilot" badge moved into the dropdown.
 - **v0.2.7** — adopted the official Viessmann wordmark as the in-app logo (new `<Brand>` component); regenerated `favicon.ico` in red (the leftover create-next-app default was orange).
 - **v0.2.6** — toast position fix on mobile: floats clearly above the bottom-nav + Submit FAB stack instead of crashing into them; width responsive to small phones.
 - **v0.2.5** — dropped redundant toasts: the submit-result screen no longer fires a toast on top of itself, and `Signed out` toasts replaced by the redirect to the landing page.

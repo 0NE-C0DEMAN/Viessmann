@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.2.8 — 2026-05-07
+
+### Admin header: responsive nav
+
+The admin header was packing 10 items into one row (brand + pilot badge + 9 nav tabs + sign out), overflowing on mobile and wrapping "Sign out" onto two lines on standard-width desktops.
+
+- **Mobile / tablet (`< lg`)**: hamburger menu icon on the right opens a slide-out drawer containing every nav item (including Settings + Sign out + Croatia · Pilot context). Drawer locks page scroll, closes on Esc / backdrop tap / link click.
+- **Desktop (`≥ lg`)**: horizontal nav now carries 8 operational tabs only — Queue, Installers, Wholesalers, Campaigns, Rewards, Fulfillment, Intelligence, Audit. Settings and Sign out moved into a new admin profile dropdown (avatar with email initial, top-right).
+- The "Croatia · Pilot" badge moved out of the header line into the profile dropdown — it was crowding the bar.
+
+The whole header now fits on a 1024 px desktop without wrapping and on a 320 px phone without overflow.
+
 ## v0.2.7 — 2026-05-07
 
 ### Wordmark logo + favicon fix
