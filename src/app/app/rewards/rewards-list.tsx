@@ -96,72 +96,83 @@ export function RewardsList({
             const requiredTier = r.tierRequired as Tier;
             return (
               <div key={r.id} className={`v-card ${!tierOk ? "opacity-80" : ""}`}>
+                {/* Top: icon + title + description. Title row uses flex-wrap so a long
+                    Croatian product name + tier badge can stack instead of overflowing. */}
                 <div className="flex items-start gap-3">
                   <div className="w-12 h-12 rounded-2xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center flex-shrink-0">
                     <Gift size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-semibold text-sm truncate min-w-0">{r.name}</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-sm break-words min-w-0">{r.name}</span>
                       {requiredTier && requiredTier !== "Bronze" && (
                         <span className={`v-pill text-[10px] flex-shrink-0 ${TIER_BADGE[requiredTier]}`}>
                           {requiredTier}+
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-[var(--vie-ink-muted)] line-clamp-2 mt-0.5">
+                    <div className="text-xs text-[var(--vie-ink-muted)] line-clamp-2 mt-0.5 break-words">
                       {r.description}
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-3 pt-3 border-t border-[var(--vie-line)] flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 flex-wrap min-w-0">
-                    <span className="font-bold text-[var(--vie-red-dark)] v-numeric text-sm whitespace-nowrap">
-                      {formatPoints(r.pointCost)} pts
+                {/* Middle: pills wrap freely on their own row. */}
+                <div className="mt-3 pt-3 border-t border-[var(--vie-line)] flex items-center gap-2 flex-wrap">
+                  <span className="font-bold text-[var(--vie-red-dark)] v-numeric text-sm whitespace-nowrap">
+                    {formatPoints(r.pointCost)} pts
+                  </span>
+                  {!inStock ? (
+                    <span className="v-pill v-pill-muted">Out of stock</span>
+                  ) : stockLow ? (
+                    <span className="v-pill v-pill-warn">Only {stock} left</span>
+                  ) : null}
+                  {!tierOk && (
+                    <span className="v-pill v-pill-muted text-[10px]">
+                      Reach {requiredTier} to unlock
                     </span>
-                    {!inStock ? (
-                      <span className="v-pill v-pill-muted">Out of stock</span>
-                    ) : stockLow ? (
-                      <span className="v-pill v-pill-warn">Only {stock} left</span>
-                    ) : null}
-                    {!tierOk && (
-                      <span className="v-pill v-pill-muted text-[10px]">
-                        Reach {requiredTier} to unlock
-                      </span>
-                    )}
-                  </div>
-                  <button
-                    disabled={!can || busy === r.id || isRedeemed}
-                    onClick={() => setPending(r)}
-                    className={`v-btn v-btn-sm flex-shrink-0 ${
-                      isRedeemed ? "v-btn-success" : can ? "v-btn-primary" : "v-btn-ghost"
-                    }`}
-                    title={
-                      !tierOk
-                        ? `Requires ${requiredTier}+`
-                        : !enoughPts
-                        ? "Not enough points"
-                        : !inStock
-                        ? "Out of stock"
-                        : "Redeem"
-                    }
-                  >
-                    {busy === r.id ? (
-                      "…"
-                    ) : isRedeemed ? (
-                      <>
-                        <Check size={14} /> Done
-                      </>
-                    ) : can ? (
-                      "Redeem"
-                    ) : (
-                      <>
-                        <Lock size={14} />
-                      </>
-                    )}
-                  </button>
+                  )}
                 </div>
+
+                {/* Bottom: button is always its own full-width row. Cannot be clipped at any viewport size. */}
+                <button
+                  disabled={!can || busy === r.id || isRedeemed}
+                  onClick={() => setPending(r)}
+                  className={`v-btn v-btn-sm w-full mt-3 ${
+                    isRedeemed ? "v-btn-success" : can ? "v-btn-primary" : "v-btn-ghost"
+                  }`}
+                  title={
+                    !tierOk
+                      ? `Requires ${requiredTier}+`
+                      : !enoughPts
+                      ? "Not enough points"
+                      : !inStock
+                      ? "Out of stock"
+                      : "Redeem"
+                  }
+                >
+                  {busy === r.id ? (
+                    "…"
+                  ) : isRedeemed ? (
+                    <>
+                      <Check size={14} /> Redeemed
+                    </>
+                  ) : !tierOk ? (
+                    <>
+                      <Lock size={14} /> Locked — reach {requiredTier}
+                    </>
+                  ) : !enoughPts ? (
+                    <>
+                      <Lock size={14} /> Need {formatPoints(r.pointCost - balance)} more pts
+                    </>
+                  ) : !inStock ? (
+                    <>
+                      <Lock size={14} /> Out of stock
+                    </>
+                  ) : (
+                    "Redeem"
+                  )}
+                </button>
               </div>
             );
           })}

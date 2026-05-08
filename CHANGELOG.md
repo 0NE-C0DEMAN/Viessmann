@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.2.18 — 2026-05-07
+
+### Reward cards bulletproofed for every viewport size + global card overflow safety net
+
+The Redeem button was still being clipped on the narrowest phones (Galaxy Fold-style 280–320 px screens) because the bottom row tried to fit `[points pill] [stock pill] [Reach Platinum to unlock pill] [Redeem button]` on one line. Even with `flex-shrink-0` on the button and `flex-wrap` on the pills container, certain combinations of Croatian product names and lock-state pills could squeeze the layout.
+
+**Structural fix (rewards-list)** — three stacked rows that can never collide:
+
+1. **Top row**: icon + title + tier badge. Title row is `flex-wrap` so a long title forces the badge below instead of overflowing. Both title and description are `break-words` so unbreakable tokens get word-broken instead of pushing the card wide.
+2. **Middle row**: pills (`gap-2 flex-wrap`) wrap freely on their own line — no button competing for space.
+3. **Bottom row**: button is now `w-full mt-3`, always its own row. Cannot be clipped at any viewport size. Bonus: the button now communicates the lock reason inline (e.g. "Need 2.500 more pts", "Locked — reach Gold") instead of just showing a 🔒 icon.
+
+**Global safety net** — added `min-width: 0` and `overflow-wrap: anywhere` to `.v-card`. Any v-card placed inside a `flex` or `grid` container will now shrink to fit narrow tracks instead of pushing the layout wider with `min-content`. Long unbreakable tokens (URLs, chained OIB strings) get word-broken so they can never blow out a card width.
+
 ## v0.2.17 — 2026-05-07
 
 ### Filter pills redesigned: brand-red active state, count badges, better spacing

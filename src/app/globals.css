@@ -60,6 +60,12 @@ body {
   padding: 18px;
   box-shadow: var(--shadow-sm);
   transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+  /* Safety net for grid/flex children: min-width: 0 lets the card shrink to
+     fit narrow tracks (320px Galaxy Fold etc) instead of pushing the layout
+     wider with min-content. overflow-wrap breaks any unbreakable token (long
+     URL, OIB chain) that would otherwise blow out the card. */
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .v-card-interactive { cursor: pointer; }
 .v-card-interactive:hover {
