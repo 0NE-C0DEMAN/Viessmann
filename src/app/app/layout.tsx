@@ -7,11 +7,13 @@ import { Brand } from "@/components/brand";
 import { db } from "@/db";
 import { receipts } from "@/db/schema";
 import { and, eq, gt, sql } from "drizzle-orm";
+import { getT, type T } from "@/lib/i18n/server";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const s = await getSession();
   if (!s.installerId) redirect("/login");
   if (s.role === "admin") redirect("/admin");
+  const { t } = await getT();
 
   // Notification badge: count of submissions still pending review for this installer.
   const pendingRows = (await db.execute(
@@ -30,7 +32,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <Brand size="sm" subtitle="Loyalty" />
           </Link>
           <div className="flex items-center gap-1">
-            <Link href="/app/notifications" prefetch className="relative p-2 rounded-lg hover:bg-[var(--vie-line)] text-[var(--vie-ink-soft)] hover:text-[var(--vie-ink)] transition-colors" title={pendingCount > 0 ? `${pendingCount} pending` : "Notifications"}>
+            <Link
+              href="/app/notifications"
+              prefetch
+              className="relative p-2 rounded-lg hover:bg-[var(--vie-line)] text-[var(--vie-ink-soft)] hover:text-[var(--vie-ink)] transition-colors"
+              title={pendingCount > 0 ? `${pendingCount} ${t("status.needs_review").toLowerCase()}` : t("nav.notifications")}
+            >
               <Bell size={18} />
               {pendingCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--vie-red)] text-white text-[10px] font-bold flex items-center justify-center v-numeric">
@@ -47,20 +54,20 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         {children}
       </main>
 
-      <BottomNav />
+      <BottomNav t={t} />
     </div>
   );
 }
 
-function BottomNav() {
+function BottomNav({ t }: { t: T }) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-[var(--vie-paper-elev)] border-t border-[var(--vie-line)] z-40 v-safe-bottom shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
       <div className="max-w-md mx-auto grid grid-cols-5">
-        <NavLink href="/app" label="Home" icon={<Home size={20} />} />
-        <NavLink href="/app/history" label="History" icon={<HistoryIcon size={20} />} />
+        <NavLink href="/app" label={t("nav.home")} icon={<Home size={20} />} />
+        <NavLink href="/app/history" label={t("nav.history")} icon={<HistoryIcon size={20} />} />
         <NavSubmit />
-        <NavLink href="/app/rewards" label="Rewards" icon={<Gift size={20} />} />
-        <NavLink href="/app/profile" label="Profile" icon={<User size={20} />} />
+        <NavLink href="/app/rewards" label={t("nav.rewards")} icon={<Gift size={20} />} />
+        <NavLink href="/app/profile" label={t("nav.profile")} icon={<User size={20} />} />
       </div>
     </nav>
   );

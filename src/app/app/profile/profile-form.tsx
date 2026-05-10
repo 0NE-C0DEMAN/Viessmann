@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
+import { useT } from "@/lib/i18n/client";
 
 interface InstallerForm {
   companyName: string;
@@ -15,6 +16,7 @@ interface InstallerForm {
 
 export function ProfileForm({ installer }: { installer: InstallerForm }) {
   const router = useRouter();
+  const { t } = useT();
   const [form, setForm] = useState(installer);
   const [loading, setLoading] = useState(false);
 
@@ -36,10 +38,10 @@ export function ProfileForm({ installer }: { installer: InstallerForm }) {
         toast.error(json.error ?? "Save failed");
         return;
       }
-      toast.success("Profile updated");
+      toast.success(t("common.saved"));
       router.refresh();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Network error");
+      toast.error(e instanceof Error ? e.message : t("common.networkError"));
     } finally {
       setLoading(false);
     }
@@ -47,31 +49,31 @@ export function ProfileForm({ installer }: { installer: InstallerForm }) {
 
   return (
     <form onSubmit={save} className="v-card space-y-3">
-      <div className="text-sm font-bold mb-1">Edit business details</div>
+      <div className="text-sm font-bold mb-1">{t("profile.editProfile")}</div>
       <div>
-        <label className="v-label">Company name</label>
+        <label className="v-label">{t("profile.companyName")}</label>
         <input className="v-input" value={form.companyName} onChange={(e) => update("companyName", e.target.value)} />
       </div>
       <div>
-        <label className="v-label">Street address</label>
+        <label className="v-label">{t("profile.address")}</label>
         <input className="v-input" value={form.address} onChange={(e) => update("address", e.target.value)} />
       </div>
       <div className="grid grid-cols-3 gap-2">
         <div className="col-span-2">
-          <label className="v-label">City</label>
+          <label className="v-label">{t("profile.city")}</label>
           <input className="v-input" value={form.city} onChange={(e) => update("city", e.target.value)} />
         </div>
         <div>
-          <label className="v-label">Postal</label>
+          <label className="v-label">{t("profile.postalCode")}</label>
           <input className="v-input" value={form.postalCode} onChange={(e) => update("postalCode", e.target.value)} />
         </div>
       </div>
       <div>
-        <label className="v-label">Phone</label>
+        <label className="v-label">{t("profile.phone")}</label>
         <input className="v-input" value={form.phone} onChange={(e) => update("phone", e.target.value)} />
       </div>
       <button type="submit" disabled={loading} className="v-btn v-btn-primary w-full">
-        {loading ? <Loader2 className="animate-spin" size={16} /> : <><Save size={16} /> Save changes</>}
+        {loading ? <Loader2 className="animate-spin" size={16} /> : <><Save size={16} /> {t("common.save")}</>}
       </button>
     </form>
   );

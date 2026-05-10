@@ -7,6 +7,7 @@ import { formatPoints } from "@/lib/money";
 import { meetsTier, tierForBalance, type Tier } from "@/lib/tier";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import type { Reward } from "@/db/schema";
+import { useT } from "@/lib/i18n/client";
 
 const TIER_BADGE: Record<Tier, string> = {
   Bronze: "v-pill-muted",
@@ -24,6 +25,7 @@ export function RewardsList({
   initialBalance: number;
   initialTier: Tier;
 }) {
+  const { t } = useT();
   const [balance, setBalance] = useState(initialBalance);
   const [busy, setBusy] = useState<string | null>(null);
   const [redeemed, setRedeemed] = useState<Set<string>>(new Set());
@@ -45,7 +47,7 @@ export function RewardsList({
       });
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.error ?? "Redemption failed");
+        toast.error(json.error ?? t("rewards.toast.failed"));
         return;
       }
       setBalance(json.newBalance);
@@ -54,9 +56,9 @@ export function RewardsList({
         ...prev,
         [reward.id]: Math.max(0, (prev[reward.id] ?? reward.inventory) - 1),
       }));
-      toast.success(`Redeemed: ${reward.name}`);
+      toast.success(t("rewards.toast.success", { name: reward.name }));
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Network error");
+      toast.error(e instanceof Error ? e.message : t("common.networkError"));
     } finally {
       setBusy(null);
     }
@@ -69,19 +71,19 @@ export function RewardsList({
   return (
     <div className="space-y-4 v-fade-in">
       <div className="flex items-baseline justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Rewards</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{t("rewards.title")}</h1>
         <div className="text-sm">
-          <span className="text-[var(--vie-ink-muted)]">Balance: </span>
-          <span className="font-bold v-numeric">{formatPoints(balance)} pts</span>
-          <span className={`v-pill ml-2 text-[10px] ${TIER_BADGE[tier]}`}>{tier}</span>
+          <span className="text-[var(--vie-ink-muted)]">{t("rewards.balance")} </span>
+          <span className="font-bold v-numeric">{formatPoints(balance)} {t("common.pts")}</span>
+          <span className={`v-pill ml-2 text-[10px] ${TIER_BADGE[tier]}`}>{t(`tier.${tier}`)}</span>
         </div>
       </div>
 
       {rewards.length === 0 ? (
         <div className="v-card text-center py-10">
           <Gift className="mx-auto text-[var(--vie-ink-muted)]" size={28} />
-          <div className="font-semibold text-sm mt-2">No rewards available</div>
-          <div className="text-xs text-[var(--vie-ink-muted)] mt-1">Check back soon.</div>
+          <div className="font-semibold text-sm mt-2">{t("rewards.empty.title")}</div>
+          <div className="text-xs text-[var(--vie-ink-muted)] mt-1">{t("rewards.empty.body")}</div>
         </div>
       ) : (
         <div className="grid gap-3">
@@ -120,16 +122,16 @@ export function RewardsList({
                 {/* Middle: pills wrap freely on their own row. */}
                 <div className="mt-3 pt-3 border-t border-[var(--vie-line)] flex items-center gap-2 flex-wrap">
                   <span className="font-bold text-[var(--vie-red-dark)] v-numeric text-sm whitespace-nowrap">
-                    {formatPoints(r.pointCost)} pts
+                    {formatPoints(r.pointCost)} {t("common.pts")}
                   </span>
                   {!inStock ? (
-                    <span className="v-pill v-pill-muted">Out of stock</span>
+                    <span className="v-pill v-pill-muted">{t("rewards.outOfStock")}</span>
                   ) : stockLow ? (
-                    <span className="v-pill v-pill-warn">Only {stock} left</span>
+                    <span className="v-pill v-pill-warn">{t("rewards.onlyLeft", { n: stock })}</span>
                   ) : null}
                   {!tierOk && (
                     <span className="v-pill v-pill-muted text-[10px]">
-                      Reach {requiredTier} to unlock
+                      {t("rewards.reachToUnlock", { tier: t(`tier.${requiredTier}`) })}
                     </span>
                   )}
                 </div>
@@ -141,36 +143,27 @@ export function RewardsList({
                   className={`v-btn v-btn-sm w-full mt-3 ${
                     isRedeemed ? "v-btn-success" : can ? "v-btn-primary" : "v-btn-ghost"
                   }`}
-                  title={
-                    !tierOk
-                      ? `Requires ${requiredTier}+`
-                      : !enoughPts
-                      ? "Not enough points"
-                      : !inStock
-                      ? "Out of stock"
-                      : "Redeem"
-                  }
                 >
                   {busy === r.id ? (
                     "…"
                   ) : isRedeemed ? (
                     <>
-                      <Check size={14} /> Redeemed
+                      <Check size={14} /> {t("rewards.btn.redeemed")}
                     </>
                   ) : !tierOk ? (
                     <>
-                      <Lock size={14} /> Locked — reach {requiredTier}
+                      <Lock size={14} /> {t("rewards.btn.locked", { tier: t(`tier.${requiredTier}`) })}
                     </>
                   ) : !enoughPts ? (
                     <>
-                      <Lock size={14} /> Need {formatPoints(r.pointCost - balance)} more pts
+                      <Lock size={14} /> {t("rewards.btn.needMore", { n: formatPoints(r.pointCost - balance) })}
                     </>
                   ) : !inStock ? (
                     <>
-                      <Lock size={14} /> Out of stock
+                      <Lock size={14} /> {t("rewards.btn.outOfStock")}
                     </>
                   ) : (
-                    "Redeem"
+                    t("rewards.btn.redeem")
                   )}
                 </button>
               </div>
@@ -181,17 +174,17 @@ export function RewardsList({
 
       <ConfirmDialog
         open={pending !== null}
-        title={`Redeem ${pending?.name ?? "reward"}?`}
+        title={t("rewards.confirm.title", { name: pending?.name ?? "" })}
         description={
           pending ? (
             <>
-              <strong className="text-[var(--vie-red-dark)]">{formatPoints(pending.pointCost)} pts</strong> will be deducted from your balance.
-              You&apos;ll be left with <strong>{formatPoints(balance - pending.pointCost)} pts</strong>. Viessmann ships within 5 business days.
+              {t("rewards.confirm.body1", { cost: formatPoints(pending.pointCost) })}{" "}
+              {t("rewards.confirm.body2", { remaining: formatPoints(balance - pending.pointCost) })}
             </>
           ) : null
         }
-        confirmLabel="Redeem"
-        cancelLabel="Cancel"
+        confirmLabel={t("rewards.btn.redeem")}
+        cancelLabel={t("common.cancel")}
         busy={busy !== null}
         onConfirm={confirmRedeem}
         onCancel={() => setPending(null)}

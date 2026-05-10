@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Camera, FileText } from "lucide-react";
 import { setPendingFile } from "./pending-upload";
+import { useT } from "@/lib/i18n/client";
 
 // Dashboard quick actions. The hidden <input> elements live inside the same
 // component as the buttons so the picker opens immediately on tap (the same
@@ -11,6 +12,7 @@ import { setPendingFile } from "./pending-upload";
 // pending-upload singleton and navigate to /app/submit which resumes the
 // preview / upload / OCR flow.
 export function QuickActions() {
+  const { t } = useT();
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
@@ -25,7 +27,7 @@ export function QuickActions() {
 
   return (
     <div>
-      <div className="text-sm font-bold mb-2 mt-3">Quick actions</div>
+      <div className="text-sm font-bold mb-2 mt-3">{t("dash.quickActions")}</div>
       <div className="grid grid-cols-2 gap-3">
         <button
           type="button"
@@ -35,8 +37,8 @@ export function QuickActions() {
           <div className="w-10 h-10 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center">
             <FileText size={18} />
           </div>
-          <div className="font-semibold text-sm mt-1">Upload PDF / XML</div>
-          <div className="text-xs text-[var(--vie-ink-muted)]">Fastest path</div>
+          <div className="font-semibold text-sm mt-1">{t("dash.uploadPdfXml")}</div>
+          <div className="text-xs text-[var(--vie-ink-muted)]">{t("dash.fastestPath")}</div>
         </button>
         <button
           type="button"
@@ -46,8 +48,8 @@ export function QuickActions() {
           <div className="w-10 h-10 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center">
             <Camera size={18} />
           </div>
-          <div className="font-semibold text-sm mt-1">Scan with camera</div>
-          <div className="text-xs text-[var(--vie-ink-muted)]">On-device OCR · free</div>
+          <div className="font-semibold text-sm mt-1">{t("dash.scanCamera")}</div>
+          <div className="text-xs text-[var(--vie-ink-muted)]">{t("dash.onDeviceOcr")}</div>
         </button>
       </div>
       <input

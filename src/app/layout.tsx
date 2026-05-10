@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { RegisterSW } from "@/components/register-sw";
 import { Toaster } from "sonner";
+import { getLocale } from "@/lib/i18n/server";
+import { I18nProvider } from "@/lib/i18n/client";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,19 +39,23 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Read the locale once on the server so the <html lang> attribute is
+  // correct on first paint and every client component below shares the same
+  // value via I18nProvider.
+  const locale = await getLocale();
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <RegisterSW />
-        {children}
+        <I18nProvider locale={locale}>{children}</I18nProvider>
         <Toaster
           position="bottom-center"
           theme="light"
@@ -78,3 +84,8 @@ export default function RootLayout({
     </html>
   );
 }
+
+// Mark the root layout as dynamic. Reading the locale cookie via `cookies()`
+// already opts us into request-time rendering, but making it explicit prevents
+// any future build-time optimisation from caching a stale lang.
+export const dynamic = "force-dynamic";

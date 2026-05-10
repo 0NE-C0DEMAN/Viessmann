@@ -7,11 +7,14 @@ import { StatusPill } from "@/components/status-pill";
 import { formatEur, formatPoints } from "@/lib/money";
 import { ArrowLeft, FileText, Calendar, Building2, User as UserIcon, Hash, Receipt as ReceiptIcon, AlertTriangle, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { getT, type T } from "@/lib/i18n/server";
 
 export default async function ReceiptDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const s = await getSession();
   if (!s.installerId) redirect("/login");
+  const { t, locale } = await getT();
+  const dateLocale = locale === "hr" ? "hr-HR" : "en-GB";
 
   const found = await db.select().from(receipts).where(eq(receipts.id, id)).limit(1);
   if (found.length === 0) notFound();
@@ -35,34 +38,34 @@ export default async function ReceiptDetail({ params }: { params: Promise<{ id: 
 
   return (
     <div className="space-y-4 v-fade-in">
-      <Link href="/app/history" className="text-sm text-[var(--vie-ink-soft)] flex items-center gap-1"><ArrowLeft size={14} /> Back to history</Link>
+      <Link href="/app/history" className="text-sm text-[var(--vie-ink-soft)] flex items-center gap-1"><ArrowLeft size={14} /> {t("receipt.backHistory")}</Link>
 
       <div className="v-card">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="flex items-center gap-1.5 text-xs text-[var(--vie-ink-muted)]"><ReceiptIcon size={12} /> Invoice</div>
+            <div className="flex items-center gap-1.5 text-xs text-[var(--vie-ink-muted)]"><ReceiptIcon size={12} /> {t("receipt.invoice")}</div>
             <div className="font-bold text-2xl tracking-tight">{r.invoiceNumber ?? "—"}</div>
-            <div className="text-sm text-[var(--vie-ink-soft)] flex items-center gap-1 mt-0.5"><Calendar size={12} /> {r.issueDate ? new Date(r.issueDate).toLocaleDateString("hr-HR") : "—"}</div>
+            <div className="text-sm text-[var(--vie-ink-soft)] flex items-center gap-1 mt-0.5"><Calendar size={12} /> {r.issueDate ? new Date(r.issueDate).toLocaleDateString(dateLocale) : "—"}</div>
           </div>
           <StatusPill status={r.status} />
         </div>
         <hr className="v-divider" />
         <div className="grid grid-cols-2 gap-4 text-xs">
-          <Party icon={<Building2 size={14} />} label="Seller (wholesaler)" name={r.wholesalerName} oib={r.wholesalerOib} />
-          <Party icon={<UserIcon size={14} />} label="Buyer (you)" name={r.buyerName} oib={r.buyerOib} />
+          <Party icon={<Building2 size={14} />} label={t("receipt.seller")} name={r.wholesalerName} oib={r.wholesalerOib} />
+          <Party icon={<UserIcon size={14} />} label={t("receipt.buyer")} name={r.buyerName} oib={r.buyerOib} />
         </div>
       </div>
 
       {r.status === "approved" && r.pointsAwarded > 0 && (
         <div className="rounded-2xl p-5 text-white v-card-hero text-center">
-          <div className="text-xs uppercase tracking-wider opacity-80 mb-1 relative">Points credited</div>
+          <div className="text-xs uppercase tracking-wider opacity-80 mb-1 relative">{t("receipt.pointsCredited")}</div>
           <div className="text-4xl font-bold v-numeric relative">+{formatPoints(r.pointsAwarded)}</div>
         </div>
       )}
 
       <div className="v-card">
         <div className="text-sm font-bold mb-3 flex items-center gap-2">
-          <FileText size={14} /> Line items <span className="v-pill v-pill-muted">{lines.length}</span>
+          <FileText size={14} /> {t("receipt.lineItems")} <span className="v-pill v-pill-muted">{lines.length}</span>
         </div>
         <div className="space-y-3">
           {lines.map(({ line, product }) => (
@@ -77,15 +80,15 @@ export default async function ReceiptDetail({ params }: { params: Promise<{ id: 
                   <div className="mt-1.5 flex items-center gap-2 flex-wrap">
                     {line.isViessmann ? (
                       <>
-                        <span className="v-pill v-pill-brand"><Hash size={10} /> Viessmann</span>
+                        <span className="v-pill v-pill-brand"><Hash size={10} /> {t("receipt.viessmann")}</span>
                         {product ? (
                           <span className="text-xs text-[var(--vie-ink-soft)] truncate">→ {product.model}</span>
                         ) : (
-                          <span className="v-pill v-pill-warn">unmatched</span>
+                          <span className="v-pill v-pill-warn">{t("receipt.unmatched")}</span>
                         )}
                       </>
                     ) : (
-                      <span className="v-pill v-pill-muted">other / 0 pts</span>
+                      <span className="v-pill v-pill-muted">{t("receipt.other")}</span>
                     )}
                   </div>
                 </div>
@@ -96,7 +99,7 @@ export default async function ReceiptDetail({ params }: { params: Promise<{ id: 
                   )}
                   {line.campaignName && line.pointsAwarded > line.pointsBase && (
                     <div className="text-[10px] text-[var(--vie-success)] font-semibold mt-0.5">
-                      +{formatPoints(line.pointsAwarded - line.pointsBase)} bonus · {line.campaignName}
+                      +{formatPoints(line.pointsAwarded - line.pointsBase)} {t("receipt.bonus")} · {line.campaignName}
                     </div>
                   )}
                 </div>
@@ -106,20 +109,20 @@ export default async function ReceiptDetail({ params }: { params: Promise<{ id: 
         </div>
         <hr className="v-divider" />
         <div className="space-y-1 text-sm">
-          <div className="flex justify-between v-numeric"><span className="text-[var(--vie-ink-muted)]">Subtotal</span><span>{formatEur(r.subtotalCents)}</span></div>
-          <div className="flex justify-between v-numeric"><span className="text-[var(--vie-ink-muted)]">VAT</span><span>{formatEur(r.vatCents)}</span></div>
-          <div className="flex justify-between font-bold text-base v-numeric"><span>Total</span><span>{formatEur(r.totalCents)}</span></div>
+          <div className="flex justify-between v-numeric"><span className="text-[var(--vie-ink-muted)]">{t("receipt.subtotal")}</span><span>{formatEur(r.subtotalCents)}</span></div>
+          <div className="flex justify-between v-numeric"><span className="text-[var(--vie-ink-muted)]">{t("receipt.vat")}</span><span>{formatEur(r.vatCents)}</span></div>
+          <div className="flex justify-between font-bold text-base v-numeric"><span>{t("receipt.total")}</span><span>{formatEur(r.totalCents)}</span></div>
         </div>
       </div>
 
       <div className="v-card">
-        <div className="text-sm font-bold mb-3">Status timeline</div>
-        <Timeline submitted={r.createdAt!} status={r.status} reviewed={r.reviewedAt} ledgerEntries={ledger.length} />
+        <div className="text-sm font-bold mb-3">{t("receipt.timeline")}</div>
+        <Timeline submitted={r.createdAt!} status={r.status} reviewed={r.reviewedAt} ledgerEntries={ledger.length} t={t} dateLocale={dateLocale} />
       </div>
 
       {r.reviewerNote && (
         <div className="v-card border-[var(--vie-red-light)] bg-[var(--vie-red-light)]/30">
-          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-red-dark)] mb-1.5">Note from Viessmann</div>
+          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-red-dark)] mb-1.5">{t("receipt.note")}</div>
           <div className="text-sm">
             <ReviewerNote note={r.reviewerNote} />
           </div>
@@ -129,7 +132,7 @@ export default async function ReceiptDetail({ params }: { params: Promise<{ id: 
       {flags.length > 0 && (
         <div className="v-card">
           <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-warn)] mb-2 flex items-center gap-1.5">
-            <AlertTriangle size={12} /> System notes ({flags.length})
+            <AlertTriangle size={12} /> {t("receipt.systemNotes")} ({flags.length})
           </div>
           <ul className="text-xs space-y-1 text-[var(--vie-ink-soft)]">
             {flags.map((f, i) => <li key={i}>• {f.replace(/_/g, " ")}</li>)}
@@ -139,13 +142,13 @@ export default async function ReceiptDetail({ params }: { params: Promise<{ id: 
 
       {r.fileUrl && (
         <a href={r.fileUrl} target="_blank" rel="noopener noreferrer" className="v-btn v-btn-ghost w-full">
-          <FileText size={16} /> View original file
+          <FileText size={16} /> {t("receipt.viewOriginal")}
         </a>
       )}
 
       {(r.status === "rejected" || r.status === "duplicate") && r.installerId === s.installerId && (
         <Link href="/app/submit" className="v-btn v-btn-primary w-full">
-          {r.status === "duplicate" ? "Submit a different invoice" : "Submit a corrected version"}
+          {r.status === "duplicate" ? t("receipt.submitDifferent") : t("receipt.submitCorrected")}
         </Link>
       )}
     </div>
@@ -181,14 +184,18 @@ function ReviewerNote({ note }: { note: string }) {
   );
 }
 
-function Timeline({ submitted, status, reviewed, ledgerEntries }: { submitted: Date; status: string; reviewed: Date | null; ledgerEntries: number }) {
+function Timeline({ submitted, status, reviewed, ledgerEntries, t, dateLocale }: { submitted: Date; status: string; reviewed: Date | null; ledgerEntries: number; t: T; dateLocale: string }) {
+  const finalKey = status === "approved" ? "receipt.timeline.approved"
+    : status === "rejected" ? "receipt.timeline.rejected"
+    : status === "duplicate" ? "receipt.timeline.duplicate"
+    : "receipt.timeline.pending";
   const items: Array<{ label: string; date: Date | null; done: boolean; failed?: boolean }> = [
-    { label: "Submitted", date: submitted, done: true },
-    { label: "Parsed & matched", date: submitted, done: true },
-    { label: status === "approved" ? "Approved" : status === "rejected" ? "Rejected" : status === "duplicate" ? "Duplicate detected" : "Pending review", date: reviewed ?? submitted, done: status !== "needs_review", failed: status === "rejected" || status === "duplicate" },
+    { label: t("receipt.timeline.submitted"), date: submitted, done: true },
+    { label: t("receipt.timeline.parsed"), date: submitted, done: true },
+    { label: t(finalKey), date: reviewed ?? submitted, done: status !== "needs_review", failed: status === "rejected" || status === "duplicate" },
   ];
   if (status === "approved" && ledgerEntries > 0) {
-    items.push({ label: "Points credited to ledger", date: reviewed ?? submitted, done: true });
+    items.push({ label: t("receipt.timeline.credited"), date: reviewed ?? submitted, done: true });
   }
   return (
     <ol className="space-y-3">
@@ -201,7 +208,7 @@ function Timeline({ submitted, status, reviewed, ledgerEntries }: { submitted: D
           </div>
           <div className="flex-1">
             <div className="text-sm font-medium">{it.label}</div>
-            <div className="text-xs text-[var(--vie-ink-muted)]">{it.date ? new Date(it.date).toLocaleString("hr-HR") : "—"}</div>
+            <div className="text-xs text-[var(--vie-ink-muted)]">{it.date ? new Date(it.date).toLocaleString(dateLocale) : "—"}</div>
           </div>
         </li>
       ))}

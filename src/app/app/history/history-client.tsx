@@ -6,18 +6,19 @@ import { StatusPill } from "@/components/status-pill";
 import { formatEur, formatPoints } from "@/lib/money";
 import { relativeDate } from "@/lib/utils";
 import { Search, FileText } from "lucide-react";
+import { useT } from "@/lib/i18n/client";
 
 type Filter = "all" | "approved" | "needs_review" | "rejected" | "duplicate";
 
-const TABS: { key: Filter; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "approved", label: "Approved" },
-  { key: "needs_review", label: "Review" },
-  { key: "rejected", label: "Rejected" },
-  { key: "duplicate", label: "Duplicate" },
-];
-
 export function HistoryClient({ rows }: { rows: Receipt[] }) {
+  const { t } = useT();
+  const TABS: { key: Filter; label: string }[] = [
+    { key: "all", label: t("history.tab.all") },
+    { key: "approved", label: t("history.tab.approved") },
+    { key: "needs_review", label: t("history.tab.review") },
+    { key: "rejected", label: t("history.tab.rejected") },
+    { key: "duplicate", label: t("history.tab.duplicate") },
+  ];
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
 
@@ -35,15 +36,15 @@ export function HistoryClient({ rows }: { rows: Receipt[] }) {
   return (
     <div className="space-y-3">
       <div className="flex items-baseline justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">History</h1>
-        <div className="text-xs text-[var(--vie-ink-muted)]">{filtered.length} of {rows.length}</div>
+        <h1 className="text-2xl font-bold tracking-tight">{t("history.title")}</h1>
+        <div className="text-xs text-[var(--vie-ink-muted)]">{filtered.length} {t("history.of")} {rows.length}</div>
       </div>
 
       <div className="relative">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--vie-ink-muted)]" />
         <input
           className="v-input pl-10"
-          placeholder="Search wholesaler, invoice, OIB…"
+          placeholder={t("history.searchPlaceholder")}
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
@@ -78,8 +79,8 @@ export function HistoryClient({ rows }: { rows: Receipt[] }) {
       {filtered.length === 0 ? (
         <div className="v-card text-center py-10">
           <FileText className="mx-auto text-[var(--vie-ink-muted)]" size={28} />
-          <div className="font-semibold text-sm mt-2">No matching submissions</div>
-          <div className="text-xs text-[var(--vie-ink-muted)] mt-1">Try a different search or filter.</div>
+          <div className="font-semibold text-sm mt-2">{t("history.empty.title")}</div>
+          <div className="text-xs text-[var(--vie-ink-muted)] mt-1">{t("history.empty.body")}</div>
         </div>
       ) : (
         <div className="space-y-2">
@@ -87,9 +88,9 @@ export function HistoryClient({ rows }: { rows: Receipt[] }) {
             <Link key={r.id} href={`/app/receipts/${r.id}`} className="v-card v-card-tight v-card-interactive block">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm truncate">{r.wholesalerName ?? "Unknown wholesaler"}</div>
+                  <div className="font-semibold text-sm truncate">{r.wholesalerName ?? t("dash.unknownWholesaler")}</div>
                   <div className="text-xs text-[var(--vie-ink-muted)] truncate">
-                    Invoice {r.invoiceNumber ?? "—"} · {relativeDate(r.createdAt)}
+                    {t("history.invoice")} {r.invoiceNumber ?? "—"} · {relativeDate(r.createdAt)}
                   </div>
                   <div className="text-xs text-[var(--vie-ink-muted)] mt-0.5 v-numeric">{formatEur(r.totalCents)}</div>
                 </div>

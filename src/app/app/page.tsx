@@ -9,6 +9,7 @@ import { StatusPill } from "@/components/status-pill";
 import { relativeDate } from "@/lib/utils";
 import { ArrowRight, TrendingUp, Sparkles } from "lucide-react";
 import { QuickActions } from "./quick-actions";
+import { getT, type T } from "@/lib/i18n/server";
 
 interface DashboardAggregate {
   balance: number;
@@ -23,6 +24,7 @@ interface DashboardAggregate {
 export default async function InstallerHome() {
   const s = await getSession();
   if (!s.installerId) redirect("/login");
+  const { t } = await getT();
 
   // Single aggregate query — balance + month earnings + status counts + identity, in one round trip.
   const aggRows = (await db.execute(sql`
@@ -62,14 +64,14 @@ export default async function InstallerHome() {
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-xs text-[var(--vie-ink-muted)]">Welcome back</div>
+        <div className="text-xs text-[var(--vie-ink-muted)]">{t("dash.welcome")}</div>
         <div className="font-bold text-lg leading-tight">{agg.company_name}</div>
       </div>
 
       {balance < 0 && (
         <div className="v-card border-[var(--vie-error)] bg-[var(--vie-error-bg)]/40">
-          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-error)] mb-1">Negative balance</div>
-          <div className="text-sm">Your balance is below zero, usually because Viessmann reversed an earlier accrual. Submit more eligible invoices to clear it. Check the Notifications tab for details.</div>
+          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-error)] mb-1">{t("dash.negBalance.title")}</div>
+          <div className="text-sm">{t("dash.negBalance.body")}</div>
         </div>
       )}
 
@@ -77,47 +79,47 @@ export default async function InstallerHome() {
         <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 80% 0%, rgba(255,255,255,0.4), transparent 50%)" }} />
         <div className="relative">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider opacity-90">{tier} tier</span>
-            <span className="v-pill bg-white/20 text-white text-[10px] backdrop-blur">+{formatPoints(agg.month_pts)} this month</span>
+            <span className="text-xs font-bold uppercase tracking-wider opacity-90">{t(`tier.${tier}`)} {t("dash.tier")}</span>
+            <span className="v-pill bg-white/20 text-white text-[10px] backdrop-blur">+{formatPoints(agg.month_pts)} {t("dash.thisMonth")}</span>
           </div>
           <div className="flex items-baseline gap-2 mt-2">
             <div className="text-5xl font-bold tracking-tight v-numeric">{formatPoints(balance)}</div>
-            <div className="text-sm opacity-80">points</div>
+            <div className="text-sm opacity-80">{t("dash.points")}</div>
           </div>
           {nextTierAt ? (
             <>
               <div className="mt-4 h-1.5 rounded-full bg-white/25 overflow-hidden">
                 <div className="h-full bg-white transition-all duration-500" style={{ width: `${tierProgress}%` }} />
               </div>
-              <div className="text-xs mt-2 opacity-90">{formatPoints(Math.max(0, nextTierAt - balance))} pts to next tier</div>
+              <div className="text-xs mt-2 opacity-90">{formatPoints(Math.max(0, nextTierAt - balance))} {t("dash.toNextTier")}</div>
             </>
           ) : (
-            <div className="text-xs mt-3 opacity-90 flex items-center gap-1"><Sparkles size={12} /> Top tier reached</div>
+            <div className="text-xs mt-3 opacity-90 flex items-center gap-1"><Sparkles size={12} /> {t("dash.topTier")}</div>
           )}
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <Stat label="Submissions" value={agg.total} />
-        <Stat label="Approved" value={agg.approved} accent="success" />
-        <Stat label="Pending" value={agg.pending} accent="warn" />
+        <Stat label={t("dash.submissions")} value={agg.total} />
+        <Stat label={t("dash.approved")} value={agg.approved} accent="success" />
+        <Stat label={t("dash.pending")} value={agg.pending} accent="warn" />
       </div>
 
       <QuickActions />
 
       <div>
         <div className="flex items-center justify-between mb-2 mt-3">
-          <div className="text-sm font-bold">Recent submissions</div>
-          <Link href="/app/history" prefetch className="text-xs text-[var(--vie-red)] font-semibold flex items-center gap-0.5">View all <ArrowRight size={12} /></Link>
+          <div className="text-sm font-bold">{t("dash.recentSubs")}</div>
+          <Link href="/app/history" prefetch className="text-xs text-[var(--vie-red)] font-semibold flex items-center gap-0.5">{t("dash.viewAll")} <ArrowRight size={12} /></Link>
         </div>
         {recent.length === 0 ? (
-          <EmptyState />
+          <EmptyState t={t} />
         ) : (
           <div className="space-y-2">
             {recent.map((r) => (
               <Link key={r.id} href={`/app/receipts/${r.id}`} prefetch className="v-card v-card-tight v-card-interactive flex items-center justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm truncate">{r.wholesalerName ?? "Unknown wholesaler"}</div>
+                  <div className="font-semibold text-sm truncate">{r.wholesalerName ?? t("dash.unknownWholesaler")}</div>
                   <div className="text-xs text-[var(--vie-ink-muted)] truncate">
                     {r.invoiceNumber ?? "—"} · {formatEur(r.totalCents)} · {relativeDate(r.createdAt)}
                   </div>
@@ -145,15 +147,15 @@ function Stat({ label, value, accent }: { label: string; value: number; accent?:
   );
 }
 
-function EmptyState() {
+function EmptyState({ t }: { t: T }) {
   return (
     <div className="v-card text-center py-8">
       <div className="w-12 h-12 mx-auto rounded-full bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] flex items-center justify-center">
         <TrendingUp size={20} />
       </div>
-      <div className="font-semibold text-sm mt-3">No submissions yet</div>
-      <div className="text-xs text-[var(--vie-ink-muted)] mt-1 mb-4">Your first submission earns instant points.</div>
-      <Link href="/app/submit" className="v-btn v-btn-primary v-btn-sm">Submit your first invoice</Link>
+      <div className="font-semibold text-sm mt-3">{t("dash.empty.title")}</div>
+      <div className="text-xs text-[var(--vie-ink-muted)] mt-1 mb-4">{t("dash.empty.body")}</div>
+      <Link href="/app/submit" className="v-btn v-btn-primary v-btn-sm">{t("dash.empty.cta")}</Link>
     </div>
   );
 }

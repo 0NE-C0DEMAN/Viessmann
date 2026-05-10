@@ -7,10 +7,12 @@ import { CheckCircle2, AlertTriangle, XCircle, Gift, Bell, RotateCcw, Sparkles, 
 import Link from "next/link";
 import { relativeDate } from "@/lib/utils";
 import { formatPoints } from "@/lib/money";
+import { getT } from "@/lib/i18n/server";
 
 export default async function NotificationsPage() {
   const s = await getSession();
   if (!s.installerId) redirect("/login");
+  const { t } = await getT();
 
   const [recentReceipts, recentRedemptions, recentLedger, tierEvents] = await Promise.all([
     db.select().from(receipts).where(eq(receipts.installerId, s.installerId)).orderBy(desc(receipts.createdAt)).limit(20),
@@ -63,8 +65,8 @@ export default async function NotificationsPage() {
         id: `r-${r.id}`,
         when: r.createdAt!,
         icon: <CheckCircle2 size={18} />,
-        title: `Approved: ${r.invoiceNumber ?? "invoice"}`,
-        body: `+${formatPoints(r.pointsAwarded)} pts credited from ${r.wholesalerName ?? "wholesaler"}.`,
+        title: t("notif.approved", { n: r.invoiceNumber ?? t("history.invoice") }),
+        body: t("notif.approved.body", { pts: formatPoints(r.pointsAwarded), who: r.wholesalerName ?? t("dash.unknownWholesaler") }),
         href: `/app/receipts/${r.id}`,
         tone: "success",
       });
@@ -73,8 +75,8 @@ export default async function NotificationsPage() {
         id: `r-${r.id}`,
         when: r.createdAt!,
         icon: <AlertTriangle size={18} />,
-        title: `Pending review: ${r.invoiceNumber ?? "invoice"}`,
-        body: "We'll get back to you within 24 hours.",
+        title: t("notif.pending", { n: r.invoiceNumber ?? t("history.invoice") }),
+        body: t("notif.pending.body"),
         href: `/app/receipts/${r.id}`,
         tone: "warn",
       });
@@ -83,8 +85,8 @@ export default async function NotificationsPage() {
         id: `r-${r.id}`,
         when: r.createdAt!,
         icon: <XCircle size={18} />,
-        title: `${r.status === "duplicate" ? "Duplicate" : "Rejected"}: ${r.invoiceNumber ?? "invoice"}`,
-        body: r.reviewerNote ?? (r.status === "duplicate" ? "Already submitted previously." : "Could not award points."),
+        title: t(r.status === "duplicate" ? "notif.duplicate" : "notif.rejected", { n: r.invoiceNumber ?? t("history.invoice") }),
+        body: r.reviewerNote ?? t(r.status === "duplicate" ? "notif.duplicate.fallback" : "notif.rejected.fallback"),
         href: `/app/receipts/${r.id}`,
         tone: "error",
       });
@@ -96,8 +98,8 @@ export default async function NotificationsPage() {
       id: `red-${r.id}`,
       when: r.createdAt!,
       icon: <Gift size={18} />,
-      title: `Redeemed: ${reward?.name ?? "—"}`,
-      body: `−${formatPoints(r.pointCost)} pts. Status: ${r.status}.`,
+      title: t("notif.redeemed", { name: reward?.name ?? "—" }),
+      body: t("notif.redeemed.body", { cost: formatPoints(r.pointCost), status: r.status }),
       tone: "brand",
     });
   }
@@ -108,8 +110,8 @@ export default async function NotificationsPage() {
         id: `l-${l.id}`,
         when: l.createdAt!,
         icon: <RotateCcw size={18} />,
-        title: `Points reversed by Viessmann`,
-        body: `${l.delta >= 0 ? "+" : ""}${formatPoints(l.delta)} pts. ${l.note ?? ""}`,
+        title: t("notif.reversal"),
+        body: `${l.delta >= 0 ? "+" : ""}${formatPoints(l.delta)} ${t("common.pts")}. ${l.note ?? ""}`,
         href: l.receiptId ? `/app/receipts/${l.receiptId}` : undefined,
         tone: l.delta >= 0 ? "info" : "error",
       });
@@ -118,8 +120,8 @@ export default async function NotificationsPage() {
         id: `l-${l.id}`,
         when: l.createdAt!,
         icon: <Coins size={18} />,
-        title: `Points adjusted by Viessmann`,
-        body: `${l.delta >= 0 ? "+" : ""}${formatPoints(l.delta)} pts. ${l.note ?? "No reason given"}.`,
+        title: t("notif.adjustment"),
+        body: `${l.delta >= 0 ? "+" : ""}${formatPoints(l.delta)} ${t("common.pts")}. ${l.note ?? ""}`,
         tone: l.delta >= 0 ? "success" : "warn",
       });
     }
@@ -131,8 +133,8 @@ export default async function NotificationsPage() {
       id: `t-${e.id}`,
       when: e.createdAt!,
       icon: <Sparkles size={18} />,
-      title: `Welcome to ${p?.to ?? "a new tier"}!`,
-      body: `You moved up from ${p?.from ?? "Bronze"} — enjoy the new rewards.`,
+      title: t("notif.tierUp", { tier: t(`tier.${p?.to ?? "Bronze"}`) }),
+      body: t("notif.tierUp.body", { from: t(`tier.${p?.from ?? "Bronze"}`) }),
       href: "/app/rewards",
       tone: "brand",
     });
@@ -142,13 +144,13 @@ export default async function NotificationsPage() {
 
   return (
     <div className="space-y-3 v-fade-in">
-      <h1 className="text-2xl font-bold tracking-tight">Notifications</h1>
+      <h1 className="text-2xl font-bold tracking-tight">{t("notif.title")}</h1>
 
       {items.length === 0 ? (
         <div className="v-card text-center py-10">
           <Bell className="mx-auto text-[var(--vie-ink-muted)]" size={28} />
-          <div className="font-semibold text-sm mt-2">All quiet here</div>
-          <div className="text-xs text-[var(--vie-ink-muted)] mt-1">Submit your first invoice to see updates.</div>
+          <div className="font-semibold text-sm mt-2">{t("notif.empty.title")}</div>
+          <div className="text-xs text-[var(--vie-ink-muted)] mt-1">{t("notif.empty.body")}</div>
         </div>
       ) : (
         <div className="space-y-2">

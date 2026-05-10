@@ -7,6 +7,7 @@ import { ProfileForm } from "./profile-form";
 import { LogoutButton } from "@/components/logout-button";
 import { formatPoints } from "@/lib/money";
 import { Calendar, MapPin, Phone, Mail, Hash } from "lucide-react";
+import { getT } from "@/lib/i18n/server";
 
 interface ProfileAggregate {
   id: string;
@@ -25,6 +26,8 @@ interface ProfileAggregate {
 export default async function ProfilePage() {
   const s = await getSession();
   if (!s.installerId) redirect("/login");
+  const { t, locale } = await getT();
+  const dateLocale = locale === "hr" ? "hr-HR" : "en-GB";
 
   // One round trip for installer + balance + lifetime earned.
   const aggRows = (await db.execute(sql`
@@ -59,36 +62,36 @@ export default async function ProfilePage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold tracking-tight">Profile</h1>
+      <h1 className="text-2xl font-bold tracking-tight">{t("profile.title")}</h1>
 
       <div className="v-card text-center">
         <div className="v-logo v-logo-lg mx-auto">{(me.company_name?.[0] ?? "?").toUpperCase()}</div>
         <div className="font-bold text-lg mt-3">{me.company_name}</div>
         <div className="text-xs text-[var(--vie-ink-muted)] flex items-center justify-center gap-1 mt-0.5"><Hash size={11} /> OIB {me.oib}</div>
         <div className="mt-3 flex items-center justify-center gap-2">
-          <span className="v-pill v-pill-brand">{tier} tier</span>
-          <span className="v-pill v-pill-muted">Member since {new Date(me.created_at).toLocaleDateString("hr-HR", { month: "short", year: "numeric" })}</span>
+          <span className="v-pill v-pill-brand">{t(`tier.${tier}`)} {t("profile.tier")}</span>
+          <span className="v-pill v-pill-muted">{t("profile.memberSince")} {new Date(me.created_at).toLocaleDateString(dateLocale, { month: "short", year: "numeric" })}</span>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="v-card v-card-tight">
-          <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--vie-ink-muted)]">Current balance</div>
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--vie-ink-muted)]">{t("profile.currentBalance")}</div>
           <div className="text-xl font-bold v-numeric mt-1">{formatPoints(me.balance)}</div>
         </div>
         <div className="v-card v-card-tight">
-          <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--vie-ink-muted)]">Lifetime earned</div>
+          <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--vie-ink-muted)]">{t("profile.lifetimeEarned")}</div>
           <div className="text-xl font-bold v-numeric mt-1">{formatPoints(me.lifetime_earned)}</div>
         </div>
       </div>
 
       <div className="v-card">
-        <div className="text-sm font-bold mb-3">Business details</div>
+        <div className="text-sm font-bold mb-3">{t("profile.businessDetails")}</div>
         <div className="space-y-2 text-sm">
-          <Row icon={<MapPin size={14} />} label="Address">{me.address ?? "—"}{me.city ? `, ${me.postal_code ?? ""} ${me.city}` : ""}</Row>
-          <Row icon={<Mail size={14} />} label="Email">{me.email}</Row>
-          <Row icon={<Phone size={14} />} label="Phone">{me.phone ?? "—"}</Row>
-          <Row icon={<Calendar size={14} />} label="Joined">{new Date(me.created_at).toLocaleDateString("hr-HR")}</Row>
+          <Row icon={<MapPin size={14} />} label={t("profile.address")}>{me.address ?? "—"}{me.city ? `, ${me.postal_code ?? ""} ${me.city}` : ""}</Row>
+          <Row icon={<Mail size={14} />} label={t("profile.email")}>{me.email}</Row>
+          <Row icon={<Phone size={14} />} label={t("profile.phone")}>{me.phone ?? "—"}</Row>
+          <Row icon={<Calendar size={14} />} label={t("profile.joined")}>{new Date(me.created_at).toLocaleDateString(dateLocale)}</Row>
         </div>
       </div>
 
@@ -101,16 +104,16 @@ export default async function ProfilePage() {
       }} />
 
       <div className="v-card">
-        <div className="text-sm font-bold mb-3">My redemptions</div>
+        <div className="text-sm font-bold mb-3">{t("profile.myRedemptions")}</div>
         {myRedemptions.length === 0 ? (
-          <div className="text-xs text-[var(--vie-ink-muted)]">No redemptions yet.</div>
+          <div className="text-xs text-[var(--vie-ink-muted)]">{t("profile.noRedemptions")}</div>
         ) : (
           <div className="space-y-2">
             {myRedemptions.map(({ r, reward }) => (
               <div key={r.id} className="flex items-center justify-between gap-3 text-sm">
                 <div className="min-w-0 flex-1">
                   <div className="font-medium truncate">{reward?.name ?? "—"}</div>
-                  <div className="text-xs text-[var(--vie-ink-muted)] truncate">{new Date(r.createdAt).toLocaleDateString("hr-HR")} · {r.status}</div>
+                  <div className="text-xs text-[var(--vie-ink-muted)] truncate">{new Date(r.createdAt).toLocaleDateString(dateLocale)} · {r.status}</div>
                 </div>
                 <div className="text-sm font-bold v-numeric text-[var(--vie-error)] flex-shrink-0">−{formatPoints(r.pointCost)}</div>
               </div>
@@ -120,16 +123,16 @@ export default async function ProfilePage() {
       </div>
 
       <div className="v-card">
-        <div className="text-sm font-bold mb-3">Recent points activity</div>
+        <div className="text-sm font-bold mb-3">{t("profile.recentActivity")}</div>
         {recentLedger.length === 0 ? (
-          <div className="text-xs text-[var(--vie-ink-muted)]">No activity yet.</div>
+          <div className="text-xs text-[var(--vie-ink-muted)]">{t("profile.noActivity")}</div>
         ) : (
           <div className="space-y-2">
             {recentLedger.map((l) => (
               <div key={l.id} className="flex items-center justify-between gap-3 text-sm">
                 <div className="min-w-0 flex-1">
-                  <div className="text-xs font-medium capitalize">{l.reason}</div>
-                  <div className="text-[10px] text-[var(--vie-ink-muted)] truncate">{new Date(l.createdAt).toLocaleString("hr-HR")} · {l.note ?? "—"}</div>
+                  <div className="text-xs font-medium capitalize">{t(`profile.ledger.${l.reason}`)}</div>
+                  <div className="text-[10px] text-[var(--vie-ink-muted)] truncate">{new Date(l.createdAt).toLocaleString(dateLocale)} · {l.note ?? "—"}</div>
                 </div>
                 <div className={`font-bold v-numeric flex-shrink-0 ${l.delta >= 0 ? "text-[var(--vie-success)]" : "text-[var(--vie-error)]"}`}>
                   {l.delta >= 0 ? "+" : ""}{formatPoints(l.delta)}

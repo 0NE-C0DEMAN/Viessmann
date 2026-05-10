@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.2.19 — 2026-05-11
+
+### Croatian translation across the installer flow + EN/HR toggle in Settings
+
+Frane is showing the prototype to his Croatian boss this week and the demo needs to be in Croatian. Built lightweight i18n infrastructure (no `next-intl` or other heavy dep — just a flat dictionary, a server helper, and a client hook) and translated every page on the installer demo path.
+
+**Infrastructure** (lives in `src/lib/i18n/`)
+
+- `dictionary.ts` — single flat dictionary, every key has `{ en, hr }`. Supports `{name}` placeholder interpolation. ~150 keys covering the full installer flow.
+- `server.ts` — `getLocale()` reads the `lang` cookie via `cookies()` (Next.js 16 async API). `getT()` returns a bound `t()` for server components.
+- `client.tsx` — `<I18nProvider locale={...}>` wraps the root layout with the locale resolved server-side. `useT()` hook returns `{ t, locale, setLocale }`.
+- `/api/locale` — POST `{locale}` sets the 1-year cookie. The client hook calls this then `router.refresh()` so server components re-render in the new language.
+
+**Toggle**
+
+- New `<LanguageToggle>` lives at the top of `/app/settings`. Two-state pill (English ⟷ Hrvatski) styled like a segmented control with the active state in Viessmann red.
+- Switching is server-side: cookie write → router.refresh() → every server component renders in the new language. No client-side flicker, no full page reload.
+- The `<html lang>` attribute on the root document follows the locale cookie too.
+
+**Pages translated**
+
+Installer side fully bilingual: bottom nav, dashboard (welcome, tier card, quick actions, recent submissions), submit (choose / preview / OCR / uploading / result stages), history (search, filter pills, list rows), rewards (balance, cards, redeem button states, confirm dialog), profile (business details, redemptions, ledger), notifications (all types: approval, pending, rejected, duplicate, redemption, reversal, adjustment, tier-up), settings (toggle + password form + cards), login (form labels, demo accounts, hints).
+
+The status pill, sign-out button, and tier names also auto-translate. Dates render via `toLocaleDateString` with `hr-HR` or `en-GB` per the locale.
+
+**Out of scope (Phase 2)** — admin pages stay English. The boss demo is installer-side; admin localisation is a separate project once the Croatian copy gets reviewed by Frane.
+
 ## v0.2.18 — 2026-05-07
 
 ### Reward cards bulletproofed for every viewport size + global card overflow safety net

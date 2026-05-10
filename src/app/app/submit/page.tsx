@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Camera, FileText, Loader2, CheckCircle2, AlertTriangle, XCircle, FileImage, ArrowLeft, RefreshCw, Smartphone, ScanLine } from "lucide-react";
 import { formatEur, formatPoints } from "@/lib/money";
 import { takePendingFile } from "../pending-upload";
+import { useT } from "@/lib/i18n/client";
 
 interface PipelineLine {
   raw_description: string;
@@ -39,13 +40,13 @@ interface PipelineResponse {
 
 type Stage = "choose" | "preview" | "uploading" | "ocr" | "result" | "image_help";
 
-const PROGRESS_STEPS = [
-  "Uploading the file",
-  "Reading the invoice",
-  "Validating OIB",
-  "Matching Viessmann products",
-  "Calculating points",
-];
+const PROGRESS_KEYS = [
+  "submit.steps.uploading",
+  "submit.steps.reading",
+  "submit.steps.oib",
+  "submit.steps.matching",
+  "submit.steps.points",
+] as const;
 
 const PARSER_LABELS: Record<string, { label: string; tone: "success" | "info" | "warn" }> = {
   "pdf-text": { label: "Light PDF parser · free", tone: "success" },
@@ -56,12 +57,13 @@ const PARSER_LABELS: Record<string, { label: string; tone: "success" | "info" | 
 
 export default function SubmitPage() {
   const router = useRouter();
+  const { t } = useT();
   const fileRef = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<Stage>("choose");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [progressStep, setProgressStep] = useState(0);
-  const [ocrStatus, setOcrStatus] = useState("Preparing OCR");
+  const [ocrStatus, setOcrStatus] = useState(t("submit.ocr.statusPrepare"));
   const [ocrProgress, setOcrProgress] = useState(0);
   const [response, setResponse] = useState<PipelineResponse | null>(null);
 
@@ -71,7 +73,7 @@ export default function SubmitPage() {
     setProgressStep(0);
     let i = 0;
     stepInterval.current = setInterval(() => {
-      i = Math.min(i + 1, PROGRESS_STEPS.length - 2);
+      i = Math.min(i + 1, PROGRESS_KEYS.length - 2);
       setProgressStep(i);
     }, 2500);
   }
@@ -121,7 +123,7 @@ export default function SubmitPage() {
       // and returns a non-JSON error page.
       setStage("ocr");
       setOcrProgress(0);
-      setOcrStatus("Loading OCR engine");
+      setOcrStatus(t("submit.ocr.statusPrepare"));
       try {
         const { extractTextFromImage } = await import("@/lib/client-ocr");
         const text = await extractTextFromImage(file, ({ status, progress }) => {
@@ -142,7 +144,7 @@ export default function SubmitPage() {
         });
         const json = await safeJson<PipelineResponse>(res);
         stopProgress();
-        setProgressStep(PROGRESS_STEPS.length - 1);
+        setProgressStep(PROGRESS_KEYS.length - 1);
         if (!res.ok && res.status !== 409) {
           toast.error(json.error ?? `Upload failed (${res.status})`);
           setStage("preview");
@@ -166,7 +168,7 @@ export default function SubmitPage() {
       const res = await fetch("/api/receipts", { method: "POST", body: fd });
       const json = await safeJson<PipelineResponse>(res);
       stopProgress();
-      setProgressStep(PROGRESS_STEPS.length - 1);
+      setProgressStep(PROGRESS_KEYS.length - 1);
       if (!res.ok && res.status !== 409) {
         toast.error(json.error ?? `Upload failed (${res.status})`);
         setStage("preview");
@@ -175,7 +177,7 @@ export default function SubmitPage() {
       handleResult(json);
     } catch (e) {
       stopProgress();
-      toast.error(e instanceof Error ? e.message : "Network error");
+      toast.error(e instanceof Error ? e.message : t("common.networkError"));
       setStage("preview");
     }
   }
@@ -243,36 +245,36 @@ export default function SubmitPage() {
   return (
     <div className="space-y-4 v-fade-in">
       <div className="flex items-center justify-between">
-        <Link href="/app" className="text-sm text-[var(--vie-ink-soft)] flex items-center gap-1"><ArrowLeft size={14} /> Back</Link>
+        <Link href="/app" className="text-sm text-[var(--vie-ink-soft)] flex items-center gap-1"><ArrowLeft size={14} /> {t("common.back")}</Link>
         {stage !== "choose" && stage !== "uploading" && (
           <button onClick={reset} className="text-xs text-[var(--vie-ink-soft)] flex items-center gap-1 hover:text-[var(--vie-ink)]">
-            <RefreshCw size={12} /> Start over
+            <RefreshCw size={12} /> {t("submit.startOver")}
           </button>
         )}
       </div>
 
       {stage === "choose" && (
-        <ChooseStage onCamera={pickCamera} onFile={pickFile} onShowHelp={showCameraHelp} />
+        <ChooseStage onCamera={pickCamera} onFile={pickFile} onShowHelp={showCameraHelp} t={t} />
       )}
 
       {stage === "image_help" && (
-        <ImageHelpStage onChooseFile={pickFile} onBack={() => setStage("choose")} />
+        <ImageHelpStage onChooseFile={pickFile} onBack={() => setStage("choose")} t={t} />
       )}
 
       {stage === "preview" && file && (
-        <PreviewStage file={file} previewUrl={previewUrl} onUpload={uploadNow} onChange={pickFile} />
+        <PreviewStage file={file} previewUrl={previewUrl} onUpload={uploadNow} onChange={pickFile} t={t} />
       )}
 
       {stage === "ocr" && (
-        <OcrStage status={ocrStatus} progress={ocrProgress} previewUrl={previewUrl} />
+        <OcrStage status={ocrStatus} progress={ocrProgress} previewUrl={previewUrl} t={t} />
       )}
 
       {stage === "uploading" && (
-        <UploadingStage step={progressStep} />
+        <UploadingStage step={progressStep} t={t} />
       )}
 
       {stage === "result" && response && (
-        <ResultStage response={response} onAnother={reset} onView={(id) => router.push(`/app/receipts/${id}`)} />
+        <ResultStage response={response} onAnother={reset} onView={(id) => router.push(`/app/receipts/${id}`)} t={t} />
       )}
 
       <input ref={fileRef} type="file" className="hidden" onChange={handleChange} />
@@ -280,12 +282,14 @@ export default function SubmitPage() {
   );
 }
 
-function ChooseStage({ onCamera, onFile, onShowHelp }: { onCamera: () => void; onFile: () => void; onShowHelp: () => void }) {
+type T = (key: string, vars?: Record<string, string | number>) => string;
+
+function ChooseStage({ onCamera, onFile, onShowHelp, t }: { onCamera: () => void; onFile: () => void; onShowHelp: () => void; t: T }) {
   return (
     <>
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Submit invoice</h1>
-        <p className="text-sm text-[var(--vie-ink-soft)] mt-1">PDF, photo, or e-invoice XML — your call.</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t("submit.title")}</h1>
+        <p className="text-sm text-[var(--vie-ink-soft)] mt-1">{t("submit.choose.subtitle")}</p>
       </div>
 
       <div className="grid gap-3">
@@ -295,10 +299,10 @@ function ChooseStage({ onCamera, onFile, onShowHelp }: { onCamera: () => void; o
           </div>
           <div className="flex-1">
             <div className="font-semibold text-sm flex items-center gap-2">
-              Upload PDF or XML
-              <span className="v-pill v-pill-success text-[10px]">recommended</span>
+              {t("submit.choose.fileTitle")}
+              <span className="v-pill v-pill-success text-[10px]">{t("submit.choose.recommended")}</span>
             </div>
-            <div className="text-xs text-[var(--vie-ink-muted)]">Fastest, ~1 second, free</div>
+            <div className="text-xs text-[var(--vie-ink-muted)]">{t("submit.choose.fileBody")}</div>
           </div>
         </button>
         <button onClick={onCamera} className="v-card v-card-interactive text-left flex items-center gap-3">
@@ -306,37 +310,35 @@ function ChooseStage({ onCamera, onFile, onShowHelp }: { onCamera: () => void; o
             <Camera size={22} />
           </div>
           <div className="flex-1">
-            <div className="font-semibold text-sm">Scan with camera</div>
-            <div className="text-xs text-[var(--vie-ink-muted)]">~20 seconds · on-device OCR · free</div>
+            <div className="font-semibold text-sm">{t("submit.choose.cameraTitle")}</div>
+            <div className="text-xs text-[var(--vie-ink-muted)]">{t("submit.choose.cameraBody")}</div>
           </div>
         </button>
       </div>
 
       <button onClick={onShowHelp} className="text-xs text-[var(--vie-ink-muted)] underline self-start">
-        Tip: photos work best when scanned to PDF first
+        {t("submit.choose.tip")}
       </button>
 
       <div className="v-card text-xs text-[var(--vie-ink-soft)] space-y-1">
-        <div className="font-semibold text-[var(--vie-ink)] mb-1">What happens next</div>
-        <p>1. We read the invoice with AI — usually 10–20 seconds for a Croatian invoice.</p>
-        <p>2. We verify the buyer OIB matches your account.</p>
-        <p>3. Only Viessmann lines earn points. Competitor lines stay on the invoice but at 0 pts.</p>
-        <p>4. If everything checks out, points hit your balance immediately.</p>
+        <div className="font-semibold text-[var(--vie-ink)] mb-1">{t("submit.choose.next")}</div>
+        <p>1. {t("submit.choose.next1")}</p>
+        <p>2. {t("submit.choose.next2")}</p>
+        <p>3. {t("submit.choose.next3")}</p>
+        <p>4. {t("submit.choose.next4")}</p>
       </div>
     </>
   );
 }
 
-function OcrStage({ status, progress, previewUrl }: { status: string; progress: number; previewUrl: string | null }) {
+function OcrStage({ status, progress, previewUrl, t }: { status: string; progress: number; previewUrl: string | null; t: T }) {
   const pct = Math.round(progress * 100);
   return (
     <div className="space-y-4 pt-2 v-fade-in">
       <div className="text-center">
         <Loader2 className="mx-auto animate-spin text-[var(--vie-red)]" size={36} />
         <h2 className="text-xl font-bold mt-3">{status}…</h2>
-        <p className="text-sm text-[var(--vie-ink-muted)] mt-1">
-          Reading the invoice on your device. First photo can take ~30s while the language model loads — subsequent ones are faster.
-        </p>
+        <p className="text-sm text-[var(--vie-ink-muted)] mt-1">{t("submit.ocr.body2")}</p>
       </div>
       <div className="v-card v-card-tight">
         <div className="h-2 rounded-full bg-[var(--vie-line)] overflow-hidden">
@@ -352,7 +354,8 @@ function OcrStage({ status, progress, previewUrl }: { status: string; progress: 
   );
 }
 
-function ImageHelpStage({ onChooseFile, onBack }: { onChooseFile: () => void; onBack: () => void }) {
+function ImageHelpStage({ onChooseFile, onBack, t }: { onChooseFile: () => void; onBack: () => void; t: T }) {
+  void t;
   return (
     <>
       <div>
@@ -410,13 +413,13 @@ function ImageHelpStage({ onChooseFile, onBack }: { onChooseFile: () => void; on
   );
 }
 
-function PreviewStage({ file, previewUrl, onUpload, onChange }: { file: File; previewUrl: string | null; onUpload: () => void; onChange: () => void }) {
+function PreviewStage({ file, previewUrl, onUpload, onChange, t }: { file: File; previewUrl: string | null; onUpload: () => void; onChange: () => void; t: T }) {
   const sizeMb = (file.size / 1024 / 1024).toFixed(2);
   return (
     <>
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Confirm & submit</h1>
-        <p className="text-sm text-[var(--vie-ink-soft)] mt-1">Make sure the invoice is fully visible and not blurry.</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t("submit.preview.confirm")}</h1>
+        <p className="text-sm text-[var(--vie-ink-soft)] mt-1">{t("submit.preview.tip")}</p>
       </div>
 
       <div className="v-card overflow-hidden p-0">
@@ -433,30 +436,30 @@ function PreviewStage({ file, previewUrl, onUpload, onChange }: { file: File; pr
       </div>
 
       <div className="grid grid-cols-2 gap-2">
-        <button onClick={onChange} className="v-btn v-btn-ghost">Choose different file</button>
-        <button onClick={onUpload} className="v-btn v-btn-primary">Submit invoice</button>
+        <button onClick={onChange} className="v-btn v-btn-ghost">{t("submit.preview.choose")}</button>
+        <button onClick={onUpload} className="v-btn v-btn-primary">{t("submit.preview.submit")}</button>
       </div>
     </>
   );
 }
 
-function UploadingStage({ step }: { step: number }) {
+function UploadingStage({ step, t }: { step: number; t: T }) {
   return (
     <div className="space-y-5 pt-6">
       <div className="text-center">
         <Loader2 className="mx-auto animate-spin text-[var(--vie-red)]" size={40} />
-        <h2 className="text-xl font-bold mt-3">Processing your invoice</h2>
-        <p className="text-sm text-[var(--vie-ink-muted)] mt-1">This usually takes 10–20 seconds.</p>
+        <h2 className="text-xl font-bold mt-3">{t("submit.uploading.steps")}</h2>
+        <p className="text-sm text-[var(--vie-ink-muted)] mt-1">{t("submit.uploading.subtitle")}</p>
       </div>
       <div className="v-card space-y-2">
-        {PROGRESS_STEPS.map((s, i) => (
-          <div key={s} className="flex items-center gap-3 text-sm">
+        {PROGRESS_KEYS.map((key, i) => (
+          <div key={key} className="flex items-center gap-3 text-sm">
             <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
               i < step ? "bg-[var(--vie-success)] text-white" : i === step ? "bg-[var(--vie-red)] text-white" : "bg-[var(--vie-line)] text-[var(--vie-ink-muted)]"
             }`}>
               {i < step ? <CheckCircle2 size={12} /> : i === step ? <Loader2 size={12} className="animate-spin" /> : <span className="text-[10px] font-bold">{i + 1}</span>}
             </div>
-            <span className={i <= step ? "font-medium text-[var(--vie-ink)]" : "text-[var(--vie-ink-muted)]"}>{s}</span>
+            <span className={i <= step ? "font-medium text-[var(--vie-ink)]" : "text-[var(--vie-ink-muted)]"}>{t(key)}</span>
           </div>
         ))}
       </div>
@@ -464,7 +467,7 @@ function UploadingStage({ step }: { step: number }) {
   );
 }
 
-function ResultStage({ response, onAnother, onView }: { response: PipelineResponse; onAnother: () => void; onView: (id: string) => void }) {
+function ResultStage({ response, onAnother, onView, t }: { response: PipelineResponse; onAnother: () => void; onView: (id: string) => void; t: T }) {
   const status = response.status ?? "needs_review";
   const ok = status === "approved";
   const reject = status === "rejected" || status === "duplicate";
@@ -473,11 +476,11 @@ function ResultStage({ response, onAnother, onView }: { response: PipelineRespon
   const iconCls = ok ? "text-[var(--vie-success)]" : reject ? "text-[var(--vie-error)]" : "text-[var(--vie-warn)]";
   const ringCls = ok ? "ring-[var(--vie-success-bg)]" : reject ? "ring-[var(--vie-error-bg)]" : "ring-[var(--vie-warn-bg)]";
 
-  const titles: Record<string, string> = {
-    approved: "Approved!",
-    needs_review: "Pending review",
-    rejected: "Rejected",
-    duplicate: "Already submitted",
+  const titleKeys: Record<string, string> = {
+    approved: "submit.result.titleApproved",
+    needs_review: "submit.result.titleReview",
+    rejected: "submit.result.titleRejected",
+    duplicate: "submit.result.titleDuplicate",
   };
 
   const flags = response.fraudFlags ?? [];
@@ -491,11 +494,11 @@ function ResultStage({ response, onAnother, onView }: { response: PipelineRespon
         <div className={`w-20 h-20 mx-auto rounded-full bg-white ring-8 ${ringCls} flex items-center justify-center`}>
           <Icon className={iconCls} size={48} />
         </div>
-        <div className="mt-4 text-xl font-bold">{titles[status]}</div>
+        <div className="mt-4 text-xl font-bold">{t(titleKeys[status] ?? "submit.result.titleReview")}</div>
         <div className="text-sm text-[var(--vie-ink-soft)] mt-1 max-w-xs mx-auto">{response.message}</div>
         {ok && response.pointsAwarded != null && (
           <div className="mt-4 inline-flex items-center px-5 py-2 rounded-xl bg-[var(--vie-red-light)] text-[var(--vie-red-dark)] font-bold text-2xl v-numeric">
-            +{formatPoints(response.pointsAwarded)} pts
+            +{formatPoints(response.pointsAwarded)} {t("common.pts")}
           </div>
         )}
       </div>
@@ -503,7 +506,7 @@ function ResultStage({ response, onAnother, onView }: { response: PipelineRespon
       {parsed && (
         <div className="v-card">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-ink-muted)]">What we read</div>
+            <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-ink-muted)]">{t("submit.result.whatWeRead")}</div>
             {response.parserUsed && (
               <span className={`v-pill v-pill-${PARSER_LABELS[response.parserUsed]?.tone ?? "muted"} text-[10px]`}>
                 {PARSER_LABELS[response.parserUsed]?.label ?? response.parserUsed}
@@ -511,19 +514,19 @@ function ResultStage({ response, onAnother, onView }: { response: PipelineRespon
             )}
           </div>
           <dl className="grid grid-cols-2 gap-y-2 text-sm">
-            <DefRow label="Seller" value={parsed.wholesaler?.name ?? "—"} />
-            <DefRow label="Buyer" value={parsed.buyer?.name ?? "—"} />
-            <DefRow label="Invoice #" value={parsed.invoice_number ?? "—"} />
-            <DefRow label="Date" value={parsed.issue_date ?? "—"} />
-            <DefRow label="Lines" value={String(parsed.line_items?.length ?? 0)} />
-            <DefRow label="Total" value={parsed.total ? formatEur(parseFloat(parsed.total.replace(/\./g, "").replace(",", ".")) * 100) : "—"} />
+            <DefRow label={t("submit.result.seller")} value={parsed.wholesaler?.name ?? "—"} />
+            <DefRow label={t("submit.result.buyer")} value={parsed.buyer?.name ?? "—"} />
+            <DefRow label={t("submit.result.invoiceNum")} value={parsed.invoice_number ?? "—"} />
+            <DefRow label={t("submit.result.date")} value={parsed.issue_date ?? "—"} />
+            <DefRow label={t("submit.result.lines")} value={String(parsed.line_items?.length ?? 0)} />
+            <DefRow label={t("submit.result.total")} value={parsed.total ? formatEur(parseFloat(parsed.total.replace(/\./g, "").replace(",", ".")) * 100) : "—"} />
           </dl>
         </div>
       )}
 
       {flags.length > 0 && (
         <div className="v-card">
-          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-warn)] mb-2">Notes ({flags.length})</div>
+          <div className="text-xs font-bold uppercase tracking-wider text-[var(--vie-warn)] mb-2">{t("submit.result.notes")} ({flags.length})</div>
           <ul className="text-xs space-y-1">
             {flags.map((f, i) => (
               <li key={i} className="text-[var(--vie-ink-soft)]">• {prettyFlag(f)}</li>
@@ -535,7 +538,7 @@ function ResultStage({ response, onAnother, onView }: { response: PipelineRespon
       <div className="flex flex-col gap-2">
         {originalId && (
           <button className="v-btn v-btn-primary" onClick={() => onView(originalId)}>
-            Open original submission
+            {t("submit.result.openOriginal")}
           </button>
         )}
         <div className="flex gap-2">
@@ -544,10 +547,10 @@ function ResultStage({ response, onAnother, onView }: { response: PipelineRespon
               className={`v-btn ${originalId ? "v-btn-ghost" : "v-btn-primary"} flex-1`}
               onClick={() => onView(targetId)}
             >
-              {originalId ? "View this attempt" : "View detail"}
+              {originalId ? t("submit.result.viewThis") : t("submit.result.viewDetail")}
             </button>
           )}
-          <button className="v-btn v-btn-ghost flex-1" onClick={onAnother}>Submit another</button>
+          <button className="v-btn v-btn-ghost flex-1" onClick={onAnother}>{t("submit.result.another")}</button>
         </div>
       </div>
     </div>
