@@ -53,7 +53,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col">
       <header className="px-6 py-5 max-w-md w-full mx-auto">
         <Link href="/" className="flex items-center gap-2.5">
-          <Brand size="md" subtitle="Loyalty" />
+          <Brand size="md" subtitle={t("brand.loyalty")} />
         </Link>
       </header>
       <main className="flex-1 px-6 max-w-md w-full mx-auto pt-2 v-fade-in">

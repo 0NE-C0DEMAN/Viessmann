@@ -1,20 +1,27 @@
 import Link from "next/link";
 import { Brand } from "@/components/brand";
 import { Mail, ArrowLeft } from "lucide-react";
+import { getT } from "@/lib/i18n/server";
 
 export const metadata = { title: "Forgot password · Viessmann B2B Loyalty" };
 
-export default function ForgotPasswordPage() {
+export default async function ForgotPasswordPage() {
+  const { t } = await getT();
+  const cardBody = t("forgot.cardBody", { email: "loyalty@viessmann.hr" });
+
+  // Split the body around the email so we can render it as a link.
+  const parts = cardBody.split("loyalty@viessmann.hr");
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="px-6 py-5 max-w-md w-full mx-auto">
         <Link href="/" className="flex items-center gap-2.5">
-          <Brand size="md" subtitle="Loyalty" />
+          <Brand size="md" subtitle={t("brand.loyalty")} />
         </Link>
       </header>
       <main className="flex-1 px-6 max-w-md w-full mx-auto pt-2 v-fade-in">
-        <h1 className="text-3xl font-bold tracking-tight">Forgot password</h1>
-        <p className="text-[var(--vie-ink-soft)] mt-1">We&apos;ll send you a temporary password to get back in.</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t("forgot.title")}</h1>
+        <p className="text-[var(--vie-ink-soft)] mt-1">{t("forgot.subtitle")}</p>
 
         <div className="v-card mt-6 space-y-3">
           <div className="flex items-start gap-3">
@@ -22,23 +29,23 @@ export default function ForgotPasswordPage() {
               <Mail size={18} />
             </div>
             <div>
-              <div className="font-semibold text-sm">Email Viessmann support</div>
+              <div className="font-semibold text-sm">{t("forgot.cardTitle")}</div>
               <div className="text-xs text-[var(--vie-ink-soft)] mt-1">
-                Send a message from your registered email address to{" "}
-                <a href="mailto:loyalty@viessmann.hr" className="text-[var(--vie-red)] font-semibold">loyalty@viessmann.hr</a>{" "}
-                including your company OIB. Our team verifies the request and issues a temporary password within one business day.
+                {parts[0]}
+                <a href="mailto:loyalty@viessmann.hr" className="text-[var(--vie-red)] font-semibold">loyalty@viessmann.hr</a>
+                {parts[1] ?? ""}
               </div>
             </div>
           </div>
         </div>
 
         <div className="v-card mt-3 text-xs text-[var(--vie-ink-muted)]">
-          <strong className="text-[var(--vie-ink)]">Why no automatic email link?</strong><br />
-          The pilot ships without an SMTP integration. Production rolls in self-service password reset over email.
+          <strong className="text-[var(--vie-ink)]">{t("forgot.whyNoLink")}</strong><br />
+          {t("forgot.whyNoLinkBody")}
         </div>
 
         <Link href="/login" className="v-btn v-btn-ghost w-full mt-4">
-          <ArrowLeft size={16} /> Back to sign in
+          <ArrowLeft size={16} /> {t("forgot.backSignIn")}
         </Link>
       </main>
     </div>

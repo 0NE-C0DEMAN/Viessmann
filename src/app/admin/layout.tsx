@@ -5,6 +5,7 @@ import { Brand } from "@/components/brand";
 import { LogoutButton } from "@/components/logout-button";
 import { AdminMobileNav } from "./admin-mobile-nav";
 import { AdminProfileMenu } from "./admin-profile-menu";
+import { getT } from "@/lib/i18n/server";
 import {
   LayoutDashboard,
   Users,
@@ -16,30 +17,31 @@ import {
   Gift,
 } from "lucide-react";
 
-// Tabs shown on desktop. Settings and Sign out are moved to the profile
-// dropdown on the right; the mobile drawer surfaces all of them.
-const DESKTOP_TABS = [
-  { href: "/admin", label: "Queue", Icon: LayoutDashboard },
-  { href: "/admin/installers", label: "Installers", Icon: Users },
-  { href: "/admin/wholesalers", label: "Wholesalers", Icon: Building2 },
-  { href: "/admin/campaigns", label: "Campaigns", Icon: Megaphone },
-  { href: "/admin/rewards", label: "Rewards", Icon: Gift },
-  { href: "/admin/fulfillment", label: "Fulfillment", Icon: PackageCheck },
-  { href: "/admin/intelligence", label: "Intelligence", Icon: BarChart3 },
-  { href: "/admin/audit", label: "Audit", Icon: ScrollText },
-];
-
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const s = await getSession();
   if (!s.installerId) redirect("/login");
   if (s.role !== "admin") redirect("/app");
+  const { t } = await getT();
+
+  // Tabs shown on desktop. Settings and Sign out are moved to the profile
+  // dropdown on the right; the mobile drawer surfaces all of them.
+  const DESKTOP_TABS = [
+    { href: "/admin", label: t("admin.tab.queue"), Icon: LayoutDashboard },
+    { href: "/admin/installers", label: t("admin.tab.installers"), Icon: Users },
+    { href: "/admin/wholesalers", label: t("admin.tab.wholesalers"), Icon: Building2 },
+    { href: "/admin/campaigns", label: t("admin.tab.campaigns"), Icon: Megaphone },
+    { href: "/admin/rewards", label: t("admin.tab.rewards"), Icon: Gift },
+    { href: "/admin/fulfillment", label: t("admin.tab.fulfillment"), Icon: PackageCheck },
+    { href: "/admin/intelligence", label: t("admin.tab.intelligence"), Icon: BarChart3 },
+    { href: "/admin/audit", label: t("admin.tab.audit"), Icon: ScrollText },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--vie-paper)]">
       <header className="sticky top-0 z-30 bg-[var(--vie-paper-elev)]/95 backdrop-blur border-b border-[var(--vie-line)]">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
           <Link href="/admin" className="inline-flex items-center min-w-0">
-            <Brand size="md" subtitle="Admin" />
+            <Brand size="md" subtitle={t("brand.admin")} />
           </Link>
 
           {/* Desktop horizontal nav */}

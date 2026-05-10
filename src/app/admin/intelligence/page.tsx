@@ -2,8 +2,12 @@ import { db } from "@/db";
 import { sql } from "drizzle-orm";
 import { IntelligenceCharts } from "./charts";
 import { formatEur } from "@/lib/money";
+import { getT } from "@/lib/i18n/server";
 
 export default async function AdminIntelligence() {
+  const { t, locale } = await getT();
+  const dateLocale = locale === "hr" ? "hr-HR" : "en-GB";
+
   const pricing = (await db.execute(sql`
     SELECT
       p.family,
@@ -74,28 +78,39 @@ export default async function AdminIntelligence() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Market intelligence</h1>
-        <p className="text-sm text-[var(--vie-ink-soft)]">Aggregated from approved submissions only.</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t("admin.intel.title")}</h1>
+        <p className="text-sm text-[var(--vie-ink-soft)]">{t("admin.intel.subtitle")}</p>
       </div>
 
       <IntelligenceCharts
         families={families.map((f) => ({ family: f.family, total: Number(f.total_cents) / 100, receipts: f.receipts, points: f.points }))}
         wholesalers={wholesalerVolume.map((w) => ({ name: w.wholesaler_name, total: Number(w.total_cents) / 100, receipts: w.receipts }))}
-        monthly={monthly.map((m) => ({ month: new Date(m.month).toLocaleDateString("hr-HR", { month: "short", year: "2-digit" }), total: Number(m.total_cents) / 100, points: m.points, receipts: m.receipts }))}
+        monthly={monthly.map((m) => ({ month: new Date(m.month).toLocaleDateString(dateLocale, { month: "short", year: "2-digit" }), total: Number(m.total_cents) / 100, points: m.points, receipts: m.receipts }))}
+        labels={{
+          empty: t("admin.intel.empty.title"),
+          emptyBody: t("admin.intel.empty.body"),
+          monthly: t("admin.intel.monthly"),
+          spendByFamily: t("admin.intel.spendByFamily"),
+          topWhole: t("admin.intel.topWhole"),
+          spendEur: t("admin.intel.spendEur"),
+          points: t("admin.intel.points"),
+          eurApproved: t("admin.intel.eurApproved"),
+        }}
+        dateLocale={dateLocale}
       />
 
       <div>
-        <div className="text-sm font-bold mb-2">Pricing per wholesaler</div>
+        <div className="text-sm font-bold mb-2">{t("admin.intel.pricing")}</div>
         <div className="v-card v-scroll-x">
           <table className="w-full text-sm min-w-[700px]">
             <thead>
               <tr className="text-left text-xs text-[var(--vie-ink-muted)] uppercase tracking-wider border-b border-[var(--vie-line)]">
-                <th className="py-2 font-semibold">Product</th>
-                <th className="font-semibold">Wholesaler</th>
-                <th className="font-semibold">Min</th>
-                <th className="font-semibold">Avg</th>
-                <th className="font-semibold">Max</th>
-                <th className="font-semibold">Samples</th>
+                <th className="py-2 font-semibold">{t("admin.intel.col.product")}</th>
+                <th className="font-semibold">{t("admin.intel.col.wholesaler")}</th>
+                <th className="font-semibold">{t("admin.intel.col.min")}</th>
+                <th className="font-semibold">{t("admin.intel.col.avg")}</th>
+                <th className="font-semibold">{t("admin.intel.col.max")}</th>
+                <th className="font-semibold">{t("admin.intel.col.samples")}</th>
               </tr>
             </thead>
             <tbody>
@@ -111,19 +126,19 @@ export default async function AdminIntelligence() {
               ))}
             </tbody>
           </table>
-          {pricing.length === 0 && <div className="text-center text-sm text-[var(--vie-ink-muted)] py-6">No approved data yet.</div>}
+          {pricing.length === 0 && <div className="text-center text-sm text-[var(--vie-ink-muted)] py-6">{t("admin.intel.noApproved")}</div>}
         </div>
       </div>
 
       <div>
-        <div className="text-sm font-bold mb-2">Competitive basket — what installers buy alongside Viessmann</div>
+        <div className="text-sm font-bold mb-2">{t("admin.intel.basket")}</div>
         <div className="v-card v-scroll-x">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs text-[var(--vie-ink-muted)] uppercase tracking-wider border-b border-[var(--vie-line)]">
-                <th className="py-2 font-semibold">Item</th>
-                <th className="font-semibold">Occurrences</th>
-                <th className="font-semibold">Total</th>
+                <th className="py-2 font-semibold">{t("admin.intel.col.item")}</th>
+                <th className="font-semibold">{t("admin.intel.col.occ")}</th>
+                <th className="font-semibold">{t("admin.intel.col.total")}</th>
               </tr>
             </thead>
             <tbody>
@@ -136,7 +151,7 @@ export default async function AdminIntelligence() {
               ))}
             </tbody>
           </table>
-          {competitive.length === 0 && <div className="text-center text-sm text-[var(--vie-ink-muted)] py-6">No approved data yet.</div>}
+          {competitive.length === 0 && <div className="text-center text-sm text-[var(--vie-ink-muted)] py-6">{t("admin.intel.noApproved")}</div>}
         </div>
       </div>
     </div>

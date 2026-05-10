@@ -10,12 +10,15 @@ import { StatusPill } from "@/components/status-pill";
 import { relativeDate } from "@/lib/utils";
 import { ArrowLeft, Mail, MapPin, Phone, Hash, Calendar, ScrollText, BadgeCheck, AlertCircle } from "lucide-react";
 import { AdminInstallerActions } from "./admin-actions";
+import { getT } from "@/lib/i18n/server";
 
 export default async function AdminInstallerDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const s = await getSession();
   if (!s.installerId) redirect("/login");
   if (s.role !== "admin") redirect("/app");
+  const { t, locale } = await getT();
+  const dateLocale = locale === "hr" ? "hr-HR" : "en-GB";
 
   const meRows = await db.select().from(installers).where(eq(installers.id, id)).limit(1);
   if (meRows.length === 0) notFound();
@@ -47,7 +50,7 @@ export default async function AdminInstallerDetail({ params }: { params: Promise
 
   return (
     <div className="space-y-5">
-      <Link href="/admin/installers" className="text-sm text-[var(--vie-ink-soft)] flex items-center gap-1"><ArrowLeft size={14} /> Back to installers</Link>
+      <Link href="/admin/installers" className="text-sm text-[var(--vie-ink-soft)] flex items-center gap-1"><ArrowLeft size={14} /> {t("admin.installer.back")}</Link>
 
       <div className="grid md:grid-cols-3 gap-5">
         <div className="md:col-span-1 space-y-4">
@@ -56,36 +59,36 @@ export default async function AdminInstallerDetail({ params }: { params: Promise
             <div className="font-bold text-lg mt-3">{me.companyName}</div>
             <div className="text-xs text-[var(--vie-ink-muted)] flex items-center justify-center gap-1 mt-0.5"><Hash size={11} /> OIB {me.oib}</div>
             <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
-              <span className="v-pill v-pill-brand">{tier} tier</span>
-              <span className="v-pill v-pill-muted">Member since {new Date(me.createdAt).toLocaleDateString("hr-HR", { month: "short", year: "numeric" })}</span>
+              <span className="v-pill v-pill-brand">{t(`tier.${tier}`)} {t("profile.tier")}</span>
+              <span className="v-pill v-pill-muted">{t("profile.memberSince")} {new Date(me.createdAt).toLocaleDateString(dateLocale, { month: "short", year: "numeric" })}</span>
             </div>
           </div>
 
           <div className="v-card">
-            <div className="text-sm font-bold mb-3">Account</div>
+            <div className="text-sm font-bold mb-3">{t("admin.installer.account")}</div>
             <div className="space-y-2 text-sm">
-              <Row icon={<Mail size={14} />} label="Email">{me.email}</Row>
-              <Row icon={<MapPin size={14} />} label="Address">{me.address ?? "—"}{me.city ? `, ${me.postalCode ?? ""} ${me.city}` : ""}</Row>
-              <Row icon={<Phone size={14} />} label="Phone">{me.phone ?? "—"}</Row>
-              <Row icon={<Calendar size={14} />} label="Joined">{new Date(me.createdAt).toLocaleDateString("hr-HR")}</Row>
+              <Row icon={<Mail size={14} />} label={t("profile.email")}>{me.email}</Row>
+              <Row icon={<MapPin size={14} />} label={t("profile.address")}>{me.address ?? "—"}{me.city ? `, ${me.postalCode ?? ""} ${me.city}` : ""}</Row>
+              <Row icon={<Phone size={14} />} label={t("profile.phone")}>{me.phone ?? "—"}</Row>
+              <Row icon={<Calendar size={14} />} label={t("profile.joined")}>{new Date(me.createdAt).toLocaleDateString(dateLocale)}</Row>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <Stat label="Balance" value={formatPoints(stats.balance)} tone="brand" />
-            <Stat label="Lifetime earned" value={formatPoints(stats.lifetime)} tone="success" />
-            <Stat label="Submissions" value={stats.submissions} />
-            <Stat label="Approved" value={stats.approved} tone="success" />
+            <Stat label={t("admin.installer.balance")} value={formatPoints(stats.balance)} tone="brand" />
+            <Stat label={t("admin.installer.lifetime")} value={formatPoints(stats.lifetime)} tone="success" />
+            <Stat label={t("admin.installer.subs")} value={stats.submissions} />
+            <Stat label={t("admin.installer.approved")} value={stats.approved} tone="success" />
           </div>
 
           <div className="v-card v-card-tight">
-            <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--vie-ink-muted)] mb-1">VIES (EU VAT registry)</div>
+            <div className="text-[10px] uppercase tracking-wider font-semibold text-[var(--vie-ink-muted)] mb-1">{t("admin.installer.viesTitle")}</div>
             {me.viesValidated ? (
-              <div className="text-sm flex items-center gap-1.5 text-[var(--vie-success)]"><BadgeCheck size={14} /> Verified {me.viesCheckedAt && `· ${new Date(me.viesCheckedAt).toLocaleDateString("hr-HR")}`}</div>
+              <div className="text-sm flex items-center gap-1.5 text-[var(--vie-success)]"><BadgeCheck size={14} /> {t("admin.installer.viesOk")} {me.viesCheckedAt && `· ${new Date(me.viesCheckedAt).toLocaleDateString(dateLocale)}`}</div>
             ) : me.viesCheckedAt ? (
-              <div className="text-sm flex items-center gap-1.5 text-[var(--vie-warn)]"><AlertCircle size={14} /> Not registered in VIES</div>
+              <div className="text-sm flex items-center gap-1.5 text-[var(--vie-warn)]"><AlertCircle size={14} /> {t("admin.installer.viesNo")}</div>
             ) : (
-              <div className="text-sm flex items-center gap-1.5 text-[var(--vie-ink-muted)]"><AlertCircle size={14} /> VIES check unavailable at signup</div>
+              <div className="text-sm flex items-center gap-1.5 text-[var(--vie-ink-muted)]"><AlertCircle size={14} /> {t("admin.installer.viesSkip")}</div>
             )}
           </div>
 
@@ -100,20 +103,20 @@ export default async function AdminInstallerDetail({ params }: { params: Promise
 
         <div className="md:col-span-2 space-y-5">
           <div className="v-card">
-            <div className="text-sm font-bold mb-3">Submissions</div>
+            <div className="text-sm font-bold mb-3">{t("admin.installer.subsTitle")}</div>
             {theirReceipts.length === 0 ? (
-              <div className="text-xs text-[var(--vie-ink-muted)]">No submissions yet.</div>
+              <div className="text-xs text-[var(--vie-ink-muted)]">{t("admin.installer.noSubs")}</div>
             ) : (
               <div className="v-scroll-x">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-xs text-[var(--vie-ink-muted)] uppercase tracking-wider border-b border-[var(--vie-line)]">
-                      <th className="py-2 font-semibold">When</th>
-                      <th className="font-semibold">Wholesaler</th>
-                      <th className="font-semibold">Invoice</th>
-                      <th className="font-semibold">Total</th>
-                      <th className="font-semibold">Pts</th>
-                      <th className="font-semibold">Status</th>
+                      <th className="py-2 font-semibold">{t("admin.installer.col.when")}</th>
+                      <th className="font-semibold">{t("admin.queue.col.wholesaler")}</th>
+                      <th className="font-semibold">{t("admin.queue.col.invoice")}</th>
+                      <th className="font-semibold">{t("admin.queue.col.total")}</th>
+                      <th className="font-semibold">{t("admin.receipt.col.pts")}</th>
+                      <th className="font-semibold">{t("admin.queue.col.status")}</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -127,7 +130,7 @@ export default async function AdminInstallerDetail({ params }: { params: Promise
                         <td className="py-2 text-xs font-semibold v-numeric">{formatPoints(r.pointsAwarded)}</td>
                         <td className="py-2"><StatusPill status={r.status} /></td>
                         <td className="py-2 text-right">
-                          <Link href={`/admin/receipts/${r.id}`} className="text-[var(--vie-red)] font-semibold text-xs">Open →</Link>
+                          <Link href={`/admin/receipts/${r.id}`} className="text-[var(--vie-red)] font-semibold text-xs">{t("admin.queue.open")}</Link>
                         </td>
                       </tr>
                     ))}
@@ -138,9 +141,9 @@ export default async function AdminInstallerDetail({ params }: { params: Promise
           </div>
 
           <div className="v-card">
-            <div className="text-sm font-bold mb-3">Redemptions</div>
+            <div className="text-sm font-bold mb-3">{t("admin.installer.redempTitle")}</div>
             {theirRedemptions.length === 0 ? (
-              <div className="text-xs text-[var(--vie-ink-muted)]">No redemptions yet.</div>
+              <div className="text-xs text-[var(--vie-ink-muted)]">{t("admin.installer.noRedemp")}</div>
             ) : (
               <div className="space-y-2">
                 {theirRedemptions.map(({ r, reward }) => (
@@ -157,16 +160,16 @@ export default async function AdminInstallerDetail({ params }: { params: Promise
           </div>
 
           <div className="v-card">
-            <div className="text-sm font-bold mb-3">Points ledger</div>
+            <div className="text-sm font-bold mb-3">{t("admin.installer.ledger")}</div>
             {theirLedger.length === 0 ? (
-              <div className="text-xs text-[var(--vie-ink-muted)]">No ledger entries yet.</div>
+              <div className="text-xs text-[var(--vie-ink-muted)]">{t("admin.installer.noLedger")}</div>
             ) : (
               <div className="space-y-2">
                 {theirLedger.map((l) => (
                   <div key={l.id} className="flex items-center justify-between text-sm border-b border-[var(--vie-line)] last:border-b-0 pb-1.5">
                     <div className="min-w-0">
-                      <div className="text-xs font-semibold capitalize">{l.reason}</div>
-                      <div className="text-[10px] text-[var(--vie-ink-muted)] truncate">{new Date(l.createdAt).toLocaleString("hr-HR")} · {l.note ?? "—"}</div>
+                      <div className="text-xs font-semibold capitalize">{t(`profile.ledger.${l.reason}`)}</div>
+                      <div className="text-[10px] text-[var(--vie-ink-muted)] truncate">{new Date(l.createdAt).toLocaleString(dateLocale)} · {l.note ?? "—"}</div>
                     </div>
                     <div className={`font-bold v-numeric ml-3 flex-shrink-0 ${l.delta >= 0 ? "text-[var(--vie-success)]" : "text-[var(--vie-error)]"}`}>
                       {l.delta >= 0 ? "+" : ""}{formatPoints(l.delta)}
@@ -179,13 +182,13 @@ export default async function AdminInstallerDetail({ params }: { params: Promise
 
           {theirAudit.length > 0 && (
             <div className="v-card">
-              <div className="text-sm font-bold mb-3 flex items-center gap-2"><ScrollText size={14} /> Audit (this installer)</div>
+              <div className="text-sm font-bold mb-3 flex items-center gap-2"><ScrollText size={14} /> {t("admin.installer.audit")}</div>
               <div className="space-y-1">
                 {theirAudit.map((a) => (
                   <div key={a.id} className="text-xs flex items-baseline gap-2">
                     <span className="text-[var(--vie-ink-muted)] whitespace-nowrap">{relativeDate(a.createdAt)}</span>
                     <code className="text-[var(--vie-ink)] font-mono">{a.action}</code>
-                    <span className="text-[var(--vie-ink-muted)] truncate">by {a.actorEmail}</span>
+                    <span className="text-[var(--vie-ink-muted)] truncate">{t("admin.installer.by")} {a.actorEmail}</span>
                   </div>
                 ))}
               </div>

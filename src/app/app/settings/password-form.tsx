@@ -14,8 +14,8 @@ export function PasswordForm() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (next.length < 6) { toast.error("Password must be at least 6 characters."); return; }
-    if (next !== confirm) { toast.error("Passwords don't match."); return; }
+    if (next.length < 6) { toast.error(t("settings.password.minLen")); return; }
+    if (next !== confirm) { toast.error(t("settings.password.mismatch")); return; }
     setBusy(true);
     try {
       const res = await fetch("/api/me/password", {
@@ -25,10 +25,10 @@ export function PasswordForm() {
       });
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json.error ?? "Could not change password");
+        toast.error(json.error ?? t("settings.password.failed"));
         return;
       }
-      toast.success(t("common.saved"));
+      toast.success(t("settings.password.success"));
       setCurrent(""); setNext(""); setConfirm("");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("common.networkError"));
@@ -49,7 +49,7 @@ export function PasswordForm() {
         <input className="v-input" type="password" required minLength={6} value={next} onChange={(e) => setNext(e.target.value)} />
       </div>
       <div>
-        <label className="v-label">{t("settings.password.new")}</label>
+        <label className="v-label">{t("settings.password.confirm")}</label>
         <input className="v-input" type="password" required minLength={6} value={confirm} onChange={(e) => setConfirm(e.target.value)} />
       </div>
       <button type="submit" disabled={busy} className="v-btn v-btn-primary w-full">

@@ -1,5 +1,48 @@
 # Changelog
 
+## v0.2.20 — 2026-05-11
+
+### Phase 2 Croatian translation: admin side + marketing pages + shared components
+
+v0.2.19 covered the installer demo path. v0.2.20 finishes the job — every page Frane or his boss might land on is now bilingual, and the EN/HR toggle in Settings flips the entire app at once.
+
+**Admin side (full translation)**
+
+- **Layout, desktop nav, mobile drawer, profile menu** — section headers ("Daily work" → "Dnevni posao"), nav labels (Queue → Pregled, Installers → Instalateri, etc.), and item descriptions all translate.
+- **Review queue** — table headers, status filter pills, summary stats, search placeholder.
+- **Installers list** — table + the points-adjustment modal (delta, reason, confirmation toast).
+- **Installer detail** — VIES verification block, account row, stats, submissions/redemptions/ledger tables, audit history.
+- **Admin actions** — disable / re-enable / reset password flows including the temporary-password copy block.
+- **Wholesalers** — table + empty state.
+- **Campaigns** — create/edit form, family selector, status toggle, delete dialog.
+- **Rewards catalog** — create/edit form with tier dropdown, deactivation dialog.
+- **Fulfillment** — filter tabs, status pills, ship/cancel actions, refund confirmation.
+- **Intelligence** — chart titles, axis legends, table headers, empty states. Recharts tooltips and pie-chart percentages now follow the cookie locale.
+- **Audit log** — table headers, filter dropdowns, search.
+- **Receipt detail (admin)** — header, line-item table, decision panel (Approve / Reject / override / reviewer note).
+- **Admin settings** — new Language toggle here too, plus admin account block.
+
+**Marketing pages**
+
+- **Landing** (`/`) — pilot badge, headline, subhead, "How it works" 3-step card, feature grid, demo accounts callout, footer links.
+- **Signup** — both steps (Business → Account), OIB inline validation messages, all field labels.
+- **Login** — already done in v0.2.19.
+- **Forgot password** — title, body, why-no-link card.
+- **Privacy & Terms** — full body text translated; Croatian wording reviewed for clarity.
+
+**Shared components**
+
+- **`<ConfirmDialog>`** — default confirm/cancel labels translate when the caller doesn't pass them; close button aria-label translated.
+- **`<ProfileMenu>`** (installer header) — "Signed in as", Profile, Settings, Sign out.
+- **`<Brand>`** — subtitle ("Loyalty" / "Admin") now flows through `t("brand.loyalty")` / `t("brand.admin")` from every layout that uses it (8 places: app layout, admin layout, landing, login, signup, forgot, privacy, terms). Croatian renders "Vjernost" under the Viessmann wordmark; admin stays "Admin".
+- **OCR status mapping** — the Tesseract worker emits English status phrases via callback ("Loading OCR engine", "Reading the invoice"). The submit page now maps each to a translated string before display. Toasts on photo OCR failures translate too.
+
+**Tier names** — Bronze / Silver / Gold / Platinum render via `t(\`tier.${tier}\`)` — Bronca / Srebro / Zlato / Platina in Croatian. Used everywhere a tier appears (rewards card, profile, dashboard, admin installers list, admin reward editor).
+
+**Date formatting** — every `toLocaleDateString` and `toLocaleString` call now follows `locale === "hr" ? "hr-HR" : "en-GB"`, so dates and times match the chosen language across both sides.
+
+**Final audit pass** — grepped for stray hardcoded English (`Sign in`, `Save`, `Cancel`, `Submit`, etc.) inside `.tsx` files and converted every user-visible occurrence. Only strings left in English are: developer-only error messages from API responses (intentional — they go to the developer's console for debugging), code comments, and Tesseract's internal phase names (which the submit page translates before showing).
+
 ## v0.2.19 — 2026-05-11
 
 ### Croatian translation across the installer flow + EN/HR toggle in Settings

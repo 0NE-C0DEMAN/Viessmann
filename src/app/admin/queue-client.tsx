@@ -6,6 +6,7 @@ import { StatusPill } from "@/components/status-pill";
 import { formatEur, formatPoints } from "@/lib/money";
 import { relativeDate } from "@/lib/utils";
 import { Search, Download } from "lucide-react";
+import { useT } from "@/lib/i18n/client";
 import type { Receipt } from "@/db/schema";
 
 type Row = Receipt & {
@@ -21,6 +22,7 @@ export function AdminQueueClient({
   rows: Row[];
   stats: { needs_review: number; approved: number; rejected: number; duplicate: number; total: number; total_points: number; total_value: number };
 }) {
+  const { t } = useT();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<Filter>("needs_review");
 
@@ -44,30 +46,36 @@ export function AdminQueueClient({
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Review queue</h1>
-          <p className="text-sm text-[var(--vie-ink-soft)]">All submissions across all installers.</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t("admin.queue.title")}</h1>
+          <p className="text-sm text-[var(--vie-ink-soft)]">{t("admin.queue.subtitle")}</p>
         </div>
         <a href="/api/admin/export/queue" download className="v-btn v-btn-ghost v-btn-sm">
-          <Download size={14} /> Export CSV
+          <Download size={14} /> {t("admin.queue.export")}
         </a>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Stat label="Awaiting review" value={stats.needs_review} tone="warn" />
-        <Stat label="Approved" value={stats.approved} tone="success" />
-        <Stat label="Points awarded" value={formatPoints(stats.total_points)} tone="brand" />
-        <Stat label="Approved value" value={formatEur(Number(stats.total_value))} tone="info" />
+        <Stat label={t("admin.queue.awaiting")} value={stats.needs_review} tone="warn" />
+        <Stat label={t("admin.queue.approved")} value={stats.approved} tone="success" />
+        <Stat label={t("admin.queue.pointsAwarded")} value={formatPoints(stats.total_points)} tone="brand" />
+        <Stat label={t("admin.queue.approvedValue")} value={formatEur(Number(stats.total_value))} tone="info" />
       </div>
 
       <div className="v-card">
         <div className="flex flex-wrap gap-3 items-center justify-between mb-4">
           <div className="relative flex-1 min-w-[240px] max-w-md">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--vie-ink-muted)]" />
-            <input className="v-input pl-10" placeholder="Search installer, invoice, OIB…" value={q} onChange={(e) => setQ(e.target.value)} />
+            <input className="v-input pl-10" placeholder={t("admin.queue.search")} value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
           <div className="flex gap-2 flex-wrap">
             {(["needs_review", "approved", "rejected", "duplicate", "all"] as Filter[]).map((f) => {
-              const labels: Record<Filter, string> = { needs_review: "Review", approved: "Approved", rejected: "Rejected", duplicate: "Duplicate", all: "All" };
+              const labels: Record<Filter, string> = {
+                needs_review: t("admin.queue.tab.review"),
+                approved: t("admin.queue.tab.approved"),
+                rejected: t("admin.queue.tab.rejected"),
+                duplicate: t("admin.queue.tab.duplicate"),
+                all: t("admin.queue.tab.all"),
+              };
               const counts: Record<Filter, number> = { needs_review: stats.needs_review, approved: stats.approved, rejected: stats.rejected, duplicate: stats.duplicate, all: stats.total };
               const active = filter === f;
               return (
@@ -90,13 +98,13 @@ export function AdminQueueClient({
           <table className="w-full text-sm min-w-[800px]">
             <thead>
               <tr className="text-left text-xs text-[var(--vie-ink-muted)] border-b border-[var(--vie-line)] uppercase tracking-wider">
-                <th className="py-2.5 font-semibold">Submitted</th>
-                <th className="font-semibold">Installer</th>
-                <th className="font-semibold">Wholesaler</th>
-                <th className="font-semibold">Invoice</th>
-                <th className="font-semibold">Total</th>
-                <th className="font-semibold">Points</th>
-                <th className="font-semibold">Status</th>
+                <th className="py-2.5 font-semibold">{t("admin.queue.col.submitted")}</th>
+                <th className="font-semibold">{t("admin.queue.col.installer")}</th>
+                <th className="font-semibold">{t("admin.queue.col.wholesaler")}</th>
+                <th className="font-semibold">{t("admin.queue.col.invoice")}</th>
+                <th className="font-semibold">{t("admin.queue.col.total")}</th>
+                <th className="font-semibold">{t("admin.queue.col.points")}</th>
+                <th className="font-semibold">{t("admin.queue.col.status")}</th>
                 <th></th>
               </tr>
             </thead>
@@ -114,13 +122,13 @@ export function AdminQueueClient({
                   <td className="py-2.5 font-semibold v-numeric">{formatPoints(r.pointsAwarded)}</td>
                   <td className="py-2.5"><StatusPill status={r.status} /></td>
                   <td className="py-2.5 text-right">
-                    <Link href={`/admin/receipts/${r.id}`} className="text-[var(--vie-red)] font-semibold text-xs">Open →</Link>
+                    <Link href={`/admin/receipts/${r.id}`} className="text-[var(--vie-red)] font-semibold text-xs">{t("admin.queue.open")}</Link>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {filtered.length === 0 && <div className="text-center text-sm text-[var(--vie-ink-muted)] py-12">No submissions match your filters.</div>}
+          {filtered.length === 0 && <div className="text-center text-sm text-[var(--vie-ink-muted)] py-12">{t("admin.queue.empty")}</div>}
         </div>
       </div>
     </div>

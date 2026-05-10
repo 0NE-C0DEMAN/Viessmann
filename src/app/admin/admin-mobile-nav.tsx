@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import { useT } from "@/lib/i18n/client";
 import {
   Menu,
   X,
@@ -20,53 +21,10 @@ import {
   Shield,
 } from "lucide-react";
 
-interface NavItem {
-  href: string;
-  label: string;
-  description: string;
-  icon: typeof LayoutDashboard;
-}
-
-interface NavSection {
-  title: string;
-  items: NavItem[];
-}
-
-const SECTIONS: NavSection[] = [
-  {
-    title: "Daily work",
-    items: [
-      { href: "/admin", label: "Queue", description: "Review submissions", icon: LayoutDashboard },
-      { href: "/admin/fulfillment", label: "Fulfillment", description: "Reward shipments", icon: PackageCheck },
-    ],
-  },
-  {
-    title: "Directory",
-    items: [
-      { href: "/admin/installers", label: "Installers", description: "Accounts & balances", icon: Users },
-      { href: "/admin/wholesalers", label: "Wholesalers", description: "Seen on invoices", icon: Building2 },
-    ],
-  },
-  {
-    title: "Configuration",
-    items: [
-      { href: "/admin/campaigns", label: "Campaigns", description: "SPIFFs & multipliers", icon: Megaphone },
-      { href: "/admin/rewards", label: "Rewards", description: "Catalog & inventory", icon: Gift },
-    ],
-  },
-  {
-    title: "Reports & system",
-    items: [
-      { href: "/admin/intelligence", label: "Intelligence", description: "Pricing & basket charts", icon: BarChart3 },
-      { href: "/admin/audit", label: "Audit", description: "Action log", icon: ScrollText },
-      { href: "/admin/settings", label: "Settings", description: "Your account", icon: Settings },
-    ],
-  },
-];
-
 export function AdminMobileNav({ email }: { email: string }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   // The drawer is portaled to document.body to escape `backdrop-filter` on
   // ancestor elements (which otherwise creates a containing block for
@@ -101,6 +59,38 @@ export function AdminMobileNav({ email }: { email: string }) {
     router.refresh();
   }
 
+  const SECTIONS = [
+    {
+      title: t("admin.nav.daily"),
+      items: [
+        { href: "/admin", label: t("admin.tab.queue"), description: t("admin.queue.desc"), icon: LayoutDashboard },
+        { href: "/admin/fulfillment", label: t("admin.tab.fulfillment"), description: t("admin.fulfillment.desc"), icon: PackageCheck },
+      ],
+    },
+    {
+      title: t("admin.nav.directory"),
+      items: [
+        { href: "/admin/installers", label: t("admin.tab.installers"), description: t("admin.installers.desc"), icon: Users },
+        { href: "/admin/wholesalers", label: t("admin.tab.wholesalers"), description: t("admin.wholesalers.desc"), icon: Building2 },
+      ],
+    },
+    {
+      title: t("admin.nav.config"),
+      items: [
+        { href: "/admin/campaigns", label: t("admin.tab.campaigns"), description: t("admin.campaigns.desc"), icon: Megaphone },
+        { href: "/admin/rewards", label: t("admin.tab.rewards"), description: t("admin.rewards.desc"), icon: Gift },
+      ],
+    },
+    {
+      title: t("admin.nav.reports"),
+      items: [
+        { href: "/admin/intelligence", label: t("admin.tab.intelligence"), description: t("admin.intelligence.desc"), icon: BarChart3 },
+        { href: "/admin/audit", label: t("admin.tab.audit"), description: t("admin.audit.desc"), icon: ScrollText },
+        { href: "/admin/settings", label: t("admin.tab.settings"), description: t("admin.settings.desc"), icon: Settings },
+      ],
+    },
+  ];
+
   // Backdrop + drawer panel — portaled to document.body so they escape any
   // ancestor that creates a containing block (sticky header has
   // `backdrop-filter`, which would otherwise trap `position: fixed`).
@@ -119,23 +109,23 @@ export function AdminMobileNav({ email }: { email: string }) {
         }`}
         role="dialog"
         aria-modal="true"
-        aria-label="Admin menu"
+        aria-label={t("admin.nav.label")}
         aria-hidden={!open}
       >
         <div className="v-safe-top">
           <div className="flex items-start justify-between p-4 pb-3 border-b border-[var(--vie-line)]">
             <div className="min-w-0 flex-1 pr-3">
               <div className="text-[10px] uppercase tracking-wider font-bold text-[var(--vie-ink-muted)]">
-                Viessmann Admin
+                {t("admin.nav.brand")}
               </div>
               <div className="font-semibold text-sm truncate mt-0.5">{email}</div>
               <div className="text-[10px] text-[var(--vie-ink-muted)] flex items-center gap-1 mt-1">
-                <Shield size={10} /> Croatia · Pilot
+                <Shield size={10} /> {t("admin.nav.region")}
               </div>
             </div>
             <button
               onClick={() => setOpen(false)}
-              aria-label="Close menu"
+              aria-label={t("admin.nav.closeMenu")}
               className="p-2 rounded-lg text-[var(--vie-ink-soft)] hover:bg-[var(--vie-paper)] hover:text-[var(--vie-ink)] -mt-1 -mr-1 flex-shrink-0"
             >
               <X size={18} />
@@ -176,7 +166,7 @@ export function AdminMobileNav({ email }: { email: string }) {
 
         <div className="p-3 border-t border-[var(--vie-line)] v-safe-bottom">
           <button onClick={logout} className="v-btn v-btn-danger w-full">
-            <LogOut size={16} /> Sign out
+            <LogOut size={16} /> {t("common.signOut")}
           </button>
         </div>
       </aside>
@@ -187,7 +177,7 @@ export function AdminMobileNav({ email }: { email: string }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        aria-label="Open menu"
+        aria-label={t("admin.nav.openMenu")}
         aria-expanded={open}
         className="lg:hidden p-2 rounded-lg text-[var(--vie-ink-soft)] hover:bg-[var(--vie-paper)] hover:text-[var(--vie-ink)] active:bg-[var(--vie-line)] transition-colors"
       >

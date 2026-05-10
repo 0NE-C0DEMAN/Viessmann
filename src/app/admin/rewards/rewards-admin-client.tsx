@@ -7,6 +7,7 @@ import { Plus, Gift, Trash2, Pencil } from "lucide-react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { formatPoints } from "@/lib/money";
 import { TIERS, type Tier } from "@/lib/tier";
+import { useT } from "@/lib/i18n/client";
 import type { Reward } from "@/db/schema";
 
 const TIER_BADGE: Record<Tier, string> = {
@@ -36,6 +37,7 @@ const EMPTY: Draft = {
 
 export function RewardsAdminClient({ rewards: initial }: { rewards: Reward[] }) {
   const router = useRouter();
+  const { t } = useT();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Reward | null>(null);
   const [draft, setDraft] = useState<Draft>(EMPTY);
@@ -66,7 +68,7 @@ export function RewardsAdminClient({ rewards: initial }: { rewards: Reward[] }) 
   }
 
   async function save() {
-    if (!draft.name.trim()) { toast.error("Name is required"); return; }
+    if (!draft.name.trim()) { toast.error(t("admin.rewards.nameRequired")); return; }
     setBusy(true);
     try {
       const url = editing ? `/api/admin/rewards/${editing.id}` : "/api/admin/rewards";
@@ -81,7 +83,7 @@ export function RewardsAdminClient({ rewards: initial }: { rewards: Reward[] }) 
         toast.error(j.error ?? `Save failed (${res.status})`);
         return;
       }
-      toast.success(editing ? "Reward updated" : "Reward created");
+      toast.success(editing ? t("admin.rewards.updated") : t("admin.rewards.created"));
       close();
       router.refresh();
     } finally {
@@ -97,10 +99,10 @@ export function RewardsAdminClient({ rewards: initial }: { rewards: Reward[] }) 
     try {
       const res = await fetch(`/api/admin/rewards/${r.id}`, { method: "DELETE" });
       if (!res.ok) {
-        toast.error("Failed to deactivate");
+        toast.error(t("admin.adj.failed"));
         return;
       }
-      toast.success("Reward deactivated");
+      toast.success(t("admin.rewards.deactivated"));
       router.refresh();
     } finally {
       setBusy(false);
@@ -111,46 +113,46 @@ export function RewardsAdminClient({ rewards: initial }: { rewards: Reward[] }) 
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Rewards catalog</h1>
-          <p className="text-sm text-[var(--vie-ink-soft)]">Add, edit, and restock the rewards installers can redeem.</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t("admin.rewards.title")}</h1>
+          <p className="text-sm text-[var(--vie-ink-soft)]">{t("admin.rewards.subtitle")}</p>
         </div>
-        <button onClick={openCreate} className="v-btn v-btn-primary"><Plus size={16} /> New reward</button>
+        <button onClick={openCreate} className="v-btn v-btn-primary"><Plus size={16} /> {t("admin.rewards.new")}</button>
       </div>
 
       {showForm && (
         <div className="v-card max-w-2xl space-y-3">
-          <div className="text-sm font-bold">{editing ? "Edit reward" : "New reward"}</div>
+          <div className="text-sm font-bold">{editing ? t("admin.rewards.edit") : t("admin.rewards.new")}</div>
           <div>
-            <label className="v-label">Name</label>
+            <label className="v-label">{t("admin.rewards.name")}</label>
             <input className="v-input" placeholder="Bauhaus poklon kartica 100€" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
           </div>
           <div>
-            <label className="v-label">Description (optional)</label>
+            <label className="v-label">{t("admin.rewards.descOpt")}</label>
             <textarea className="v-textarea min-h-[60px]" value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} />
           </div>
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <label className="v-label">Point cost</label>
+              <label className="v-label">{t("admin.rewards.cost")}</label>
               <input type="number" min={1} className="v-input" value={draft.pointCost} onChange={(e) => setDraft({ ...draft, pointCost: Number(e.target.value) })} />
             </div>
             <div>
-              <label className="v-label">Inventory</label>
+              <label className="v-label">{t("admin.rewards.inv")}</label>
               <input type="number" min={0} className="v-input" value={draft.inventory} onChange={(e) => setDraft({ ...draft, inventory: Number(e.target.value) })} />
             </div>
             <div>
-              <label className="v-label">Tier required</label>
+              <label className="v-label">{t("admin.rewards.tier")}</label>
               <select className="v-select" value={draft.tierRequired} onChange={(e) => setDraft({ ...draft, tierRequired: e.target.value as Tier })}>
-                {TIERS.map((t) => <option key={t} value={t}>{t}</option>)}
+                {TIERS.map((tier) => <option key={tier} value={tier}>{t(`tier.${tier}`)}</option>)}
               </select>
             </div>
           </div>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="checkbox" checked={draft.active} onChange={(e) => setDraft({ ...draft, active: e.target.checked })} />
-            Active (visible in installer rewards page)
+            {t("admin.rewards.activeLbl")}
           </label>
           <div className="flex gap-2 pt-1">
-            <button onClick={close} disabled={busy} className="v-btn v-btn-ghost flex-1">Cancel</button>
-            <button onClick={save} disabled={busy} className="v-btn v-btn-primary flex-1">{busy ? "…" : editing ? "Save changes" : "Create reward"}</button>
+            <button onClick={close} disabled={busy} className="v-btn v-btn-ghost flex-1">{t("admin.rewards.cancel")}</button>
+            <button onClick={save} disabled={busy} className="v-btn v-btn-primary flex-1">{busy ? "…" : editing ? t("admin.rewards.saveBtn") : t("admin.rewards.createBtn")}</button>
           </div>
         </div>
       )}
@@ -158,8 +160,8 @@ export function RewardsAdminClient({ rewards: initial }: { rewards: Reward[] }) 
       {initial.length === 0 ? (
         <div className="v-card text-center py-12">
           <Gift className="mx-auto text-[var(--vie-ink-muted)]" size={32} />
-          <div className="font-semibold mt-2">No rewards yet</div>
-          <div className="text-xs text-[var(--vie-ink-muted)] mt-1">Add the first one to fill the catalog.</div>
+          <div className="font-semibold mt-2">{t("admin.rewards.empty.title")}</div>
+          <div className="text-xs text-[var(--vie-ink-muted)] mt-1">{t("admin.rewards.empty.body")}</div>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-3">
@@ -174,18 +176,18 @@ export function RewardsAdminClient({ rewards: initial }: { rewards: Reward[] }) 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <div className="font-bold truncate">{r.name}</div>
-                      {!r.active && <span className="v-pill v-pill-muted text-[10px]">Inactive</span>}
+                      {!r.active && <span className="v-pill v-pill-muted text-[10px]">{t("admin.rewards.inactive")}</span>}
                     </div>
                     <div className="text-xs text-[var(--vie-ink-muted)] truncate">{r.description ?? "—"}</div>
                     <div className="flex flex-wrap items-center gap-2 mt-2 text-xs">
-                      <span className="font-bold v-numeric text-[var(--vie-red-dark)]">{formatPoints(r.pointCost)} pts</span>
-                      <span className={`v-pill text-[10px] ${TIER_BADGE[tier]}`}>{tier}+</span>
-                      <span className="v-pill v-pill-muted text-[10px]">Stock {r.inventory}</span>
+                      <span className="font-bold v-numeric text-[var(--vie-red-dark)]">{formatPoints(r.pointCost)} {t("common.pts")}</span>
+                      <span className={`v-pill text-[10px] ${TIER_BADGE[tier]}`}>{t(`tier.${tier}`)}+</span>
+                      <span className="v-pill v-pill-muted text-[10px]">{t("admin.rewards.stock")} {r.inventory}</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex gap-2 mt-3">
-                  <button onClick={() => openEdit(r)} className="v-btn v-btn-ghost v-btn-sm flex-1"><Pencil size={14} /> Edit</button>
+                  <button onClick={() => openEdit(r)} className="v-btn v-btn-ghost v-btn-sm flex-1"><Pencil size={14} /> {t("admin.rewards.editBtn")}</button>
                   {r.active && (
                     <button onClick={() => setConfirmDeactivate(r)} className="v-btn v-btn-danger v-btn-sm v-btn-icon"><Trash2 size={14} /></button>
                   )}
@@ -198,10 +200,10 @@ export function RewardsAdminClient({ rewards: initial }: { rewards: Reward[] }) 
 
       <ConfirmDialog
         open={confirmDeactivate !== null}
-        title={`Deactivate "${confirmDeactivate?.name}"?`}
-        description="The reward will disappear from the installer rewards page. Existing redemptions are unaffected. You can re-activate later by editing it."
-        confirmLabel="Deactivate"
-        cancelLabel="Keep active"
+        title={t("admin.rewards.deactDailog.title", { name: confirmDeactivate?.name ?? "" })}
+        description={t("admin.rewards.deactDailog.body")}
+        confirmLabel={t("admin.rewards.deactDailog.confirm")}
+        cancelLabel={t("admin.rewards.deactDailog.keep")}
         tone="danger"
         busy={busy}
         onConfirm={performDeactivate}

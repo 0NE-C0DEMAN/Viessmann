@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { relativeDate } from "@/lib/utils";
+import { useT } from "@/lib/i18n/client";
 
 interface Row {
   id: string;
@@ -15,6 +16,7 @@ interface Row {
 }
 
 export function AuditClient({ rows }: { rows: Row[] }) {
+  const { t } = useT();
   const [q, setQ] = useState("");
   const [action, setAction] = useState("all");
   const [entity, setEntity] = useState("all");
@@ -37,8 +39,10 @@ export function AuditClient({ rows }: { rows: Row[] }) {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Audit log</h1>
-        <p className="text-sm text-[var(--vie-ink-soft)]">Last 1000 actions, newest first. {filtered.length} of {rows.length} shown.</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t("admin.audit.title")}</h1>
+        <p className="text-sm text-[var(--vie-ink-soft)]">
+          {t("admin.audit.subtitle")} {filtered.length} {t("history.of")} {rows.length} {t("admin.audit.shown")}.
+        </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -46,17 +50,17 @@ export function AuditClient({ rows }: { rows: Row[] }) {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--vie-ink-muted)]" />
           <input
             className="v-input pl-10"
-            placeholder="Search actor, payload, entity id…"
+            placeholder={t("admin.audit.search")}
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
         </div>
         <select className="v-select max-w-[200px]" value={action} onChange={(e) => setAction(e.target.value)}>
-          <option value="all">All actions</option>
+          <option value="all">{t("admin.audit.allActions")}</option>
           {actions.map((a) => <option key={a} value={a}>{a}</option>)}
         </select>
         <select className="v-select max-w-[180px]" value={entity} onChange={(e) => setEntity(e.target.value)}>
-          <option value="all">All entities</option>
+          <option value="all">{t("admin.audit.allEntities")}</option>
           {entities.map((e) => <option key={e} value={e}>{e}</option>)}
         </select>
       </div>
@@ -65,11 +69,11 @@ export function AuditClient({ rows }: { rows: Row[] }) {
         <table className="w-full text-sm min-w-[800px]">
           <thead>
             <tr className="text-left text-xs text-[var(--vie-ink-muted)] uppercase tracking-wider border-b border-[var(--vie-line)]">
-              <th className="py-2.5 font-semibold">When</th>
-              <th className="font-semibold">Actor</th>
-              <th className="font-semibold">Action</th>
-              <th className="font-semibold">Entity</th>
-              <th className="font-semibold">Payload</th>
+              <th className="py-2.5 font-semibold">{t("admin.audit.col.when")}</th>
+              <th className="font-semibold">{t("admin.audit.col.actor")}</th>
+              <th className="font-semibold">{t("admin.audit.col.action")}</th>
+              <th className="font-semibold">{t("admin.audit.col.entity")}</th>
+              <th className="font-semibold">{t("admin.audit.col.payload")}</th>
             </tr>
           </thead>
           <tbody>
@@ -93,7 +97,7 @@ export function AuditClient({ rows }: { rows: Row[] }) {
             ))}
           </tbody>
         </table>
-        {filtered.length === 0 && <div className="text-center text-sm text-[var(--vie-ink-muted)] py-12">No entries match.</div>}
+        {filtered.length === 0 && <div className="text-center text-sm text-[var(--vie-ink-muted)] py-12">{t("admin.audit.empty")}</div>}
       </div>
     </div>
   );

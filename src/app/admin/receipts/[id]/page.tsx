@@ -8,12 +8,15 @@ import { StatusPill } from "@/components/status-pill";
 import { formatEur, formatPoints } from "@/lib/money";
 import { ArrowLeft } from "lucide-react";
 import { AdminDecisionPanel } from "./decision-panel";
+import { getT } from "@/lib/i18n/server";
 
 export default async function AdminReceiptDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const s = await getSession();
   if (!s.installerId) redirect("/login");
   if (s.role !== "admin") redirect("/app");
+  const { t, locale } = await getT();
+  const dateLocale = locale === "hr" ? "hr-HR" : "en-GB";
 
   const rRows = await db
     .select({
@@ -37,51 +40,51 @@ export default async function AdminReceiptDetail({ params }: { params: Promise<{
 
   return (
     <div className="space-y-4">
-      <Link href="/admin" className="text-sm text-[var(--vie-ink-soft)] flex items-center gap-1"><ArrowLeft size={14} /> Back to queue</Link>
+      <Link href="/admin" className="text-sm text-[var(--vie-ink-soft)] flex items-center gap-1"><ArrowLeft size={14} /> {t("admin.receipt.back")}</Link>
 
       <div className="grid md:grid-cols-3 gap-4">
         <div className="md:col-span-2 space-y-4">
           <div className="v-card">
             <div className="flex items-start justify-between">
               <div>
-                <div className="text-xs text-[var(--vie-ink-soft)]">Invoice</div>
+                <div className="text-xs text-[var(--vie-ink-soft)]">{t("admin.receipt.invoice")}</div>
                 <div className="font-bold text-lg">{r.invoiceNumber ?? "—"}</div>
-                <div className="text-xs text-[var(--vie-ink-soft)]">{r.issueDate ? new Date(r.issueDate).toLocaleDateString("hr-HR") : "—"}</div>
+                <div className="text-xs text-[var(--vie-ink-soft)]">{r.issueDate ? new Date(r.issueDate).toLocaleDateString(dateLocale) : "—"}</div>
               </div>
               <StatusPill status={r.status} />
             </div>
             <hr className="my-3 border-[var(--vie-line)]" />
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <div className="text-[var(--vie-ink-soft)]">Wholesaler (seller)</div>
+                <div className="text-[var(--vie-ink-soft)]">{t("admin.receipt.seller")}</div>
                 <div className="font-semibold">{r.wholesalerName ?? "—"}</div>
                 <div className="text-[var(--vie-ink-soft)]">OIB {r.wholesalerOib ?? "—"}</div>
               </div>
               <div>
-                <div className="text-[var(--vie-ink-soft)]">Buyer on invoice</div>
+                <div className="text-[var(--vie-ink-soft)]">{t("admin.receipt.buyer")}</div>
                 <div className="font-semibold">{r.buyerName ?? "—"}</div>
                 <div className="text-[var(--vie-ink-soft)]">OIB {r.buyerOib ?? "—"}</div>
               </div>
             </div>
             <hr className="my-3 border-[var(--vie-line)]" />
             <div className="text-xs">
-              <div className="text-[var(--vie-ink-soft)]">Submitting installer</div>
+              <div className="text-[var(--vie-ink-soft)]">{t("admin.receipt.submitter")}</div>
               <div className="font-semibold">{installer?.companyName ?? "—"}</div>
               <div className="text-[var(--vie-ink-soft)]">{installer?.email} · OIB {installer?.oib}</div>
             </div>
           </div>
 
           <div className="v-card">
-            <div className="text-sm font-bold mb-3">Line items ({lines.length})</div>
+            <div className="text-sm font-bold mb-3">{t("admin.receipt.lines")} ({lines.length})</div>
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-xs text-[var(--vie-ink-soft)] border-b border-[var(--vie-line)] text-left">
-                  <th className="py-1.5">Item</th>
-                  <th>Qty</th>
-                  <th>Price</th>
-                  <th>Amount</th>
-                  <th>Match</th>
-                  <th className="text-right">Pts</th>
+                  <th className="py-1.5">{t("admin.receipt.col.item")}</th>
+                  <th>{t("admin.receipt.col.qty")}</th>
+                  <th>{t("admin.receipt.col.price")}</th>
+                  <th>{t("admin.receipt.col.amount")}</th>
+                  <th>{t("admin.receipt.col.match")}</th>
+                  <th className="text-right">{t("admin.receipt.col.pts")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -102,10 +105,10 @@ export default async function AdminReceiptDetail({ params }: { params: Promise<{
                             <div className="text-[var(--vie-ink-soft)]">{line.matchKind} · {line.matchConfidence}%</div>
                           </div>
                         ) : (
-                          <span className="text-[var(--vie-warn)]">unmatched Viessmann</span>
+                          <span className="text-[var(--vie-warn)]">{t("admin.receipt.unmatched")}</span>
                         )
                       ) : (
-                        <span className="text-[var(--vie-ink-soft)]">other</span>
+                        <span className="text-[var(--vie-ink-soft)]">{t("admin.receipt.other")}</span>
                       )}
                     </td>
                     <td className="py-2 text-right text-xs font-semibold">
@@ -122,14 +125,14 @@ export default async function AdminReceiptDetail({ params }: { params: Promise<{
             </table>
             <hr className="my-3 border-[var(--vie-line)]" />
             <div className="flex justify-between text-sm">
-              <span className="text-[var(--vie-ink-soft)]">Subtotal {formatEur(r.subtotalCents)} · VAT {formatEur(r.vatCents)}</span>
+              <span className="text-[var(--vie-ink-soft)]">{t("receipt.subtotal")} {formatEur(r.subtotalCents)} · {t("receipt.vat")} {formatEur(r.vatCents)}</span>
               <span className="font-bold">{formatEur(r.totalCents)}</span>
             </div>
           </div>
 
           {r.fraudFlags && (r.fraudFlags as string[]).length > 0 && (
             <div className="v-card">
-              <div className="text-xs font-bold mb-2 text-[var(--vie-warn)]">Fraud / data flags</div>
+              <div className="text-xs font-bold mb-2 text-[var(--vie-warn)]">{t("admin.receipt.flagsTitle")}</div>
               <ul className="text-xs space-y-1 list-disc pl-4 text-[var(--vie-ink-soft)]">
                 {(r.fraudFlags as string[]).map((f, i) => <li key={i}>{f}</li>)}
               </ul>
@@ -137,7 +140,7 @@ export default async function AdminReceiptDetail({ params }: { params: Promise<{
           )}
 
           {r.fileUrl && (
-            <a href={r.fileUrl} target="_blank" rel="noopener noreferrer" className="v-btn v-btn-ghost w-full">View original file</a>
+            <a href={r.fileUrl} target="_blank" rel="noopener noreferrer" className="v-btn v-btn-ghost w-full">{t("admin.receipt.viewFile")}</a>
           )}
         </div>
 

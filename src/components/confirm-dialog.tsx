@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { AlertTriangle, X } from "lucide-react";
+import { useT } from "@/lib/i18n/client";
 
 export type ConfirmTone = "default" | "danger" | "success";
 
@@ -33,13 +34,18 @@ export function ConfirmDialog({
   open,
   title,
   description,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   tone = "default",
   busy = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const { t } = useT();
+  // Default labels translate when the caller doesn't pass them.
+  const confirmText = confirmLabel ?? t("confirm.confirm");
+  const cancelText = cancelLabel ?? t("confirm.cancel");
+
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
@@ -64,7 +70,7 @@ export function ConfirmDialog({
       >
         <button
           onClick={() => !busy && onCancel()}
-          aria-label="Close"
+          aria-label={t("confirm.close")}
           className="absolute top-3 right-3 p-1 rounded-lg text-[var(--vie-ink-muted)] hover:bg-[var(--vie-line)] hover:text-[var(--vie-ink)] transition-colors"
         >
           <X size={16} />
@@ -79,9 +85,9 @@ export function ConfirmDialog({
           </div>
         </div>
         <div className="grid grid-cols-2 gap-2 mt-5">
-          <button onClick={onCancel} disabled={busy} className="v-btn v-btn-ghost">{cancelLabel}</button>
+          <button onClick={onCancel} disabled={busy} className="v-btn v-btn-ghost">{cancelText}</button>
           <button onClick={onConfirm} disabled={busy} className={`v-btn ${TONE_BTN[tone]}`}>
-            {busy ? "…" : confirmLabel}
+            {busy ? "…" : confirmText}
           </button>
         </div>
       </div>

@@ -29,7 +29,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <header className="sticky top-0 z-30 bg-[var(--vie-paper-elev)]/95 backdrop-blur border-b border-[var(--vie-line)]">
         <div className="max-w-md w-full mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/app" prefetch className="flex items-center">
-            <Brand size="sm" subtitle="Loyalty" />
+            <Brand size="sm" subtitle={t("brand.loyalty")} />
           </Link>
           <div className="flex items-center gap-1">
             <Link

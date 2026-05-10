@@ -131,7 +131,7 @@ export default function SubmitPage() {
           setOcrProgress(progress);
         });
         if (!text || text.trim().length < 20) {
-          toast.error("Could not read enough text from the photo. Try better lighting or upload a PDF.");
+          toast.error(t("submit.ocr.tooLittleText"));
           setStage("preview");
           return;
         }
@@ -153,7 +153,7 @@ export default function SubmitPage() {
         handleResult(json);
       } catch (e) {
         stopProgress();
-        toast.error(e instanceof Error ? e.message : "OCR failed");
+        toast.error(e instanceof Error ? e.message : t("submit.ocr.failed"));
         setStage("preview");
       }
       return;
@@ -333,11 +333,22 @@ function ChooseStage({ onCamera, onFile, onShowHelp, t }: { onCamera: () => void
 
 function OcrStage({ status, progress, previewUrl, t }: { status: string; progress: number; previewUrl: string | null; t: T }) {
   const pct = Math.round(progress * 100);
+  // The OCR engine emits English status strings via the worker callback.
+  // Map the well-known phrases to translated copy; fall back to the raw string
+  // for anything unexpected so we never lose information.
+  const STATUS_MAP: Record<string, string> = {
+    "Loading OCR engine": t("submit.ocr.statusLoad"),
+    "Loading Croatian language model": t("submit.ocr.statusModel"),
+    "Preparing OCR": t("submit.ocr.statusPrepare"),
+    "Reading the invoice": t("submit.ocr.statusReading"),
+    "Done": t("submit.ocr.statusDone"),
+  };
+  const display = STATUS_MAP[status] ?? status;
   return (
     <div className="space-y-4 pt-2 v-fade-in">
       <div className="text-center">
         <Loader2 className="mx-auto animate-spin text-[var(--vie-red)]" size={36} />
-        <h2 className="text-xl font-bold mt-3">{status}…</h2>
+        <h2 className="text-xl font-bold mt-3">{display}…</h2>
         <p className="text-sm text-[var(--vie-ink-muted)] mt-1">{t("submit.ocr.body2")}</p>
       </div>
       <div className="v-card v-card-tight">
