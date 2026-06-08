@@ -9,74 +9,55 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --red:#ff3e17; --red-dark:#cc2900;
-    --ink:#0f172a; --ink-soft:#475569; --ink-mute:#94a3b8;
-    --bg:#f4f6fb; --card:#ffffff; --line:#e6e9f0; --line-2:#d6dbe6;
-    --shadow-sm:0 1px 2px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.05);
-    --shadow-md:0 6px 16px rgba(15,23,42,.08), 0 2px 6px rgba(15,23,42,.05);
+    --red:#ff3e17;--red-dark:#cc2900;--ink:#0f172a;--ink-soft:#475569;--ink-mute:#94a3b8;
+    --bg:#f4f6fb;--card:#ffffff;--line:#e6e9f0;--line-2:#d6dbe6;
+    --shadow-sm:0 1px 2px rgba(15,23,42,.06),0 1px 3px rgba(15,23,42,.05);
+    --shadow-md:0 6px 16px rgba(15,23,42,.08),0 2px 6px rgba(15,23,42,.05);
     --shadow-lg:0 18px 40px rgba(15,23,42,.16);
-    --c-input:#2563eb;  --b-input:#eff6ff;
-    --c-read:#0d9488;   --b-read:#effdfa;
-    --c-find:#4f46e5;   --b-find:#eef2ff;
-    --c-check:#d97706;  --b-check:#fff8ec;
-    --c-decide:#e11d48; --b-decide:#fff1f3;
-    --c-reward:#16a34a; --b-reward:#f0fdf4;
-    --c-output:#7c3aed; --b-output:#f5f3ff;
-    --c-admin:#475569;  --b-admin:#f1f5f9;
-    --c-data:#0891b2;   --b-data:#ecfeff;
-    --ok:#16a34a; --bad:#e11d48;
+    --c-input:#2563eb;--b-input:#eff6ff;--c-read:#0d9488;--b-read:#effdfa;--c-find:#4f46e5;--b-find:#eef2ff;
+    --c-check:#d97706;--b-check:#fff8ec;--c-decide:#e11d48;--b-decide:#fff1f3;--c-reward:#16a34a;--b-reward:#f0fdf4;
+    --c-output:#7c3aed;--b-output:#f5f3ff;--c-admin:#475569;--b-admin:#f1f5f9;--c-data:#0891b2;--b-data:#ecfeff;
+    --ok:#16a34a;--bad:#e11d48;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
   body{font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--bg);
     -webkit-font-smoothing:antialiased;overflow:hidden;display:flex;flex-direction:column;height:100vh}
 
-  .top{flex:0 0 auto;background:var(--card);border-bottom:1px solid var(--line);padding:12px 20px;
-    display:flex;align-items:center;gap:18px;flex-wrap:wrap;z-index:20}
+  .top{flex:0 0 auto;background:var(--card);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;z-index:20}
   .brand{display:flex;align-items:center;gap:11px;min-width:0}
-  .brand .logo{width:30px;height:30px;border-radius:8px;background:var(--red);display:flex;align-items:center;
-    justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(255,62,23,.35)}
+  .brand .logo{width:30px;height:30px;border-radius:8px;background:var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(255,62,23,.35)}
   .brand .logo svg{width:18px;height:18px;color:#fff}
   .brand .bt{font-size:15px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
   .brand .bs{font-size:12px;color:var(--ink-mute);font-weight:500}
   .top .spacer{flex:1}
   .ctrls{display:flex;align-items:center;gap:8px}
-  .btn{border:1px solid var(--line-2);background:var(--card);color:var(--ink-soft);height:36px;padding:0 12px;
-    border-radius:9px;font-family:inherit;font-size:13px;font-weight:600;display:inline-flex;align-items:center;
-    gap:7px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .btn{border:1px solid var(--line-2);background:var(--card);color:var(--ink-soft);height:36px;padding:0 12px;border-radius:9px;font-family:inherit;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:7px;cursor:pointer;transition:.15s;white-space:nowrap;text-decoration:none}
   .btn:hover{border-color:var(--ink-mute);color:var(--ink)}
   .btn svg{width:15px;height:15px}
   .btn.play{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 2px 8px rgba(255,62,23,.3)}
   .btn.play:hover{background:var(--red-dark);border-color:var(--red-dark);color:#fff}
   .btn.ghost{border-color:transparent;background:transparent}
   .zoom{display:flex;border:1px solid var(--line-2);border-radius:9px;overflow:hidden;background:var(--card)}
-  .zoom button{width:34px;height:36px;border:none;background:transparent;cursor:pointer;color:var(--ink-soft);
-    font-size:17px;display:flex;align-items:center;justify-content:center}
+  .zoom button{width:34px;height:36px;border:none;background:transparent;cursor:pointer;color:var(--ink-soft);font-size:17px;display:flex;align-items:center;justify-content:center}
   .zoom button:hover{background:var(--bg)}
   .zoom button:not(:last-child){border-right:1px solid var(--line)}
 
-  .flows{flex:0 0 auto;background:var(--card);border-bottom:1px solid var(--line);padding:0 20px;display:flex;
-    gap:4px;overflow-x:auto;z-index:15;align-items:center}
+  .flows{flex:0 0 auto;background:var(--card);border-bottom:1px solid var(--line);padding:0 20px;display:flex;gap:4px;overflow-x:auto;z-index:15;align-items:center}
   .flows::-webkit-scrollbar{height:0}
-  .flow-tab{border:none;background:transparent;cursor:pointer;font-family:inherit;padding:12px 4px;margin-right:16px;
-    font-size:14px;font-weight:600;color:var(--ink-mute);border-bottom:2.5px solid transparent;white-space:nowrap;
-    transition:.15s;display:flex;align-items:center;gap:8px}
-  .flow-tab .n{width:22px;height:22px;border-radius:6px;background:var(--bg);color:var(--ink-mute);font-size:11px;
-    font-weight:700;display:flex;align-items:center;justify-content:center;transition:.15s}
+  .flow-tab{border:none;background:transparent;cursor:pointer;font-family:inherit;padding:12px 4px;margin-right:15px;font-size:14px;font-weight:600;color:var(--ink-mute);border-bottom:2.5px solid transparent;white-space:nowrap;transition:.15s;display:flex;align-items:center;gap:8px}
+  .flow-tab .n{width:22px;height:22px;border-radius:6px;background:var(--bg);color:var(--ink-mute);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:.15s}
   .flow-tab:hover{color:var(--ink-soft)}
   .flow-tab.on{color:var(--ink);border-bottom-color:var(--red)}
   .flow-tab.on .n{background:var(--red);color:#fff}
-  .flow-tab.real.on{border-bottom-color:var(--ok)}
-  .flow-tab.real.bad.on{border-bottom-color:var(--bad)}
-  .flow-tab.real .n{background:var(--b-reward);color:var(--ok)}
-  .flow-tab.real.bad .n{background:var(--b-decide);color:var(--bad)}
-  .flow-tab.real.on .n{background:var(--ok);color:#fff}
-  .flow-tab.real.bad.on .n{background:var(--bad);color:#fff}
-  .flow-div{width:1px;height:24px;background:var(--line);margin:0 14px 0 0;flex-shrink:0}
+  .flow-tab.over.on{border-bottom-color:var(--ink)} .flow-tab.over.on .n{background:var(--ink)}
+  .flow-tab.real.on{border-bottom-color:var(--ok)} .flow-tab.real.bad.on{border-bottom-color:var(--bad)}
+  .flow-tab.real .n{background:var(--b-reward);color:var(--ok)} .flow-tab.real.bad .n{background:var(--b-decide);color:var(--bad)}
+  .flow-tab.real.on .n{background:var(--ok);color:#fff} .flow-tab.real.bad.on .n{background:var(--bad);color:#fff}
+  .flow-div{width:1px;height:24px;background:var(--line);margin:0 13px 0 0;flex-shrink:0}
 
   .stage{flex:1;position:relative;overflow:hidden;min-height:0}
-  .canvas{position:absolute;inset:0;overflow:hidden;cursor:grab;
-    background-image:radial-gradient(circle at 1px 1px,#d8deea 1.1px,transparent 0);background-size:26px 26px}
+  .canvas{position:absolute;inset:0;overflow:hidden;cursor:grab;background-image:radial-gradient(circle at 1px 1px,#d8deea 1.1px,transparent 0);background-size:26px 26px}
   .canvas.grab{cursor:grabbing}
   .viewport{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
   .wires{position:absolute;top:0;left:0;overflow:visible;pointer-events:none}
@@ -86,152 +67,154 @@
   .wire-lbl{font-family:Inter;font-size:11px;font-weight:600;fill:#94a3b8}
   .wire-lbl-bg{fill:var(--bg)}
 
-  .node{position:absolute;width:230px;min-height:72px;background:var(--card);border:1.5px solid var(--line);
-    border-radius:15px;box-shadow:var(--shadow-sm);padding:13px 15px;display:flex;align-items:center;gap:12px;
-    cursor:pointer;transition:transform .25s cubic-bezier(.34,1.4,.5,1),box-shadow .2s,border-color .2s}
+  .node{position:absolute;width:234px;min-height:72px;background:var(--card);border:1.5px solid var(--line);border-radius:15px;box-shadow:var(--shadow-sm);padding:13px 15px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .25s cubic-bezier(.34,1.4,.5,1),box-shadow .2s,border-color .2s}
   .node:hover{border-color:var(--line-2);box-shadow:var(--shadow-md);transform:translateY(-1px)}
   .node .ico{width:42px;height:42px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
   .node .ico svg{width:22px;height:22px}
   .node .tx{min-width:0;flex:1}
   .node .tt{font-size:14.5px;font-weight:700;line-height:1.2;letter-spacing:-.01em}
   .node .ss{font-size:12px;color:var(--ink-mute);margin-top:2px;line-height:1.25;font-weight:500}
-  .node .step-badge{position:absolute;top:-9px;left:-9px;width:24px;height:24px;border-radius:50%;background:var(--card);
-    border:2px solid var(--line-2);color:var(--ink-mute);font-size:11px;font-weight:800;display:flex;align-items:center;
-    justify-content:center;transition:.2s;box-shadow:var(--shadow-sm)}
+  .node .info{position:absolute;top:9px;right:10px;font-size:10px;font-weight:700;color:var(--ink-mute);opacity:.5}
+  .node .step-badge{position:absolute;top:-9px;left:-9px;width:24px;height:24px;border-radius:50%;background:var(--card);border:2px solid var(--line-2);color:var(--ink-mute);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:.2s;box-shadow:var(--shadow-sm)}
   .node.done .step-badge{background:#dcfce7;border-color:#86efac;color:#16a34a}
   .node.on .step-badge{background:var(--red);border-color:var(--red);color:#fff}
-  .node[data-cat=input]  .ico{background:var(--b-input); color:var(--c-input)}
-  .node[data-cat=read]   .ico{background:var(--b-read);  color:var(--c-read)}
-  .node[data-cat=find]   .ico{background:var(--b-find);  color:var(--c-find)}
-  .node[data-cat=check]  .ico{background:var(--b-check); color:var(--c-check)}
-  .node[data-cat=decide] .ico{background:var(--b-decide);color:var(--c-decide)}
-  .node[data-cat=reward] .ico{background:var(--b-reward);color:var(--c-reward)}
-  .node[data-cat=output] .ico{background:var(--b-output);color:var(--c-output)}
-  .node[data-cat=admin]  .ico{background:var(--b-admin); color:var(--c-admin)}
-  .node[data-cat=data]   .ico{background:var(--b-data);  color:var(--c-data)}
+  .node[data-cat=input] .ico{background:var(--b-input);color:var(--c-input)} .node[data-cat=read] .ico{background:var(--b-read);color:var(--c-read)}
+  .node[data-cat=find] .ico{background:var(--b-find);color:var(--c-find)} .node[data-cat=check] .ico{background:var(--b-check);color:var(--c-check)}
+  .node[data-cat=decide] .ico{background:var(--b-decide);color:var(--c-decide)} .node[data-cat=reward] .ico{background:var(--b-reward);color:var(--c-reward)}
+  .node[data-cat=output] .ico{background:var(--b-output);color:var(--c-output)} .node[data-cat=admin] .ico{background:var(--b-admin);color:var(--c-admin)}
+  .node[data-cat=data] .ico{background:var(--b-data);color:var(--c-data)}
   .node.on{transform:scale(1.05);box-shadow:0 0 0 4px rgba(255,62,23,.16),var(--shadow-lg);border-color:var(--red)}
   .node.dim{opacity:.4}
 
-  .token{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--red);
-    box-shadow:0 0 0 6px rgba(255,62,23,.18),0 0 16px 3px rgba(255,62,23,.55);transform:translate(-50%,-50%);
-    transition:left .7s cubic-bezier(.5,0,.3,1),top .7s cubic-bezier(.5,0,.3,1);z-index:5;pointer-events:none;opacity:0}
+  .token{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--red);box-shadow:0 0 0 6px rgba(255,62,23,.18),0 0 16px 3px rgba(255,62,23,.55);transform:translate(-50%,-50%);transition:left .7s cubic-bezier(.5,0,.3,1),top .7s cubic-bezier(.5,0,.3,1);z-index:5;pointer-events:none;opacity:0}
   .token.show{opacity:1}
-  .token::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--red);opacity:.5;
-    animation:ring 1.1s ease-out infinite}
+  .token::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--red);opacity:.5;animation:ring 1.1s ease-out infinite}
   @keyframes ring{from{transform:scale(.7);opacity:.6}to{transform:scale(1.9);opacity:0}}
 
-  .caption{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(15,23,42,.93);color:#fff;
-    backdrop-filter:blur(8px);border-radius:14px;padding:12px 20px;display:flex;align-items:center;gap:15px;
-    box-shadow:var(--shadow-lg);max-width:min(720px,92vw);z-index:10;opacity:0;transition:opacity .3s;pointer-events:none}
+  .caption{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:rgba(15,23,42,.93);color:#fff;backdrop-filter:blur(8px);border-radius:14px;padding:12px 20px;display:flex;align-items:center;gap:15px;box-shadow:var(--shadow-lg);max-width:min(720px,92vw);z-index:10;opacity:0;transition:opacity .3s;pointer-events:none}
   .caption.show{opacity:1}
-  .caption .cap-step{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fca5a5;
-    background:rgba(255,62,23,.18);padding:5px 9px;border-radius:7px;white-space:nowrap;flex-shrink:0}
-  .caption .cap-tx{min-width:0}
-  .caption .cap-t{font-size:15px;font-weight:700;line-height:1.2}
-  .caption .cap-d{font-size:13px;color:#cbd5e1;margin-top:2px;line-height:1.35}
+  .caption .cap-step{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fca5a5;background:rgba(255,62,23,.18);padding:5px 9px;border-radius:7px;white-space:nowrap;flex-shrink:0}
+  .caption .cap-t{font-size:15px;font-weight:700;line-height:1.2} .caption .cap-d{font-size:13px;color:#cbd5e1;margin-top:2px;line-height:1.35}
 
-  .hint{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--ink-mute);
-    background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);padding:6px 13px;
-    border-radius:100px;z-index:8;font-weight:500;box-shadow:var(--shadow-sm)}
+  .hint{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--ink-mute);background:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid var(--line);padding:6px 13px;border-radius:100px;z-index:8;font-weight:500;box-shadow:var(--shadow-sm)}
   .hint b{color:var(--ink-soft)}
-
-  .legend{position:absolute;bottom:18px;left:18px;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
-    border:1px solid var(--line);border-radius:11px;padding:11px 13px;z-index:8;box-shadow:var(--shadow-sm);max-width:230px}
+  .legend{position:absolute;bottom:18px;left:18px;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:11px;padding:11px 13px;z-index:8;box-shadow:var(--shadow-sm);max-width:230px}
   .legend .lt{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:8px}
   .legend .li{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);margin:0 10px 5px 0;font-weight:500}
   .legend .sw{width:11px;height:11px;border-radius:4px}
 
-  /* invoice preview card */
-  .preview-card{position:absolute;top:16px;left:18px;width:188px;background:var(--card);border:1px solid var(--line);
-    border-radius:13px;box-shadow:var(--shadow-md);z-index:9;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s}
+  .preview-card{position:absolute;top:16px;left:18px;width:188px;background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow-md);z-index:9;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s}
   .preview-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
   .preview-card .ph{padding:9px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px}
-  .preview-card .ph .dt{font-size:11px;font-weight:700;color:var(--ink)}
-  .preview-card .ph .ds{font-size:10px;color:var(--ink-mute)}
+  .preview-card .ph .dt{font-size:11px;font-weight:700;color:var(--ink)} .preview-card .ph .ds{font-size:10px;color:var(--ink-mute)}
   .preview-card .ph svg{width:15px;height:15px;color:var(--red);flex-shrink:0}
   .preview-card .pimg{position:relative;background:#f1f5f9}
   .preview-card .pimg img{width:100%;display:block}
-  .preview-card .pimg .expand{position:absolute;bottom:7px;right:7px;background:rgba(15,23,42,.82);color:#fff;
-    font-size:10px;font-weight:600;padding:4px 8px;border-radius:6px;display:flex;align-items:center;gap:5px}
+  .preview-card .pimg .expand{position:absolute;bottom:7px;right:7px;background:rgba(15,23,42,.82);color:#fff;font-size:10px;font-weight:600;padding:4px 8px;border-radius:6px;display:flex;align-items:center;gap:5px}
   .preview-card .pimg .expand svg{width:11px;height:11px}
 
-  /* result card */
-  .result-card{position:absolute;bottom:18px;right:18px;background:var(--card);border:1px solid var(--line);
-    border-left:5px solid var(--rc,var(--ink-mute));border-radius:13px;box-shadow:var(--shadow-lg);z-index:9;
-    padding:14px 18px;min-width:230px;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none}
+  .result-card{position:absolute;bottom:18px;right:18px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--rc,var(--ink-mute));border-radius:13px;box-shadow:var(--shadow-lg);z-index:9;padding:14px 18px;min-width:230px;opacity:0;transform:translateY(8px);transition:opacity .35s,transform .35s;pointer-events:none}
   .result-card.show{opacity:1;transform:none}
-  .result-card.ok{--rc:var(--ok)}
-  .result-card.bad{--rc:var(--bad)}
+  .result-card.ok{--rc:var(--ok)} .result-card.bad{--rc:var(--bad)}
   .result-card .rh{display:flex;align-items:center;gap:9px;margin-bottom:8px}
   .result-card .rh .ri{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center}
   .result-card.ok .rh .ri{background:var(--b-reward);color:var(--ok)} .result-card.bad .rh .ri{background:var(--b-decide);color:var(--bad)}
   .result-card .rh .ri svg{width:18px;height:18px}
   .result-card .rh .rt{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--rc)}
-  .result-card .rbig{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1}
-  .result-card .rsub{font-size:12.5px;color:var(--ink-soft);margin-top:5px;font-weight:500}
+  .result-card .rbig{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1} .result-card .rsub{font-size:12.5px;color:var(--ink-soft);margin-top:5px;font-weight:500}
 
-  /* lightbox */
-  .lightbox{position:fixed;inset:0;background:rgba(15,23,42,.82);backdrop-filter:blur(4px);z-index:80;display:flex;
-    align-items:center;justify-content:center;padding:32px;opacity:0;pointer-events:none;transition:.2s}
-  .lightbox.open{opacity:1;pointer-events:auto}
-  .lightbox img{max-width:min(820px,94vw);max-height:92vh;border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,.5);background:#fff}
-  .lightbox .lx-close{position:absolute;top:20px;right:24px;color:#fff;font-size:30px;cursor:pointer;opacity:.85}
+  /* zoomable invoice lightbox */
+  .lightbox{position:fixed;inset:0;background:rgba(15,23,42,.86);backdrop-filter:blur(4px);z-index:80;display:none;opacity:0;transition:opacity .2s}
+  .lightbox.open{display:block;opacity:1}
+  .lx-stage{position:absolute;inset:0;overflow:hidden;cursor:grab}
+  .lx-stage.grab{cursor:grabbing}
+  .lx-img{position:absolute;top:50%;left:50%;transform-origin:center;will-change:transform;max-width:none;border-radius:6px;box-shadow:0 30px 80px rgba(0,0,0,.5);background:#fff;user-select:none;-webkit-user-drag:none}
+  .lx-bar{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:10px;padding:5px;box-shadow:var(--shadow-lg);z-index:2}
+  .lx-bar button{width:38px;height:36px;border:none;background:transparent;border-radius:7px;cursor:pointer;color:var(--ink-soft);font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  .lx-bar button:hover{background:var(--bg);color:var(--ink)}
+  .lx-bar .lx-rd{min-width:54px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--ink-mute)}
+  .lx-close{position:absolute;top:18px;right:22px;color:#fff;font-size:30px;cursor:pointer;opacity:.85;z-index:2;line-height:1}
+  .lx-hint{position:absolute;top:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.8);font-size:12px;font-weight:500;z-index:2}
 
   /* detail panel */
   .scrim{position:fixed;inset:0;background:rgba(15,23,42,.35);backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:.25s;z-index:40}
   .scrim.open{opacity:1;pointer-events:auto}
-  .panel{position:fixed;top:0;right:0;width:min(440px,100vw);height:100vh;background:var(--card);box-shadow:var(--shadow-lg);
-    transform:translateX(100%);transition:transform .34s cubic-bezier(.32,.72,0,1);z-index:50;display:flex;flex-direction:column}
+  .panel{position:fixed;top:0;right:0;width:min(460px,100vw);height:100vh;background:var(--card);box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform .34s cubic-bezier(.32,.72,0,1);z-index:50;display:flex;flex-direction:column}
   .panel.open{transform:none}
   .panel .ph{padding:24px 26px 20px;border-bottom:1px solid var(--line);position:relative}
-  .panel .ph .close{position:absolute;top:18px;right:18px;width:32px;height:32px;border-radius:9px;border:1px solid var(--line);
-    background:var(--card);cursor:pointer;color:var(--ink-mute);font-size:18px;display:flex;align-items:center;justify-content:center}
+  .panel .ph .close{position:absolute;top:18px;right:18px;width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--card);cursor:pointer;color:var(--ink-mute);font-size:18px;display:flex;align-items:center;justify-content:center}
   .panel .ph .close:hover{color:var(--ink);border-color:var(--ink-mute)}
   .panel .ph .pico{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
   .panel .ph .pico svg{width:27px;height:27px}
   .panel .ph .pcat{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
   .panel .ph h2{font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
   .panel .pb{padding:22px 26px;overflow-y:auto;flex:1}
-  .panel .sec{margin-bottom:22px}
-  .panel .sec:last-child{margin-bottom:0}
-  .panel .sl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-mute);
-    margin-bottom:9px;display:flex;align-items:center;gap:7px}
+  .panel .sec{margin-bottom:20px} .panel .sec:last-child{margin-bottom:0}
+  .panel .sl{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:9px;display:flex;align-items:center;gap:7px}
   .panel .sl svg{width:14px;height:14px}
-  .panel .sec p{font-size:15px;line-height:1.6;color:var(--ink-soft)}
   .panel .sec.what p{font-size:16px;color:var(--ink);line-height:1.55}
-  .panel .data{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14px;
-    line-height:1.7;color:var(--ink)}
-  .panel .data b{font-weight:700} .panel .data code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;
-    background:#eef2f7;padding:1px 5px;border-radius:4px}
-  .panel .tech{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.65}
-  .panel .tech code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:rgba(255,255,255,.12);
-    color:#fff;padding:1px 5px;border-radius:4px}
-  .panel .tech b{color:#fff}
+  .panel .sec p{font-size:14.5px;line-height:1.6;color:var(--ink-soft)}
+  .io{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .io .iocell{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:11px 13px}
+  .io .iocell .iol{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+  .io .in .iol{color:var(--c-input)} .io .out .iol{color:var(--c-reward)}
+  .io .iocell .iov{font-size:13px;line-height:1.5;color:var(--ink)} .io .iocell .iov code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:#eef2f7;padding:1px 4px;border-radius:4px}
+  .formula{font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.7;background:#0f172a;color:#e2e8f0;border-radius:11px;padding:14px 16px;white-space:normal;word-break:break-word}
+  .formula .hl{color:#fca5a5;font-weight:700} .formula .gn{color:#86efac} .formula b{color:#fff}
+  .data{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.7;color:var(--ink)}
+  .data b{font-weight:700} .data code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:#eef2f7;padding:1px 5px;border-radius:4px}
+  .ex{background:#fffaf5;border:1px solid #ffe2d3;border-radius:12px;padding:13px 15px;font-size:14px;line-height:1.6;color:var(--ink-soft)} .ex b{color:var(--ink)}
+  .tech{background:#0f172a;color:#cbd5e1;border-radius:12px;padding:13px 15px;font-size:12.5px;line-height:1.6}
+  .tech code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;background:rgba(255,255,255,.12);color:#fff;padding:1px 5px;border-radius:4px} .tech b{color:#fff}
   .chk{list-style:none;margin:0;padding:0}
   .chk li{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;line-height:1.5;padding:3px 0;color:var(--ink)}
-  .chk li .ic{flex-shrink:0;width:16px;height:16px;margin-top:1px}
-  .chk li.ok .ic{color:var(--ok)} .chk li.bad .ic{color:var(--bad)}
-  .chk li.bad{font-weight:600}
+  .chk li .ic{flex-shrink:0;width:16px;height:16px;margin-top:1px} .chk li.ok .ic{color:var(--ok)} .chk li.bad .ic{color:var(--bad)} .chk li.bad{font-weight:600}
   table.calc{width:100%;border-collapse:collapse;font-size:13px}
   table.calc th,table.calc td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)}
   table.calc th:first-child,table.calc td:first-child{text-align:left}
   table.calc th{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-mute);font-weight:700}
-  table.calc td:last-child{font-weight:700;color:var(--ink)}
-  table.calc tr.muted td{color:var(--ink-mute)}
-  table.calc tr.tot td{border-top:2px solid var(--line-2);border-bottom:none;font-weight:800;padding-top:8px}
-  table.calc tr.tot td:last-child{color:var(--ok)}
+  table.calc td:last-child{font-weight:700;color:var(--ink)} table.calc tr.muted td{color:var(--ink-mute)}
+  table.calc tr.tot td{border-top:2px solid var(--line-2);border-bottom:none;font-weight:800;padding-top:8px} table.calc tr.tot td:last-child{color:var(--ok)}
   .pnav{display:flex;gap:10px;padding:16px 26px;border-top:1px solid var(--line)}
-  .pnav button{flex:1;height:42px;border:1px solid var(--line-2);background:var(--card);border-radius:10px;font-family:inherit;
-    font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
-  .pnav button:hover:not(:disabled){border-color:var(--ink-mute);color:var(--ink)}
-  .pnav button:disabled{opacity:.4;cursor:default}
+  .pnav button{flex:1;height:42px;border:1px solid var(--line-2);background:var(--card);border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+  .pnav button:hover:not(:disabled){border-color:var(--ink-mute);color:var(--ink)} .pnav button:disabled{opacity:.4;cursor:default}
   .pnav button svg{width:15px;height:15px}
 
-  @media (max-width:680px){
-    .brand .bs{display:none}.legend{display:none}.preview-card{width:140px}
-    .hint{display:none}.caption{bottom:14px;padding:10px 14px}.ctrls .lbl{display:none}
-    .result-card{left:18px;right:18px;bottom:14px}
-  }
+  /* overview */
+  .overview{position:absolute;inset:0;overflow-y:auto;display:none;background:var(--bg)}
+  .overview.show{display:block}
+  .ov-wrap{max-width:1080px;margin:0 auto;padding:40px 32px 80px}
+  .ov-hero{margin-bottom:34px}
+  .ov-eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:12px}
+  .ov-hero h1{font-size:38px;font-weight:800;letter-spacing:-.03em;line-height:1.08;margin-bottom:14px}
+  .ov-hero p{font-size:17px;line-height:1.6;color:var(--ink-soft);max-width:780px}
+  .ov-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0 40px}
+  .ov-stat{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:18px 20px;box-shadow:var(--shadow-sm)}
+  .ov-stat .v{font-size:26px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+  .ov-stat .l{font-size:12.5px;color:var(--ink-soft);margin-top:4px;font-weight:500;line-height:1.35}
+  .ov-h{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mute);margin:34px 0 16px;display:flex;align-items:center;gap:10px}
+  .ov-h::after{content:"";flex:1;height:1px;background:var(--line)}
+  .ov-journey{background:var(--ink);border-radius:16px;padding:24px 26px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;box-shadow:var(--shadow-md)}
+  .ov-jstep{display:flex;flex-direction:column;gap:4px;color:#fff;min-width:0;flex:1}
+  .ov-jstep .jn{width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center}
+  .ov-jstep .jn svg{width:17px;height:17px;color:#fff}
+  .ov-jstep .jt{font-size:13.5px;font-weight:700;margin-top:7px;line-height:1.2}
+  .ov-jstep .jd{font-size:11.5px;color:rgba(255,255,255,.6);line-height:1.35}
+  .ov-jarrow{color:rgba(255,255,255,.4);flex-shrink:0}
+  .ov-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .ov-cardx{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column}
+  .ov-cardx .ci{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .ov-cardx .ci svg{width:23px;height:23px}
+  .ov-cardx h3{font-size:18px;font-weight:700;letter-spacing:-.01em;margin-bottom:8px}
+  .ov-cardx p{font-size:14px;line-height:1.55;color:var(--ink-soft);margin-bottom:8px}
+  .ov-cardx .why{font-size:13px;line-height:1.5;color:var(--ink-mute);margin-bottom:16px}
+  .ov-cardx .why b{color:var(--ink-soft)}
+  .ov-cardx .go{margin-top:auto;align-self:flex-start;background:var(--bg);border:1px solid var(--line-2);color:var(--ink);font-family:inherit;font-size:12.5px;font-weight:700;padding:9px 14px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:7px}
+  .ov-cardx .go:hover{border-color:var(--red);color:var(--red)} .ov-cardx .go svg{width:13px;height:13px}
+  .ov-note{margin-top:30px;background:#fffaf5;border:1px solid #ffe2d3;border-radius:13px;padding:18px 22px;font-size:14.5px;line-height:1.6;color:var(--ink-soft)} .ov-note b{color:var(--ink)}
+
+  @media (max-width:760px){.brand .bs{display:none}.legend{display:none}.preview-card{width:140px}.hint{display:none}.ctrls .lbl{display:none}.ov-stats,.ov-cards{grid-template-columns:1fr 1fr}.io{grid-template-columns:1fr}.result-card{left:18px;right:18px}}
+  @media (max-width:520px){.ov-stats,.ov-cards{grid-template-columns:1fr}.ov-hero h1{font-size:30px}}
 </style>
 </head>
 <body>
@@ -239,11 +222,11 @@
 <div class="top">
   <div class="brand">
     <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4l9 16 9-16"/></svg></span>
-    <div><div class="bt">Viessmann Loyalty</div><div class="bs">How it works — watch a real invoice run through it</div></div>
+    <div><div class="bt">Viessmann Loyalty</div><div class="bs">How it works — watch it run, click any step for the detail</div></div>
   </div>
   <div class="spacer"></div>
-  <div class="ctrls">
-    <a class="btn ghost" href="architecture-technical.html" title="Detailed technical version"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg><span class="lbl">Technical view</span></a>
+  <div class="ctrls" id="canvasCtrls">
+    <a class="btn ghost" href="architecture-technical.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg><span class="lbl">Technical view</span></a>
     <button class="btn play" id="playBtn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Play</span></button>
     <button class="btn" id="replayBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span class="lbl">Replay</span></button>
     <div class="zoom"><button id="zoomOut">−</button><button id="zoomFit" style="font-size:13px;font-weight:700">Fit</button><button id="zoomIn">+</button></div>
@@ -254,22 +237,25 @@
 
 <div class="stage">
   <div class="canvas" id="canvas">
-    <div class="viewport" id="viewport">
-      <svg class="wires" id="wires"></svg>
-      <div class="token" id="token"></div>
-    </div>
-    <div class="hint" id="hint"><b>Tip:</b> watch it play · click any step for the real detail · drag to move · scroll to zoom</div>
+    <div class="viewport" id="viewport"><svg class="wires" id="wires"></svg><div class="token" id="token"></div></div>
+    <div class="hint" id="hint"><b>Tip:</b> watch it play · click any step for inputs, outputs, formula &amp; example · drag to move</div>
     <div class="preview-card" id="previewCard" style="display:none">
-      <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><div><div class="dt" id="pvTitle">Invoice</div><div class="ds" id="pvSub">tap to enlarge</div></div></div>
+      <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><div><div class="dt" id="pvTitle">Invoice</div><div class="ds" id="pvSub">tap to enlarge &amp; zoom</div></div></div>
       <div class="pimg"><img id="pvImg" alt="Invoice preview"><span class="expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Enlarge</span></div>
     </div>
     <div class="legend" id="legend"></div>
     <div class="result-card" id="resultCard"><div class="rh"><span class="ri" id="rcIco"></span><span class="rt" id="rcTag"></span></div><div class="rbig" id="rcBig"></div><div class="rsub" id="rcSub"></div></div>
-    <div class="caption" id="caption"><span class="cap-step" id="capStep">Step 1</span><div class="cap-tx"><div class="cap-t" id="capT"></div><div class="cap-d" id="capD"></div></div></div>
+    <div class="caption" id="caption"><span class="cap-step" id="capStep">Step 1</span><div><div class="cap-t" id="capT"></div><div class="cap-d" id="capD"></div></div></div>
   </div>
+  <div class="overview" id="overview"></div>
 </div>
 
-<div class="lightbox" id="lightbox"><span class="lx-close" id="lxClose">×</span><img id="lxImg" alt="Invoice"></div>
+<div class="lightbox" id="lightbox">
+  <div class="lx-stage" id="lxStage"><img class="lx-img" id="lxImg" alt="Invoice" draggable="false"></div>
+  <span class="lx-close" id="lxClose">×</span>
+  <div class="lx-hint">drag to move · scroll or use −/+ to zoom</div>
+  <div class="lx-bar"><button id="lxOut">−</button><div class="lx-rd" id="lxRd">100%</div><button id="lxIn">+</button><button id="lxReset" style="font-size:13px;font-weight:700">Reset</button></div>
+</div>
 
 <div class="scrim" id="scrim"></div>
 <aside class="panel" id="panel">
@@ -298,274 +284,380 @@ const ICON={
   layers:'<path d="M12 2L2 7l10 5 10-5z"/><path d="M2 12l10 5 10-5M2 17l10 5 10-5"/>',
   megaphone:'<path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 8a4 4 0 0 1 0 8"/>',
   chart:'<path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="7"/><rect x="12" y="7" width="3" height="11"/><rect x="17" y="13" width="3" height="5"/>',
+  sigma:'<path d="M18 4H6l7 8-7 8h12"/>',
+  percent:'<path d="M19 5L5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
+  filter:'<path d="M22 3H2l8 9.5V19l4 2v-8.5z"/>',
+  database:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',
   receipt:'<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1z"/><path d="M8 7h8M8 11h8M8 15h5"/>'
 };
-const CATNAME={input:'Start',read:'Automatic',find:'Automatic',check:'Safety check',decide:'Decision',reward:'Reward',output:'Result',admin:'Viessmann',data:'Records'};
-function svgIco(k){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(ICON[k]||ICON.check)+'</svg>';}
+const CATNAME={input:'Start',read:'Automatic',find:'Automatic',check:'Safety check',decide:'Decision',reward:'Calculation',output:'Result',admin:'Viessmann',data:'Records'};
+function ico(k){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(ICON[k]||ICON.check)+'</svg>';}
 const CK='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>';
 const CX='<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>';
 
-// ============ real points calculation table (success) ============
 const CALC=`<table class="calc"><tr><th>Product</th><th>Qty</th><th>Base</th><th>Campaign</th><th>Points</th></tr>
 <tr><td>Vitodens 100-W</td><td>5</td><td>1,500</td><td>+250</td><td>1,750</td></tr>
 <tr><td>Vitoconnect OT2</td><td>5</td><td>250</td><td>+250</td><td>500</td></tr>
 <tr><td>Osjetnik ZK04306</td><td>5</td><td>50</td><td>+250</td><td>300</td></tr>
 <tr class="muted"><td>Membr. posuda DD8</td><td>5</td><td>—</td><td>not Viessmann</td><td>0</td></tr>
 <tr class="tot"><td>Total</td><td>20</td><td>1,800</td><td>+750</td><td>2,550</td></tr></table>`;
-const MATCHES=`<table class="calc"><tr><th>Invoice line</th><th>KPD</th><th>Match</th></tr>
-<tr><td>Vitodens 100-W ×5</td><td>28.21.11</td><td>✓ boiler</td></tr>
-<tr><td>Vitoconnect OT2 ×5</td><td>26.20.16</td><td>✓ control</td></tr>
-<tr><td>Osjetnik ZK04306 ×5</td><td>28.21.19</td><td>✓ sensor</td></tr>
-<tr class="muted"><td>Membr. posuda DD8 ×5</td><td>28.21.19</td><td>— not ours</td></tr></table>`;
+const MATCHES=`<table class="calc"><tr><th>Invoice line</th><th>KPD</th><th>Match · conf.</th></tr>
+<tr><td>Vitodens 100-W ×5</td><td>28.21.11</td><td>✓ 90%</td></tr>
+<tr><td>Vitoconnect OT2 ×5</td><td>26.20.16</td><td>✓ 90%</td></tr>
+<tr><td>Osjetnik ZK04306 ×5</td><td>28.21.19</td><td>✓ 90%</td></tr>
+<tr class="muted"><td>Membr. posuda DD8 ×5</td><td>28.21.19</td><td>— none</td></tr></table>`;
 const CHK_OK=`<ul class="chk">
 <li class="ok">${CK}<span><b>It's your invoice</b> — buyer OIB 98765432109 matches Instalaterm's account</span></li>
-<li class="ok">${CK}<span><b>Real company</b> — OIB checksum valid</span></li>
+<li class="ok">${CK}<span><b>Real company</b> — OIB checksum valid (mod-11-10)</span></li>
 <li class="ok">${CK}<span><b>Right currency</b> — EUR</span></li>
 <li class="ok">${CK}<span><b>Totals add up</b> — 7.415,00 + 1.853,75 = 9.268,75</span></li>
+<li class="ok">${CK}<span><b>Sensible pace</b> — well under 30 / hour</span></li>
 <li class="ok">${CK}<span><b>Not a duplicate</b> — never submitted before</span></li></ul>`;
 const CHK_DUP=`<ul class="chk">
-<li class="ok">${CK}<span>Buyer OIB matches the account</span></li>
-<li class="ok">${CK}<span>OIB checksum valid · currency EUR · totals add up</span></li>
+<li class="ok">${CK}<span>Buyer OIB matches the account · checksum valid · EUR · totals add up</span></li>
 <li class="bad">${CX}<span><b>Already used</b> — this exact invoice was approved on an earlier submission</span></li></ul>`;
 
-// ============ WORKFLOWS ============
+// ============ OVERVIEW CONTENT ============
+const OVERVIEW=`<div class="ov-wrap">
+  <div class="ov-hero">
+    <div class="ov-eyebrow">Overview · for the whole team</div>
+    <h1>A loyalty program that runs itself — <span style="color:var(--red)">from invoice to reward.</span></h1>
+    <p>Croatian heating installers earn points for the Viessmann products they buy. They just photograph the wholesaler invoice; the app reads it, checks it's genuine, works out the points, and credits their account — and Viessmann sees exactly what's selling. No paperwork, no spreadsheets, and <b>no expensive AI bills</b>.</p>
+  </div>
+  <div class="ov-stats">
+    <div class="ov-stat"><div class="v">4 ways</div><div class="l">to send an invoice — photo, PDF, or e-invoice — all read automatically</div></div>
+    <div class="ov-stat"><div class="v">~2 sec</div><div class="l">from upload to a points decision for a clean invoice</div></div>
+    <div class="ov-stat"><div class="v">4 tiers</div><div class="l">Bronze → Silver → Gold → Platinum, each unlocking better rewards</div></div>
+    <div class="ov-stat"><div class="v">EU-hosted</div><div class="l">data stays in the EU · OIB-verified · GDPR-ready</div></div>
+  </div>
+
+  <div class="ov-h">The whole journey, in one line</div>
+  <div class="ov-journey">
+    <div class="ov-jstep"><span class="jn">${ico('camera')}</span><span class="jt">Upload</span><span class="jd">photo / PDF / XML</span></div>
+    <span class="ov-jarrow">→</span>
+    <div class="ov-jstep"><span class="jn">${ico('eye')}</span><span class="jt">Read</span><span class="jd">text, on-device</span></div>
+    <span class="ov-jarrow">→</span>
+    <div class="ov-jstep"><span class="jn">${ico('search')}</span><span class="jt">Match</span><span class="jd">Viessmann items</span></div>
+    <span class="ov-jarrow">→</span>
+    <div class="ov-jstep"><span class="jn">${ico('shield')}</span><span class="jt">Check</span><span class="jd">genuine &amp; unique</span></div>
+    <span class="ov-jarrow">→</span>
+    <div class="ov-jstep"><span class="jn">${ico('star')}</span><span class="jt">Calculate</span><span class="jd">points + campaigns</span></div>
+    <span class="ov-jarrow">→</span>
+    <div class="ov-jstep"><span class="jn">${ico('gift')}</span><span class="jt">Reward</span><span class="jd">tiers &amp; redeem</span></div>
+  </div>
+
+  <div class="ov-h">Each part, on its own</div>
+  <div class="ov-cards">
+    <div class="ov-cardx"><div class="ci" style="background:var(--b-read);color:var(--c-read)">${ico('eye')}</div><h3>Reading the invoice</h3><p>Turns a photo, PDF or e-invoice into clean data — the company, the date, the total and every product line.</p><div class="why"><b>Why it matters:</b> zero typing for the installer, and it runs on the phone with no AI fees.</div><button class="go" data-go="reading">Watch this flow ${ico('search')}</button></div>
+    <div class="ov-cardx"><div class="ci" style="background:var(--b-find);color:var(--c-find)">${ico('search')}</div><h3>Matching products</h3><p>Recognises which lines are genuine Viessmann products by their code, model and description — and ignores the rest.</p><div class="why"><b>Why it matters:</b> only real Viessmann purchases earn points.</div><button class="go" data-go="reading">See it in “Reading” ${ico('search')}</button></div>
+    <div class="ov-cardx"><div class="ci" style="background:var(--b-reward);color:var(--c-reward)">${ico('star')}</div><h3>Points &amp; the maths</h3><p>Base points per product × quantity, plus campaign bonuses, capped fairly — then added to an append-only balance and a tier.</p><div class="why"><b>Why it matters:</b> every point is explainable and reproducible to the cent.</div><button class="go" data-go="points">Watch the maths ${ico('search')}</button></div>
+    <div class="ov-cardx"><div class="ci" style="background:var(--b-check);color:var(--c-check)">${ico('shield')}</div><h3>Keeping it fair</h3><p>Validates the company number, blocks duplicate claims, watches the pace, and decides: approve, review, or reject.</p><div class="why"><b>Why it matters:</b> no double-claims and no fake invoices — trust in the numbers.</div><button class="go" data-go="fair">Watch the checks ${ico('search')}</button></div>
+    <div class="ov-cardx"><div class="ci" style="background:var(--b-admin);color:var(--c-admin)">${ico('userCheck')}</div><h3>Behind the scenes</h3><p>Viessmann reviews anything unusual, launches campaigns, and reads dashboards of what's selling and where.</p><div class="why"><b>Why it matters:</b> full control plus real market insight.</div><button class="go" data-go="admin">Watch the admin side ${ico('search')}</button></div>
+    <div class="ov-cardx"><div class="ci" style="background:var(--b-reward);color:var(--c-reward)">${ico('receipt')}</div><h3>See it on a real invoice</h3><p>Run an actual demo invoice end-to-end — one that's approved (+2,550 points) and one that's caught as a duplicate.</p><div class="why"><b>Why it matters:</b> the clearest way to see it all working together.</div><button class="go" data-go="real-ok">Run a real invoice ${ico('search')}</button></div>
+  </div>
+
+  <div class="ov-note">Every tab below <b>plays itself</b> as an animation — and you can <b>click any step</b> to see its inputs, outputs, the exact formula, and a worked example. Want the deep engineering version? Use <b>Technical view</b> in the top-right.</div>
+</div>`;
+
+// ============ FLOWS ============
 const FLOWS=[
-// ---------- REAL EXAMPLE · APPROVED ----------
+{ key:'overview', name:'Overview', tag:'☆', over:true, html:OVERVIEW },
+
+// ---------- REAL · APPROVED ----------
 { key:'real-ok', name:'Real invoice · approved', tag:'✓', real:true,
-  preview:{img:'samples/agria-001-1.png', title:'Invoice AGRIA #001', sub:'Agria → Instalaterm · tap to enlarge'},
+  preview:{img:'samples/agria-001-1.png', title:'Invoice AGRIA #001', sub:'Agria → Instalaterm · tap to zoom'},
   result:{kind:'ok', tag:'Approved', big:'+2,550 points', sub:'Instalaterm d.o.o. · Bronze → Silver'},
   nodes:[
-    {id:'u',col:0,row:0,cat:'input',icon:'camera',title:'Installer uploads',sub:'Invoice_AGRIA_001.pdf',
-      note:'Ivo (Instalaterm) uploads the Agria invoice',
+    {id:'u',col:0,row:0,cat:'input',icon:'camera',title:'Installer uploads',sub:'Invoice_AGRIA_001.pdf',note:'Ivo (Instalaterm) uploads the Agria invoice',
       what:'Ivo from Instalaterm d.o.o. uploads a wholesaler invoice he received from Agria.',
-      data:'<b>File:</b> Invoice_AGRIA_001.pdf<br><b>Uploaded by:</b> ivo@instalaterm.hr<br><b>Account:</b> Instalaterm d.o.o.',
-      tech:'This PDF has a real text layer, so it is read directly with <code>unpdf</code>. A phone photo would be read on-device with Tesseract OCR instead — no cloud AI either way.'},
-    {id:'r',col:1,row:0,cat:'read',icon:'eye',title:'The app reads it',sub:'text pulled in ~1s',
-      note:'Reads the whole invoice automatically — no typing',
-      what:'The app reads the invoice text by itself — the header, the line-item table, and the totals.',
-      data:'It captures the seller and buyer blocks, all four product lines with their KPD codes, and the totals at the bottom.',
-      tech:'<code>unpdf</code> pulls the text; the shared Croatian-invoice parser then runs the same way whether the text came from a PDF, an OCR’d photo, or an e-invoice XML.'},
-    {id:'d',col:2,row:0,cat:'find',icon:'building',title:'Understands the details',sub:'who · when · how much',
-      note:'Seller Agria · Buyer Instalaterm · 9.268,75 €',
+      input:'A file from the installer — here a <code>.pdf</code>',output:'The raw document, queued to be read',
+      data:'<b>File:</b> Invoice_AGRIA_001.pdf<br><b>Uploaded by:</b> ivo@instalaterm.hr<br><b>Account OIB:</b> 98765432109',
+      tech:'PDFs with a text layer are read with <code>unpdf</code>; photos use on-device Tesseract OCR; e-invoices are XML. No cloud AI.'},
+    {id:'r',col:1,row:0,cat:'read',icon:'eye',title:'The app reads it',sub:'text pulled in ~1s',note:'Reads the whole invoice automatically — no typing',
+      what:'The app reads the invoice text by itself — header, line-item table and totals.',
+      input:'The PDF document',output:'Plain text of the entire invoice',
+      data:'Captures the seller &amp; buyer blocks, all four product lines with KPD codes, and the totals.',
+      tech:'<code>unpdf</code> extracts the text layer; the same Croatian-invoice parser then runs whether the text came from a PDF, an OCR’d photo, or XML.'},
+    {id:'d',col:2,row:0,cat:'find',icon:'building',title:'Understands the details',sub:'who · when · how much',note:'Seller Agria · Buyer Instalaterm · 9.268,75 €',
       what:'It pulls out the key facts a person would look for on the invoice.',
+      input:'Plain invoice text',output:'Structured fields: parties, OIBs, date, total',
       data:'<b>Seller:</b> Agria d.o.o. — OIB 76958388708<br><b>Buyer:</b> Instalaterm d.o.o. — OIB 98765432109<br><b>Invoice:</b> 001/2026 · 17.01.2026<br><b>Total:</b> 9.268,75 € (EUR)',
-      tech:'Patterns locate <code>OIB</code>, <code>Racun</code>, <code>Datum izdavanja</code> and <code>Ukupan iznos za platiti</code>. Croatian numbers like <code>9.268,75</code> are converted to 9268.75.'},
-    {id:'f',col:3,row:0,cat:'find',icon:'search',title:'Finds Viessmann items',sub:'3 of 4 lines matched',
-      note:'3 Viessmann products found · 1 line ignored',
+      tech:'Patterns find <code>OIB</code>, <code>Racun</code>, <code>Datum izdavanja</code> and <code>Ukupan iznos za platiti</code>. Croatian numbers like <code>9.268,75</code> become 9268.75.'},
+    {id:'f',col:3,row:0,cat:'find',icon:'search',title:'Finds Viessmann items',sub:'3 of 4 lines matched',note:'3 Viessmann products found · 1 line ignored',
       what:'It recognises which lines are genuine Viessmann products and ignores the rest.',
+      input:'Each invoice line (text + KPD code + quantity)',output:'Matched product + a confidence score, or “not ours”',
+      formula:'<b>Match ladder</b> (first hit wins):<br>KPD code exact → <span class="gn">conf 95</span><br>model name in text → <span class="gn">conf 90</span><br>word-similarity ≥ 0.35 → fuzzy<br>family only → <span class="gn">conf 50</span>',
       data:MATCHES,
-      tech:'Each line is matched by its KPD code, then the model name, then word-similarity. The expansion vessel isn’t a Viessmann product, so it earns nothing.'},
-    {id:'c',col:4,row:0,cat:'check',icon:'shield',title:'Safety checks — all pass',sub:'genuine & not reused',
-      note:'Every check passes — genuine, yours, not reused',
+      tech:'The Vitodens line matches on its model name (conf 90); the KPD code 28.21.11 is shared by several products so the exact-code tier is skipped. The expansion vessel isn’t a Viessmann product → 0.'},
+    {id:'c',col:4,row:0,cat:'check',icon:'shield',title:'Safety checks — all pass',sub:'genuine & not reused',note:'Every check passes — genuine, yours, not reused',
       what:'It runs the automatic safety checks before any points are given.',
+      input:'The structured invoice + the installer’s account',output:'A clean bill of health → eligible for points',
       data:CHK_OK,
-      tech:'The company number uses the official mod-11-10 checksum. Duplicates are caught by looking up the (seller OIB, invoice no, buyer OIB, total) combination against already-approved invoices.'},
-    {id:'p',col:5,row:0,cat:'reward',icon:'star',title:'Points calculated',sub:'2,550 points',
-      note:'2,550 points — base + Spring campaign bonus',
+      tech:'OIB uses the ISO 7064 mod-11-10 checksum. Duplicates are caught by a <code>(seller OIB, invoice no, buyer OIB, total)</code> lookup against approved invoices. Pace limit is 30 / hour.'},
+    {id:'p',col:5,row:0,cat:'reward',icon:'star',title:'Points calculated',sub:'2,550 points',note:'2,550 points — base + Spring campaign bonus',
       what:'Points are worked out per product, then the active campaign adds a bonus on top.',
+      input:'Each matched line (base points × qty)',output:'Total points for the whole invoice',
+      formula:'per line: <b>points = round(base × multiplier%) + flat × qty</b><br>“All-family Spring +50” → +50 × qty. Best single campaign per line, then capped.',
       data:CALC,
-      tech:'Per line: <b>points = base + campaign bonus</b>. The “All-family Spring +50” campaign adds 50 pts per unit (5 units = +250 each). Campaigns are non-stackable — the single best one is used per line.'},
-    {id:'m',col:6,row:0,cat:'output',icon:'trophy',title:'Balance & tier',sub:'Bronze → Silver',
-      note:'Balance 0 → 2,550 · climbs to Silver',
+      tech:'See the full breakdown in the <b>“Points &amp; the maths”</b> tab — every step, formula and clamp.'},
+    {id:'m',col:6,row:0,cat:'output',icon:'trophy',title:'Balance & tier',sub:'Bronze → Silver',note:'Balance 0 → 2,550 · climbs to Silver',
       what:'The points land in the installer’s balance and lift them up a tier.',
-      data:'<b>Balance:</b> 0 → <b>2,550 points</b><br><b>Tier:</b> Bronze → <b>Silver</b> (crossed the 2,000 mark)<br>Ivo can now redeem Silver-level rewards.',
-      tech:'The balance is the running total of an append-only ledger (it is never an editable number), and the tier is simply a function of that balance.'}
+      input:'+2,550 points',output:'New balance and tier',
+      formula:'<b>balance = Σ Δ</b> (sum of every ledger change)<br>0 + 2,550 = <span class="gn">2,550</span> → ≥ 2,000 → <b>Silver</b>',
+      data:'<b>Balance:</b> 0 → <b>2,550</b><br><b>Tier:</b> Bronze → <b>Silver</b><br>Ivo can now redeem Silver-level rewards.',
+      tech:'The balance is the running total of an append-only ledger (never an editable number); tier is a pure function of the balance.'}
   ],
   edges:[['u','r'],['r','d'],['d','f'],['f','c'],['c','p',{lbl:'approved'}],['p','m']],
   happy:['u','r','d','f','c','p','m']
 },
-// ---------- REAL EXAMPLE · REJECTED (duplicate) ----------
+// ---------- REAL · REJECTED ----------
 { key:'real-dup', name:'Real invoice · rejected', tag:'✕', real:true, bad:true,
   preview:{img:'samples/agria-001-1.png', title:'Invoice AGRIA #001', sub:'submitted a second time'},
   result:{kind:'bad', tag:'Duplicate', big:'0 points', sub:'Already claimed · no double-counting'},
   nodes:[
-    {id:'u',col:0,row:0,cat:'input',icon:'camera',title:'Same invoice, again',sub:'already claimed once',
-      note:'The same Agria invoice is submitted a second time',
-      what:'The very same invoice that was already approved earlier is submitted again — by mistake, or to try to claim twice.',
-      data:'<b>File:</b> Invoice_AGRIA_001.pdf <i>(again)</i><br>This invoice was already approved on an earlier run (+2,550 pts).',
-      tech:'Nothing stops someone re-uploading a file — the safety net is the duplicate check further down the line.'},
-    {id:'r',col:1,row:0,cat:'read',icon:'eye',title:'The app reads it',sub:'same as before',
-      note:'Reads exactly the same details',
-      what:'It reads the invoice the same way as before — same seller, buyer, products and total.',
+    {id:'u',col:0,row:0,cat:'input',icon:'camera',title:'Same invoice, again',sub:'already claimed once',note:'The same Agria invoice is submitted a second time',
+      what:'The very same invoice that was already approved earlier is submitted again.',
+      input:'A file — identical to a previous upload',output:'Queued to be read (the app doesn’t know yet)',
+      data:'<b>File:</b> Invoice_AGRIA_001.pdf <i>(again)</i><br>Already approved earlier for +2,550 pts.',
+      tech:'Nothing stops a re-upload — the safety net is the duplicate check further down.'},
+    {id:'r',col:1,row:0,cat:'read',icon:'eye',title:'The app reads it',sub:'same as before',note:'Reads exactly the same details',
+      what:'It reads the invoice the same way as before — same content.',
+      input:'The same PDF',output:'The same plain text',
       data:'Identical content to the first submission.',
-      tech:'The parser is deterministic — the same document always yields the same structured data.'},
-    {id:'d',col:2,row:0,cat:'find',icon:'building',title:'Understands the details',sub:'who · when · how much',
-      note:'Seller Agria · Buyer Instalaterm · 9.268,75 €',
-      what:'It extracts the same key facts.',
-      data:'<b>Seller:</b> Agria d.o.o. — OIB 76958388708<br><b>Buyer:</b> Instalaterm d.o.o. — OIB 98765432109<br><b>Invoice:</b> 001/2026 · <b>Total:</b> 9.268,75 €',
-      tech:'These four fields form the duplicate fingerprint used in the next checks.'},
-    {id:'f',col:3,row:0,cat:'find',icon:'search',title:'Finds Viessmann items',sub:'same 3 lines',
-      note:'Same 3 Viessmann products',
+      tech:'The parser is deterministic — the same document always yields the same data.'},
+    {id:'d',col:2,row:0,cat:'find',icon:'building',title:'Understands the details',sub:'who · when · how much',note:'Seller Agria · Buyer Instalaterm · 9.268,75 €',
+      what:'It extracts the same key facts — these become the duplicate “fingerprint”.',
+      input:'Plain invoice text',output:'The four fields used to spot duplicates',
+      data:'<b>Seller OIB:</b> 76958388708<br><b>Invoice no:</b> 001/2026<br><b>Buyer OIB:</b> 98765432109<br><b>Total:</b> 9.268,75 €',
+      tech:'These four fields form the duplicate fingerprint checked next.'},
+    {id:'f',col:3,row:0,cat:'find',icon:'search',title:'Finds Viessmann items',sub:'same 3 lines',note:'Same 3 Viessmann products',
       what:'It matches the same Viessmann products as the first time.',
+      input:'The invoice lines',output:'The same 3 matched products',
       data:MATCHES,
-      tech:'Product matching doesn’t change — the difference shows up only at the duplicate check.'},
-    {id:'c',col:4,row:0,cat:'check',icon:'shield',title:'Safety checks — duplicate!',sub:'caught here',
-      note:'Caught: this invoice was already approved',
-      what:'The checks run — and the duplicate check catches it. This exact invoice has been claimed before.',
+      tech:'Matching is unchanged — the difference only shows at the duplicate check.'},
+    {id:'c',col:4,row:0,cat:'check',icon:'shield',title:'Safety checks — duplicate!',sub:'caught here',note:'Caught: this invoice was already approved',
+      what:'The checks run — and the duplicate check catches it.',
+      input:'The fingerprint (seller OIB, invoice no, buyer OIB, total)',output:'A match against an already-approved invoice',
+      formula:'<b>look up</b> (76958388708, 001/2026, 98765432109, 9.268,75)<br>among <span class="hl">approved</span> invoices → <b>match found</b> → duplicate',
       data:CHK_DUP,
-      tech:'The fingerprint (seller OIB 76958388708, invoice 001/2026, buyer OIB 98765432109, total 9.268,75) matches an existing <b>approved</b> invoice — so this one is flagged as a duplicate.'},
-    {id:'z',col:5,row:0,cat:'decide',icon:'x',title:'Rejected — duplicate',sub:'0 points',
-      note:'Marked duplicate · 0 points · balance unchanged',
+      tech:'A non-unique index on those four columns makes the lookup instant; only invoices already <code>approved</code> count as the original.'},
+    {id:'z',col:5,row:0,cat:'decide',icon:'x',title:'Rejected — duplicate',sub:'0 points',note:'Marked duplicate · 0 points · balance unchanged',
       what:'It is marked as a duplicate and no points are awarded. The installer is told why.',
-      data:'<b>Result:</b> Duplicate<br><b>Points:</b> 0<br><b>Message to installer:</b> “Already submitted — duplicate of an earlier invoice.”<br>The balance stays exactly as it was.',
-      tech:'The receipt is still saved (with status <code>duplicate</code> and a note pointing to the original) for a full audit trail — it just earns nothing.'}
+      input:'The duplicate verdict',output:'Status “duplicate”, 0 points, a clear message',
+      data:'<b>Result:</b> Duplicate<br><b>Points:</b> 0<br><b>Message:</b> “Already submitted — duplicate of an earlier invoice.”<br>The balance stays exactly as it was.',
+      tech:'The receipt is still saved (status <code>duplicate</code>, with a note pointing to the original) for a full audit trail — it just earns nothing.'}
   ],
   edges:[['u','r'],['r','d'],['d','f'],['f','c'],['c','z',{lbl:'duplicate',dashed:1}]],
   happy:['u','r','d','f','c','z']
 },
-// ---------- SIMPLE TOURS ----------
-{ key:'journey', name:'The big picture',
+
+// ---------- THE BIG PICTURE ----------
+{ key:'journey', name:'The big picture', tag:'1',
   nodes:[
     {id:'u',col:0,row:1,cat:'input',icon:'camera',title:'Snap the invoice',sub:'photo, PDF or e-invoice',
-      what:'The installer takes a photo of the wholesaler invoice — or uploads a PDF or e-invoice — from their phone.',
-      ex:'As easy as sending a photo in a chat. <b>Two taps and it’s in.</b>',
-      tech:'Three input types are accepted: digital PDF, phone photo/scan, and official e-invoice XML.'},
+      what:'The installer sends the wholesaler invoice from their phone — a photo, a PDF, or an official e-invoice.',
+      input:'A photo, PDF, or XML e-invoice',output:'The document, ready to read',
+      ex:'As easy as sending a photo in a chat — <b>two taps</b>.'},
     {id:'r',col:1,row:1,cat:'read',icon:'eye',title:'The app reads it',sub:'automatically · no typing',
-      what:'The app reads the invoice text by itself. Nothing to type, and it works without any paid AI service.',
-      ex:'It even reads a slightly crooked phone photo — and the reading happens <b>on the phone itself</b>.',
-      tech:'PDFs use a light text extractor; photos use on-device OCR (Croatian + English); XML is read directly. No cloud AI bill.'},
+      what:'The app reads the invoice text by itself — no typing, and no paid AI service.',
+      input:'The uploaded document',output:'Clean, structured invoice data',
+      ex:'Even a slightly crooked phone photo works, and the reading happens <b>on the phone</b>.',
+      tech:'PDF → light text extractor · photo → on-device OCR (hrv+eng) · XML → read directly.'},
     {id:'f',col:2,row:1,cat:'find',icon:'search',title:'Finds the products',sub:'which items are Viessmann',
-      what:'It picks out the Viessmann products on the invoice and quietly ignores everything else.',
-      ex:'On a mixed invoice it spots the <b>Vitodens</b> boiler and skips the unrelated pipes and fittings.',
-      tech:'Lines are matched to the product catalogue by KPD code, model name, then word-similarity.'},
+      what:'It picks out the Viessmann products and quietly ignores everything else.',
+      input:'The invoice lines',output:'Matched Viessmann products (others → 0)',
+      ex:'On a mixed invoice it spots the <b>Vitodens</b> boiler and skips unrelated fittings.'},
     {id:'c',col:3,row:1,cat:'check',icon:'shield',title:'Checks it’s genuine',sub:'real & not reused',
-      what:'It makes sure the company is real and that this invoice hasn’t already been used to claim points.',
-      ex:'A copy-pasted or re-sent invoice <b>won’t earn points twice</b>.',
-      tech:'Validates the Croatian OIB checksum, confirms the buyer matches the account, and checks a duplicate fingerprint.'},
+      what:'It confirms the company is real and that this invoice hasn’t already earned points.',
+      input:'The invoice + the account',output:'Approve, review, or reject',
+      ex:'A copy-pasted or re-sent invoice <b>won’t earn points twice</b>.'},
     {id:'p',col:4,row:0,cat:'reward',icon:'star',title:'Points awarded',sub:'right away',
-      what:'Eligible purchases earn points immediately — with extra on top during a promotion.',
-      ex:'A boiler might earn <b>350 points</b>, plus a <b>+50</b> bonus during a spring campaign.',
-      tech:'Points are written to an append-only ledger; campaign bonuses are applied per line, non-stackable.'},
+      what:'Eligible purchases earn points immediately, with extra during a campaign.',
+      input:'The matched products',output:'Points added to the balance',
+      ex:'A boiler earns its base points <b>+ a campaign bonus</b>.'},
     {id:'a',col:4,row:2,cat:'admin',icon:'userCheck',title:'Or a quick human check',sub:'only when unsure',
-      what:'If something looks unusual, a Viessmann colleague takes a quick look before points are given.',
-      ex:'<b>Most invoices go straight through</b> — only the rare odd one gets a human glance.',
-      tech:'Soft flags (e.g. an unmatched line or an old date) route an invoice to the admin review queue.'},
+      what:'If something looks unusual, a Viessmann colleague takes a quick look first.',
+      input:'A flagged invoice',output:'An approve / decline decision',
+      ex:'<b>Most go straight through</b> — only the rare odd one is reviewed.'},
     {id:'m',col:5,row:1,cat:'output',icon:'trophy',title:'Rewards unlocked',sub:'balance · tiers · gifts',
-      what:'The installer watches their points grow, climb through tiers, and redeem them for rewards.',
-      ex:'<b>Bronze → Silver → Gold → Platinum</b> — each level unlocks better rewards.',
-      tech:'Tier is derived from the balance; rewards can require a minimum tier and reserve stock on redemption.'}
+      what:'The installer watches points grow, climb tiers, and redeem rewards.',
+      input:'Their points balance',output:'A tier and a rewards catalogue',
+      ex:'<b>Bronze → Silver → Gold → Platinum</b>, better rewards each level.'}
   ],
   edges:[['u','r'],['r','f'],['f','c'],['c','p',{lbl:'looks good'}],['c','a',{lbl:'unsure',dashed:1}],['a','p',{dashed:1}],['p','m']],
   happy:['u','r','f','c','p','m']
 },
-{ key:'reading', name:'Reading an invoice',
+
+// ---------- READING AN INVOICE ----------
+{ key:'reading', name:'Reading an invoice', tag:'2',
   nodes:[
     {id:'a',col:0,row:0,cat:'input',icon:'camera',title:'Photo or file',sub:'phone or computer',
-      what:'The installer adds the invoice as a photo, a PDF, or an official e-invoice file.',ex:'Whatever they have to hand — a quick snap is fine.',
-      tech:'Accepted: PDF, JPG/PNG photo, or UBL / HR-CIUS / PEPPOL e-invoice XML.'},
-    {id:'b',col:1,row:0,cat:'read',icon:'eye',title:'Read the text',sub:'on the device · free & private',
-      what:'The app turns the picture into text right on the device. Free, fast, and nothing private is sent away.',ex:'No cloud AI bills — and the photo <b>stays on the installer’s phone</b>.',
-      tech:'Photos: Tesseract OCR (hrv+eng) in the browser. PDFs: unpdf text layer. Only the extracted text is sent on.'},
-    {id:'c',col:2,row:0,cat:'find',icon:'building',title:'Who & how much',sub:'company and total',
-      what:'It finds who sold the goods and the total amount on the invoice.',ex:'It reads a Croatian total like <b>1.299,00 €</b> correctly.',
-      tech:'Regex over the parsed text finds the OIBs, invoice number, date and total; Croatian decimals are normalised.'},
+      what:'The installer adds the invoice as a photo, a PDF, or an e-invoice file.',
+      input:'JPG/PNG photo, PDF, or e-invoice XML',output:'The raw document',
+      ex:'Whatever they have to hand — a quick snap is fine.',
+      tech:'Photos are capped and read on-device; only extracted text is sent on (keeps it under the upload limit).'},
+    {id:'b',col:1,row:0,cat:'read',icon:'eye',title:'Turn it into text',sub:'on the device · free',
+      what:'The app turns the picture into text right on the device — free and private.',
+      input:'The document (image or PDF)',output:'Plain text of the invoice',
+      ex:'No cloud AI bills, and a photo <b>stays on the phone</b>.',
+      tech:'PDF: <code>unpdf</code> text layer. Photo: Tesseract OCR (hrv + eng) in the browser. XML: parsed directly.'},
+    {id:'c',col:2,row:0,cat:'find',icon:'building',title:'Find who & how much',sub:'company, date, total',
+      what:'It finds the seller, the buyer, the date and the total.',
+      input:'Plain invoice text',output:'Parties, OIBs, invoice no, date, total',
+      formula:'finds <code>OIB</code> · <code>Racun</code> · <code>Datum izdavanja</code> · <code>Ukupan iznos</code><br>Croatian <code>1.299,00</code> → <b>1299.00</b>',
+      ex:'It reads a Croatian total like <b>1.299,00 €</b> correctly.'},
     {id:'d',col:3,row:0,cat:'find',icon:'search',title:'Spot Viessmann items',sub:'match the models',
-      what:'It recognises the Viessmann product names and models in the list of items.',ex:'“VITODENS 200-W” on paper is matched to the real product.',
-      tech:'KPD code → model substring → word-similarity, each with a confidence score.'},
+      what:'It recognises the Viessmann product names and models in the list.',
+      input:'Each line: description + KPD code + qty',output:'A matched product + confidence',
+      formula:'KPD exact → 95 · model in text → 90 · similarity ≥ 0.35 → fuzzy · family → 50',
+      ex:'“VITODENS 200-W” on paper is matched to the real product.'},
     {id:'e',col:4,row:0,cat:'output',icon:'check',title:'Ready to score',sub:'clean, tidy data',
-      what:'The messy invoice is now neat, structured information — ready for the next steps.',ex:'From a crooked photo to <b>clean data</b> in a second or two.',
-      tech:'Output is a structured receipt: parties, totals, and matched line items with points-per-unit.'}
+      what:'The messy invoice is now neat, structured information.',
+      input:'All the parsed pieces',output:'A structured receipt with matched lines',
+      ex:'From a crooked photo to <b>clean data</b> in a second or two.'}
   ],
   edges:[['a','b'],['b','c'],['c','d'],['d','e']],happy:['a','b','c','d','e']
 },
-{ key:'points', name:'Earning points',
+
+// ---------- POINTS & THE MATHS ----------
+{ key:'points', name:'Points & the maths', tag:'3',
   nodes:[
-    {id:'a',col:0,row:0,cat:'reward',icon:'check',title:'Eligible purchase',sub:'a Viessmann product',
-      what:'Only genuine Viessmann products on an approved invoice earn points.',ex:'Other brands on the same invoice simply earn nothing.',
-      tech:'Non-Viessmann lines are kept on the receipt but scored at 0.'},
-    {id:'b',col:1,row:0,cat:'reward',icon:'star',title:'Base points',sub:'set for each product',
-      what:'Each product has a set number of points, decided by Viessmann.',ex:'A <b>Vitodens 200-W</b> is worth <b>350 points</b> a unit.',
-      tech:'base = points-per-unit × quantity, stored separately from any bonus.'},
-    {id:'c',col:2,row:0,cat:'check',icon:'megaphone',title:'Campaign bonus',sub:'extra during promotions',
-      what:'During a campaign, chosen products earn a bonus on top — a multiplier or a flat extra.',ex:'A spring promo adds <b>+50 points</b> per unit.',
-      tech:'final = round(base × multiplier%) + flat × qty. Non-stackable: the best single campaign per line.'},
-    {id:'d',col:3,row:0,cat:'data',icon:'coins',title:'Added to balance',sub:'kept safely, never lost',
-      what:'The points are added to the installer’s balance and recorded so nothing can ever go missing.',ex:'350 + 50 = <b>400 points</b> land in the balance.',
-      tech:'One append-only ledger row per credit; balance = sum of all rows.'},
-    {id:'e',col:4,row:0,cat:'output',icon:'trophy',title:'Climb the tiers',sub:'Bronze → Platinum',
-      what:'As the balance grows, the installer moves up through loyalty tiers.',ex:'Crossing <b>2,000 points</b> moves them from Bronze to <b>Silver</b>.',
-      tech:'Thresholds: Bronze 0 · Silver 2,000 · Gold 8,000 · Platinum 25,000.'},
-    {id:'f',col:5,row:0,cat:'output',icon:'gift',title:'Unlock rewards',sub:'redeem for gifts',
-      what:'Higher tiers and bigger balances unlock better rewards to redeem.',ex:'Tools, gift cards, training — the better the tier, the better the catalogue.',
-      tech:'Each reward has a point cost, stock, and an optional minimum tier.'}
+    {id:'l',col:0,row:0,cat:'input',icon:'receipt',title:'A matched line',sub:'product × quantity',
+      what:'We start from one matched Viessmann line on an approved invoice.',
+      input:'A matched product + the quantity from the invoice',output:'Product’s points-per-unit and the quantity',
+      ex:'<b>Vitodens 100-W</b>, quantity <b>5</b> — worth <b>300</b> points each.'},
+    {id:'b',col:1,row:0,cat:'reward',icon:'star',title:'Base points',sub:'set per product',
+      what:'Each product has a fixed points value set by Viessmann; multiply by the quantity.',
+      input:'points-per-unit, quantity',output:'Base points for the line',
+      formula:'<b>base = points-per-unit × quantity</b>',
+      ex:'300 × 5 = <span class="gn">1,500</span> base points.'},
+    {id:'c',col:2,row:0,cat:'check',icon:'filter',title:'Which campaigns apply?',sub:'family · active · dates',
+      what:'Active campaigns are filtered to the ones that actually apply to this line.',
+      input:'The line’s product family + the active campaigns',output:'The campaigns that apply here',
+      formula:'apply if <b>active</b> AND <b>(family matches OR all-family)</b> AND <b>within dates</b>',
+      ex:'“All-family Spring +50” applies. “Q2 Vitocal” (heat-pumps only) <b>does not</b> apply to a boiler.'},
+    {id:'a',col:3,row:0,cat:'reward',icon:'percent',title:'Apply the campaign',sub:'multiplier + flat',
+      what:'Each applicable campaign gives a candidate total: a multiplier on the base plus a flat amount per unit.',
+      input:'base, multiplier %, flat-per-unit, quantity',output:'A candidate point total per campaign',
+      formula:'<b>final = round(base × multiplier%) + round(flat × qty)</b>',
+      ex:'Spring +50: round(1,500 × 100%) + (50 × 5) = 1,500 + 250 = <span class="gn">1,750</span>.'},
+    {id:'n',col:4,row:0,cat:'decide',icon:'sigma',title:'Best, non-stackable',sub:'pick the single best',
+      what:'Campaigns don’t stack — the single best candidate is kept (and only if it beats the base).',
+      input:'All candidate totals for the line',output:'The winning total for the line',
+      formula:'<b>line = max(candidates)</b>, used only if &gt; base',
+      ex:'Only one campaign applies, and 1,750 &gt; 1,500 → the line is worth <span class="gn">1,750</span>.'},
+    {id:'k',col:5,row:0,cat:'check',icon:'shield',title:'Per-installer cap',sub:'fair limits',
+      what:'A campaign can cap how much bonus one installer can earn from it — the bonus is clamped to what’s left.',
+      input:'The campaign cap and what this installer already claimed',output:'The final, capped line total',
+      formula:'<b>remaining = max(0, cap − alreadyClaimed)</b><br><b>final = base + min(bonus, remaining)</b>',
+      ex:'Spring is uncapped (cap = 0 = unlimited) → no clamp → stays <span class="gn">1,750</span>.'},
+    {id:'s',col:6,row:0,cat:'reward',icon:'coins',title:'Add up the invoice',sub:'sum the lines',
+      what:'Every line’s points are added together for the whole invoice.',
+      input:'Each line’s final points',output:'Total points for the receipt',
+      formula:'<b>total = Σ line points</b>',
+      ex:'1,750 + 500 + 300 + 0 = <span class="gn">2,550</span> points.'},
+    {id:'g',col:7,row:0,cat:'data',icon:'database',title:'Write to the ledger',sub:'append-only',
+      what:'The points are written as one entry in an append-only ledger — never edited, fully auditable.',
+      input:'The receipt total',output:'One ledger entry (a “delta”)',
+      formula:'<b>Δ = +2,550</b> · reason = <code>accrual</code> · linked to the receipt',
+      ex:'If a decision is ever changed, the old entry is <b>reversed</b> with a new entry — never overwritten.',
+      tech:'Reasons: <code>accrual</code> (earned), <code>redemption</code> (spent), <code>reversal</code> (undo), <code>adjustment</code> (admin).'},
+    {id:'t',col:8,row:0,cat:'output',icon:'trophy',title:'Balance & tier',sub:'Bronze → Platinum',
+      what:'The balance is the sum of all ledger entries; the tier follows the balance.',
+      input:'All ledger entries',output:'Current balance and tier',
+      formula:'<b>balance = Σ Δ</b><br>Bronze ≥ 0 · Silver ≥ 2,000 · Gold ≥ 8,000 · Platinum ≥ 25,000',
+      ex:'0 + 2,550 = 2,550 → ≥ 2,000 → <b>Silver</b>.'}
   ],
-  edges:[['a','b'],['b','c'],['c','d'],['d','e'],['e','f']],happy:['a','b','c','d','e','f']
+  edges:[['l','b'],['b','c'],['c','a'],['a','n'],['n','k'],['k','s'],['s','g'],['g','t']],
+  happy:['l','b','c','a','n','k','s','g','t']
 },
-{ key:'fair', name:'Keeping it fair',
+
+// ---------- KEEPING IT FAIR ----------
+{ key:'fair', name:'Keeping it fair', tag:'4',
   nodes:[
     {id:'i',col:0,row:1,cat:'check',icon:'shield',title:'Every invoice is checked',sub:'automatically',
-      what:'Before any points are given, the app runs a few quick, automatic safety checks.',ex:'It all happens in the background, in a moment.',
+      what:'Before any points are given, the app runs a few quick, automatic checks.',
+      input:'A parsed, product-matched invoice',output:'A set of pass/fail flags',
+      ex:'It all happens in the background, in a moment.',
       tech:'All checks are deterministic — same input, same result, fully auditable.'},
-    {id:'o',col:1,row:1,cat:'check',icon:'building',title:'Is the company real?',sub:'valid company number',
-      what:'It confirms the company’s official number (the Croatian “OIB”) is valid and matches the account.',ex:'A made-up or mistyped number is caught straight away.',
-      tech:'OIB is validated with the ISO 7064 mod-11-10 checksum; the buyer OIB must equal the account OIB.'},
+    {id:'o',col:1,row:1,cat:'check',icon:'building',title:'Is the company real?',sub:'valid OIB & yours',
+      what:'It validates the official company number (OIB) and that the buyer is this installer.',
+      input:'Seller &amp; buyer OIBs + the account OIB',output:'Valid / invalid · yours / not yours',
+      formula:'<b>OIB checksum</b> (ISO 7064 mod-11-10) over 11 digits<br>and <b>buyer OIB = account OIB</b>',
+      ex:'A made-up or mistyped number fails the checksum and is caught immediately.'},
     {id:'c',col:2,row:1,cat:'check',icon:'copy',title:'Used before?',sub:'no double-claims',
-      what:'It checks whether this exact invoice has already been submitted and approved.',ex:'The same invoice <b>can’t be claimed twice</b>.',
-      tech:'A (seller OIB, invoice no, buyer OIB, total) fingerprint is looked up against approved receipts.'},
+      what:'It checks whether this exact invoice has already been submitted and approved.',
+      input:'(seller OIB, invoice no, buyer OIB, total)',output:'Unique / already-claimed',
+      formula:'look up the 4-field fingerprint among <b>approved</b> invoices → match ⇒ <b>duplicate</b>',
+      ex:'The same invoice <b>can’t be claimed twice</b>.'},
     {id:'v',col:3,row:1,cat:'check',icon:'gauge',title:'Too many, too fast?',sub:'sensible limits',
-      what:'It watches for an unusual flurry of submissions in a short time.',ex:'Dozens of invoices in a minute? That gets flagged.',
-      tech:'A rate check flags more than ~30 submissions from one installer within an hour.'},
+      what:'It watches for an unusual flurry of submissions in a short time.',
+      input:'Recent submission count for this installer',output:'Normal / flagged',
+      formula:'flag if <b>&gt; 30 submissions within 1 hour</b>',
+      ex:'Dozens of invoices in a minute? That gets flagged for a look.'},
     {id:'d',col:4,row:1,cat:'decide',icon:'scale',title:'Decision',sub:'approve · review · reject',
-      what:'Based on the checks, the invoice is approved, sent for a quick human review, or declined.',ex:'Clean invoices sail through automatically.',
-      tech:'Hard fails → rejected; soft flags → needs_review; otherwise approved. Duplicates are marked separately.'},
+      what:'Based on the checks, the invoice is approved, sent to a human, or declined.',
+      input:'All the check flags',output:'One of: approved · needs review · rejected · duplicate',
+      formula:'hard fail (e.g. not your invoice, no Viessmann line) → <b>reject</b><br>soft flag (odd date, unmatched line) → <b>review</b><br>else → <b>approve</b>',
+      ex:'Clean invoices sail through automatically.'},
     {id:'ok',col:5,row:0,cat:'reward',icon:'check',title:'Approved',sub:'points awarded',
-      what:'Everything checks out — points are awarded right away.',ex:'The happy, common path.',tech:'Points accrue to the ledger immediately.'},
+      what:'Everything checks out — points are awarded right away.',input:'A clean invoice',output:'Points credited',ex:'The happy, common path.'},
     {id:'rv',col:5,row:1,cat:'admin',icon:'userCheck',title:'Needs a look',sub:'human review',
-      what:'Something was slightly unusual, so a Viessmann colleague reviews it first.',ex:'A safety net, not a roadblock.',tech:'Lands in the admin review queue with the flags attached.'},
+      what:'Something was slightly unusual, so a colleague reviews it first.',input:'A soft-flagged invoice',output:'A human decision',ex:'A safety net, not a roadblock.'},
     {id:'no',col:5,row:2,cat:'output',icon:'x',title:'Declined',sub:'with a clear reason',
-      what:'If it fails a key check, it’s declined and the installer is told why.',ex:'e.g. “This invoice was already used.”',tech:'Stored with a status and reviewer note for the audit trail.'}
+      what:'If it fails a key check, it’s declined and the installer is told why.',input:'A hard-failed invoice',output:'A rejection + reason',ex:'e.g. “This invoice was already used.”'}
   ],
   edges:[['i','o'],['o','c'],['c','v'],['v','d'],['d','ok',{lbl:'all clear'}],['d','rv',{lbl:'unsure',dashed:1}],['d','no',{lbl:'failed',dashed:1}]],
   happy:['i','o','c','v','d','ok']
 },
-{ key:'admin', name:'Behind the scenes',
+
+// ---------- BEHIND THE SCENES ----------
+{ key:'admin', name:'Behind the scenes', tag:'5',
   nodes:[
     {id:'q',col:0,row:0,cat:'admin',icon:'layers',title:'Submissions queue',sub:'everything in one place',
-      what:'Every submitted invoice lands in one tidy queue for the Viessmann team.',ex:'Sorted, searchable, with the ones needing attention on top.',
-      tech:'Filterable by status; CSV export for finance.'},
+      what:'Every submitted invoice lands in one tidy queue for the Viessmann team.',
+      input:'All incoming invoices',output:'A sorted, searchable queue',
+      ex:'The ones needing attention float to the top.',tech:'Filter by status; export to CSV for finance.'},
     {id:'r',col:1,row:0,cat:'admin',icon:'userCheck',title:'Quick review',sub:'approve or decline',
-      what:'A reviewer opens an invoice, sees what the app found, and approves or declines it.',ex:'They can even fine-tune the points if needed.',
-      tech:'Optional points override + reviewer note on the decision.'},
+      what:'A reviewer opens an invoice, sees what the app found, and approves or declines.',
+      input:'A queued invoice + the app’s findings',output:'A decision (with optional points override)',
+      ex:'They can fine-tune the points or add a note if needed.'},
     {id:'p',col:2,row:0,cat:'reward',icon:'coins',title:'Points go out',sub:'or a reason is given',
-      what:'Approving sends the points to the installer instantly; declining records a clear reason.',ex:'And re-deciding never double-counts the points.',
-      tech:'Re-approving reverses the previous accrual first, then posts the new one — idempotent.'},
+      what:'Approving credits the installer instantly; declining records a clear reason.',
+      input:'The decision',output:'A ledger entry, or a logged rejection',
+      formula:'re-approving first <b>reverses</b> the old points, then adds the new — never double-counts',
+      ex:'Change a 400-pt approval to 700 → reverse −400, add +700 → net +300.'},
     {id:'c',col:3,row:0,cat:'check',icon:'megaphone',title:'Run campaigns',sub:'boost chosen products',
-      what:'The team can launch promotions that add bonus points to chosen product ranges.',ex:'“Double points on heat pumps this quarter.”',
-      tech:'Campaigns set a multiplier and/or flat bonus, a product family, and a per-installer cap.'},
+      what:'The team launches promotions that add bonus points to chosen product ranges.',
+      input:'A campaign: family, multiplier, flat bonus, cap, dates',output:'Bonus points applied automatically going forward',
+      ex:'“Double points on heat pumps this quarter.”'},
     {id:'i',col:4,row:0,cat:'output',icon:'chart',title:'See the trends',sub:'what’s selling, where',
-      what:'Clear dashboards show what’s being installed, by whom, and where.',ex:'Helpful market insight, built from approved invoices.',
-      tech:'Aggregated from approved receipts only — volume, family mix, top wholesalers, pricing.'}
+      what:'Dashboards show what’s being installed, by whom, and where.',
+      input:'All approved invoices',output:'Volume, family mix, top wholesalers, pricing',
+      ex:'Real market insight, built only from approved data.'}
   ],
   edges:[['q','r'],['r','p'],['p','c'],['c','i']],happy:['q','r','p','c','i']
 }
 ];
 
 // ============ ENGINE ============
-const NW=230,NH=72,HG=104,VG=58,PAD=80;
+const NW=234,NH=72,HG=104,VG=58,PAD=80;
 const WF={
   flow:null,nodes:[],byId:{},scale:1,tx:0,ty:0,playing:false,idx:0,t1:null,t2:null,panelId:null,el:{},
   init(){
-    ['canvas','viewport','wires','token','caption','capStep','capT','capD','legend','previewCard','resultCard','lightbox'].forEach(id=>this.el[id]=document.getElementById(id));
-    this.buildTabs();this.buildLegend();this.bindControls();this.bindPan();this.load('real-ok');
+    ['canvas','viewport','wires','token','caption','capStep','capT','capD','legend','previewCard','resultCard','overview'].forEach(id=>this.el[id]=document.getElementById(id));
+    this.buildTabs();this.buildLegend();this.bindControls();this.bindPan();this.LB.init();this.load('overview');
   },
   buildTabs(){
-    const f=this.el? document.getElementById('flows'):null;const F=document.getElementById('flows');
-    let realCount=0;
-    F.innerHTML=FLOWS.map((w,i)=>{
-      const cls='flow-tab'+(w.real?' real':'')+(w.bad?' bad':'');
-      const badge=w.tag?w.tag:(i-1);
-      return `<button class="${cls}" data-k="${w.key}"><span class="n">${badge}</span>${w.name}</button>`;
-    }).join('');
-    // insert a divider after the real ones
+    const F=document.getElementById('flows');
+    F.innerHTML=FLOWS.map(w=>{const cls='flow-tab'+(w.over?' over':'')+(w.real?' real':'')+(w.bad?' bad':'');return `<button class="${cls}" data-k="${w.key}"><span class="n">${w.tag||''}</span>${w.name}</button>`;}).join('');
     const tabs=[...F.querySelectorAll('.flow-tab')];
-    const firstSimple=tabs.find(t=>!t.classList.contains('real'));
-    if(firstSimple){const div=document.createElement('span');div.className='flow-div';F.insertBefore(div,firstSimple);}
-    tabs.forEach((b,i)=>{ if(!b.classList.contains('real')){b.querySelector('.n').textContent=String([...tabs].filter(x=>!x.classList.contains('real')).indexOf(b)+1);} b.onclick=()=>this.load(b.dataset.k); });
+    const firstNumbered=tabs.find(t=>!t.classList.contains('over')&&!t.classList.contains('real'));
+    if(firstNumbered){const d=document.createElement('span');d.className='flow-div';F.insertBefore(d,firstNumbered);}
+    tabs.forEach(b=>b.onclick=()=>this.load(b.dataset.k));
   },
-  buildLegend(){
-    const cats=[['input','Start'],['read','Automatic'],['check','Safety check'],['decide','Decision'],['reward','Reward'],['admin','Viessmann'],['output','Result']];
-    this.el.legend.innerHTML='<div class="lt">What the colours mean</div>'+cats.map(([c,n])=>`<span class="li"><span class="sw" style="background:var(--c-${c})"></span>${n}</span>`).join('');
-  },
+  buildLegend(){const cats=[['input','Start'],['read','Automatic'],['check','Safety check'],['decide','Decision'],['reward','Calculation'],['admin','Viessmann'],['output','Result']];
+    this.el.legend.innerHTML='<div class="lt">What the colours mean</div>'+cats.map(([c,n])=>`<span class="li"><span class="sw" style="background:var(--c-${c})"></span>${n}</span>`).join('');},
   bindControls(){
     document.getElementById('playBtn').onclick=()=>this.togglePlay();
     document.getElementById('replayBtn').onclick=()=>{this.clearStates();this.startPlay();};
@@ -576,32 +668,33 @@ const WF={
     document.getElementById('scrim').onclick=()=>this.closePanel();
     document.getElementById('pPrev').onclick=()=>this.panelStep(-1);
     document.getElementById('pNext').onclick=()=>this.panelStep(1);
-    this.el.previewCard.onclick=()=>this.openLightbox();
-    document.getElementById('lxClose').onclick=()=>this.closeLightbox();
-    this.el.lightbox.onclick=(e)=>{if(e.target===this.el.lightbox)this.closeLightbox();};
-    window.addEventListener('keydown',e=>{if(e.key==='Escape'){this.closePanel();this.closeLightbox();}});
+    this.el.previewCard.onclick=()=>this.LB.open(this.flow&&this.flow.preview&&this.flow.preview.img);
+    this.el.overview.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)this.load(g.dataset.go);});
+    window.addEventListener('keydown',e=>{if(e.key==='Escape'){this.closePanel();this.LB.close();}});
   },
   bindPan(){
     const c=this.el.canvas;let sx,sy,stx,sty,drag=false;
     c.addEventListener('pointerdown',e=>{if(e.target.closest('.node')||e.target.closest('.preview-card')||e.target.closest('.result-card'))return;drag=true;sx=e.clientX;sy=e.clientY;stx=this.tx;sty=this.ty;c.classList.add('grab');try{c.setPointerCapture(e.pointerId)}catch(_){}});
     c.addEventListener('pointermove',e=>{if(!drag)return;this.tx=stx+(e.clientX-sx);this.ty=sty+(e.clientY-sy);this.apply();});
     c.addEventListener('pointerup',()=>{drag=false;c.classList.remove('grab');});
-    c.addEventListener('wheel',e=>{e.preventDefault();this.zoomAt(e.deltaY<0?1.12:1/1.12,e.clientX,e.clientY);},{passive:false});
+    /* mouse-wheel zoom intentionally disabled on the flow canvas */
   },
   load(key){
     const w=FLOWS.find(f=>f.key===key);if(!w)return;this.stopPlay();this.flow=w;this.idx=0;
-    this.el.caption.classList.remove('show');this.el.token.classList.remove('show');this.el.resultCard.classList.remove('show');
     document.querySelectorAll('.flow-tab').forEach(b=>b.classList.toggle('on',b.dataset.k===key));
+    // overview mode
+    if(w.over){this.el.overview.innerHTML=w.html;this.el.overview.classList.add('show');this.el.canvas.style.display='none';
+      document.getElementById('canvasCtrls').style.visibility='hidden';this.el.overview.scrollTop=0;return;}
+    this.el.overview.classList.remove('show');this.el.canvas.style.display='';document.getElementById('canvasCtrls').style.visibility='';
+    this.el.caption.classList.remove('show');this.el.token.classList.remove('show');this.el.resultCard.classList.remove('show');
     this.nodes=w.nodes.map(n=>({...n,x:PAD+n.col*(NW+HG),y:PAD+n.row*(NH+VG)}));
     this.byId={};this.nodes.forEach(n=>this.byId[n.id]=n);
     this.render();this.fit();
-    // preview + legend + result toggling
     if(w.preview){this.el.previewCard.style.display='';this.el.legend.style.display='none';
       document.getElementById('pvImg').src=w.preview.img;document.getElementById('pvTitle').textContent=w.preview.title;document.getElementById('pvSub').textContent=w.preview.sub;}
     else{this.el.previewCard.style.display='none';this.el.legend.style.display='';}
-    this.el.resultCard.classList.remove('show');
     if(w.result){const rc=this.el.resultCard;rc.className='result-card '+w.result.kind;
-      document.getElementById('rcIco').innerHTML=svgIco(w.result.kind==='ok'?'trophy':'x');
+      document.getElementById('rcIco').innerHTML=ico(w.result.kind==='ok'?'trophy':'x');
       document.getElementById('rcTag').textContent=w.result.tag;document.getElementById('rcBig').textContent=w.result.big;document.getElementById('rcSub').textContent=w.result.sub;}
     clearTimeout(this._auto);this._auto=setTimeout(()=>this.startPlay(),650);
   },
@@ -617,14 +710,10 @@ const WF={
       if(o.lbl){const mx=(x1+x2)/2,my=(y1+y2)/2;paths+=`<rect class="wire-lbl-bg" x="${mx-o.lbl.length*3.4-6}" y="${my-9}" width="${o.lbl.length*6.8+12}" height="18" rx="9"/><text class="wire-lbl" x="${mx}" y="${my+4}" text-anchor="middle">${o.lbl}</text>`;}
     });
     W.innerHTML=paths;
-    this.nodes.forEach(n=>{
-      const stepNo=this.flow.happy.indexOf(n.id);
-      const d=document.createElement('div');d.className='node';d.dataset.id=n.id;d.dataset.cat=n.cat;
-      d.style.left=n.x+'px';d.style.top=n.y+'px';
-      d.innerHTML=(stepNo>=0?`<span class="step-badge">${stepNo+1}</span>`:'')+`<div class="ico">${svgIco(n.icon)}</div><div class="tx"><div class="tt">${n.title}</div><div class="ss">${n.sub}</div></div>`;
-      d.onclick=(e)=>{e.stopPropagation();this.openPanel(n.id);};
-      vp.appendChild(d);
-    });
+    this.nodes.forEach(n=>{const stepNo=this.flow.happy.indexOf(n.id);
+      const d=document.createElement('div');d.className='node';d.dataset.id=n.id;d.dataset.cat=n.cat;d.style.left=n.x+'px';d.style.top=n.y+'px';
+      d.innerHTML=(stepNo>=0?`<span class="step-badge">${stepNo+1}</span>`:'')+`<span class="info">ⓘ</span><div class="ico">${ico(n.icon)}</div><div class="tx"><div class="tt">${n.title}</div><div class="ss">${n.sub}</div></div>`;
+      d.onclick=(e)=>{e.stopPropagation();this.openPanel(n.id);};vp.appendChild(d);});
     this.nodeEls={};vp.querySelectorAll('.node').forEach(el=>this.nodeEls[el.dataset.id]=el);
   },
   apply(){this.el.viewport.style.transform=`translate(${this.tx}px,${this.ty}px) scale(${this.scale})`;},
@@ -632,46 +721,67 @@ const WF={
     const li=(this.flow&&this.flow.preview)?224:0;const aw=cw-li;
     const s=Math.min(aw/this.worldW,ch/this.worldH,1.15)*0.92;this.scale=s;this.tx=li+(aw-this.worldW*s)/2;this.ty=Math.max(16,(ch-this.worldH*s)/2);this.apply();},
   zoomBy(f){this.scale=Math.min(2.2,Math.max(.3,this.scale*f));this.apply();},
-  zoomAt(f,cx,cy){const r=this.el.canvas.getBoundingClientRect();const px=cx-r.left,py=cy-r.top;const ns=Math.min(2.2,Math.max(.3,this.scale*f)),k=ns/this.scale;this.tx=px-(px-this.tx)*k;this.ty=py-(py-this.ty)*k;this.scale=ns;this.apply();},
   togglePlay(){if(this.playing)this.stopPlay();else{if(this.idx>=this.flow.happy.length)this.clearStates();this.startPlay();}},
   setPlayBtn(p){document.getElementById('playBtn').innerHTML=p?'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg><span class="lbl">Pause</span>':'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span class="lbl">Play</span>';},
-  startPlay(){if(!this.flow)return;this.playing=true;this.setPlayBtn(true);if(this.idx>=this.flow.happy.length)this.idx=0;this.el.token.classList.add('show');this.tick();},
+  startPlay(){if(!this.flow||this.flow.over)return;this.playing=true;this.setPlayBtn(true);if(this.idx>=this.flow.happy.length)this.idx=0;this.el.token.classList.add('show');this.tick();},
   stopPlay(){this.playing=false;this.setPlayBtn(false);clearTimeout(this.t1);clearTimeout(this.t2);},
   clearStates(){this.idx=0;Object.values(this.nodeEls||{}).forEach(el=>el.classList.remove('on','done','dim'));this.el.wires.querySelectorAll('.wire').forEach(w=>w.classList.remove('flow'));this.el.caption.classList.remove('show');this.el.token.classList.remove('show');this.el.resultCard.classList.remove('show');},
-  tick(){
-    const h=this.flow.happy;
+  tick(){const h=this.flow.happy;
     if(this.idx>=h.length){if(this.flow.result)this.el.resultCard.classList.add('show');
-      this.t1=setTimeout(()=>{if(!this.playing)return;this.clearStates();this.el.token.classList.add('show');this.tick();},2400);return;}
+      this.t1=setTimeout(()=>{if(!this.playing)return;this.clearStates();this.el.token.classList.add('show');this.tick();},2600);return;}
     const id=h[this.idx],n=this.byId[id],el=this.nodeEls[id];
     if(this.idx>0){const prev=h[this.idx-1];this.nodeEls[prev]&&this.nodeEls[prev].classList.replace('on','done');const w=this.el.wires.querySelector(`.wire[data-a="${prev}"][data-b="${id}"]`);w&&w.classList.add('flow');}
     this.el.token.style.left=(n.x+NW/2)+'px';this.el.token.style.top=(n.y+NH/2)+'px';el&&el.classList.add('on');
     this.el.capStep.textContent=`Step ${this.idx+1} of ${h.length}`;this.el.capT.textContent=n.title;this.el.capD.textContent=n.note||n.what;this.el.caption.classList.add('show');
-    this.idx++;this.t2=setTimeout(()=>{if(this.playing)this.tick();},this.idx===1?1000:1700);
-  },
-  openPanel(id){
-    this.stopPlay();const n=this.byId[id];if(!n)return;this.panelId=id;
+    this.idx++;this.t2=setTimeout(()=>{if(this.playing)this.tick();},this.idx===1?1000:1700);},
+  sec(label,iconKey,inner){return `<div class="sec"><div class="sl">${ico(iconKey)}${label}</div>${inner}</div>`;},
+  openPanel(id){this.stopPlay();const n=this.byId[id];if(!n)return;this.panelId=id;
     const cc=getComputedStyle(document.documentElement).getPropertyValue('--c-'+n.cat).trim();
     const bb=getComputedStyle(document.documentElement).getPropertyValue('--b-'+n.cat).trim();
-    const pico=document.getElementById('pIco');pico.style.background=bb;pico.style.color=cc;pico.innerHTML=svgIco(n.icon);
-    const pcat=document.getElementById('pCat');pcat.textContent=CATNAME[n.cat]||'';pcat.style.color=cc;
+    const pi=document.getElementById('pIco');pi.style.background=bb;pi.style.color=cc;pi.innerHTML=ico(n.icon);
+    const pc=document.getElementById('pCat');pc.textContent=CATNAME[n.cat]||'';pc.style.color=cc;
     document.getElementById('pTitle').textContent=n.title;
-    let html=`<div class="sec what"><div class="sl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>What happens here</div><p>${n.what}</p></div>`;
-    if(n.data)html+=`<div class="sec"><div class="sl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>From this invoice</div><div class="data">${n.data}</div></div>`;
-    if(n.ex)html+=`<div class="sec"><div class="sl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>For example</div><div class="data">${n.ex}</div></div>`;
-    if(n.tech)html+=`<div class="sec"><div class="sl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Under the hood</div><div class="tech">${n.tech}</div></div>`;
-    document.getElementById('pBody').innerHTML=html;
+    let h=`<div class="sec what"><div class="sl">${ico('eye')}What happens here</div><p>${n.what}</p></div>`;
+    if(n.input||n.output)h+=this.sec('Input → Output','search',`<div class="io"><div class="iocell in"><div class="iol">▸ In</div><div class="iov">${n.input||'—'}</div></div><div class="iocell out"><div class="iol">▸ Out</div><div class="iov">${n.output||'—'}</div></div></div>`);
+    if(n.formula)h+=this.sec('The formula','percent',`<div class="formula">${n.formula}</div>`);
+    if(n.ex)h+=this.sec('Worked example','star',`<div class="ex">${n.ex}</div>`);
+    if(n.data)h+=this.sec('From this invoice','receipt',`<div class="data">${n.data}</div>`);
+    if(n.tech)h+=this.sec('Under the hood','filter',`<div class="tech">${n.tech}</div>`);
+    document.getElementById('pBody').innerHTML=h;
     Object.values(this.nodeEls).forEach(el=>{el.classList.remove('on');el.classList.toggle('dim',el.dataset.id!==id);});
     this.nodeEls[id].classList.add('on');this.nodeEls[id].classList.remove('dim');
     const hi=this.flow.happy.indexOf(id);
     document.getElementById('pPrev').disabled=hi<=0;document.getElementById('pNext').disabled=hi<0||hi>=this.flow.happy.length-1;
-    document.getElementById('scrim').classList.add('open');document.getElementById('panel').classList.add('open');
-  },
+    document.getElementById('scrim').classList.add('open');document.getElementById('panel').classList.add('open');},
   panelStep(dir){const hi=this.flow.happy.indexOf(this.panelId);if(hi<0)return;const ni=hi+dir;if(ni<0||ni>=this.flow.happy.length)return;this.openPanel(this.flow.happy[ni]);},
   closePanel(){document.getElementById('scrim').classList.remove('open');document.getElementById('panel').classList.remove('open');Object.values(this.nodeEls||{}).forEach(el=>el.classList.remove('dim'));},
-  openLightbox(){if(!this.flow||!this.flow.preview)return;document.getElementById('lxImg').src=this.flow.preview.img;this.el.lightbox.classList.add('open');},
-  closeLightbox(){this.el.lightbox.classList.remove('open');}
+
+  // ---- zoomable invoice lightbox ----
+  LB:{
+    s:1,x:0,y:0,el:{},
+    init(){['lightbox','lxStage','lxImg','lxRd'].forEach(id=>this.el[id]=document.getElementById(id));
+      document.getElementById('lxClose').onclick=()=>this.close();
+      document.getElementById('lxIn').onclick=()=>this.zoom(1.25,null,null);
+      document.getElementById('lxOut').onclick=()=>this.zoom(1/1.25,null,null);
+      document.getElementById('lxReset').onclick=()=>{this.s=1;this.x=0;this.y=0;this.apply();};
+      this.el.lightbox.addEventListener('wheel',e=>{e.preventDefault();this.zoom(e.deltaY<0?1.15:1/1.15,e.clientX,e.clientY);},{passive:false});
+      let dx,dy,ox,oy,drag=false;const st=this.el.lxStage;
+      st.addEventListener('pointerdown',e=>{drag=true;dx=e.clientX;dy=e.clientY;ox=this.x;oy=this.y;st.classList.add('grab');try{st.setPointerCapture(e.pointerId)}catch(_){}});
+      st.addEventListener('pointermove',e=>{if(!drag)return;this.x=ox+(e.clientX-dx);this.y=oy+(e.clientY-dy);this.apply();});
+      st.addEventListener('pointerup',()=>{drag=false;st.classList.remove('grab');});
+      this.el.lxImg.addEventListener('dblclick',()=>{this.s=this.s>1.2?1:2.2;this.apply();});
+    },
+    open(src){if(!src)return;this.el.lxImg.src=src;this.s=1;this.x=0;this.y=0;this.apply();this.el.lightbox.classList.add('open');},
+    close(){this.el.lightbox.classList.remove('open');},
+    zoom(f,cx,cy){const r=this.el.lxStage.getBoundingClientRect();
+      if(cx==null){cx=r.left+r.width/2;cy=r.top+r.height/2;}
+      const ns=Math.min(6,Math.max(.4,this.s*f)),k=ns/this.s;
+      const px=cx-r.left-r.width/2,py=cy-r.top-r.height/2;
+      this.x=px-(px-this.x)*k;this.y=py-(py-this.y)*k;this.s=ns;this.apply();},
+    apply(){this.el.lxImg.style.transform=`translate(calc(-50% + ${this.x}px), calc(-50% + ${this.y}px)) scale(${this.s})`;this.el.lxRd.textContent=Math.round(this.s*100)+'%';}
+  }
 };
-window.addEventListener('resize',()=>{if(WF.flow)WF.fit();});
+window.addEventListener('resize',()=>{if(WF.flow&&!WF.flow.over)WF.fit();});
 WF.init();
 </script>
 </body>

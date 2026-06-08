@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.2.25 — 2026-05-11
+
+### Deeper detail on every step · a Points-&-maths flow · an Overview · a zoomable invoice
+
+A big pass on the friendly tour ( `/architecture.html` ), taking the depth from the technical version but keeping it approachable.
+
+- **Mouse-wheel zoom on the flow canvas is disabled** (it was easy to trigger by accident) — use the `+` / `−` / `Fit` buttons. *Wheel zoom still works inside the invoice preview, where you want it.*
+- **Every step is now detailed.** Clicking a step shows **Input → Output**, the **exact formula** (where there is one), and a **worked example** — plus "From this invoice" real data and an "Under the hood" note where relevant. Pulled from the restored technical version.
+- **New flow: "Points & the maths"** — the full point-calculation architecture in nine steps, each with its formula and real numbers: a matched line → `base = points-per-unit × qty` → which campaigns apply (family/active/dates) → `final = round(base × multiplier%) + flat × qty` → best non-stackable → `remaining = max(0, cap − claimed)` per-installer cap → sum the invoice → append-only ledger (Δ) → `balance = Σ Δ` → tier thresholds. This is the maths the CEO asked to see.
+- **New Overview tab** — explains the program for the whole team: the headline facts, **the whole journey in one line** (all together), and **each part on its own** (Reading · Points & maths · Keeping it fair · Behind the scenes · a real run) with a "watch this flow" button.
+- **The invoice preview is fully zoomable & pannable** — scroll or `+`/`−` to zoom (up to 600%), drag to move, **Reset** — so every line, KPD code and amount is readable.
+
+Browser-verified at a real viewport: overview, the maths flow, the detailed step panels, and the invoice zoom all confirmed.
+
 ## v0.2.24 — 2026-05-11
 
 ### The tour now runs a *real* invoice — with previews, real data, and the points maths
