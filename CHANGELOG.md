@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.26 — 2026-05-11
+
+### Fix: the enlarged invoice now opens fit-to-screen
+
+The zoomable invoice preview opened at the image's native resolution — which is larger than the screen, so you landed zoomed into a corner. It now opens **fit to the window** (the whole invoice visible = 100%), and you zoom in from there with scroll, `+`/`−`, or double-click. The zoom limits and **Reset** are relative to that fit.
+
 ## v0.2.25 — 2026-05-11
 
 ### Deeper detail on every step · a Points-&-maths flow · an Overview · a zoomable invoice
