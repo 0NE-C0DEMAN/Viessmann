@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.2.28 — 2026-06-09
+
+### The remaining flows densified to match — every tab now has stage-grouped, multi-element diagrams
+
+v0.2.27 brought the system map and the topic flows up to technical depth; this pass does the same for the flows that were still light — so **every** diagram is now stage-grouped with many more elements.
+
+- **The big picture**: 7 → **13 nodes** across 6 stages (Capture · Read · Match · Check · Decide · Reward) — read and "understand details" split out, matching vs. ignoring shown side by side, the genuine/duplicate checks separated, a decision node with the human-review branch, and a ledger → tier/rewards/notify fan-out.
+- **Points & the maths**: 9 → **13 nodes** — adds the **active-campaigns** rule store feeding the campaign filter, the **already-claimed** store feeding the per-installer cap, a **redemption** branch (−points to the same ledger), and a **tier-change audit** entry.
+- **Real invoice · approved**: 7 → **13 nodes** across 7 stages — the safety checks split into **genuine & yours** vs **not a duplicate**, the points split into **base → campaign bonus → total**, plus the **Viessmann catalog** and **ledger** data-stores. Still runs on the real AGRIA #001 invoice with its actual numbers (+2,550 → Silver).
+- **Real invoice · rejected**: 6 → **10 nodes** — the ordinary checks (which all *pass*) are shown separately from the **duplicate check that fails**, with an **Approved invoices** store and a "lookup" wire showing exactly what it matched against; ends on **balance unchanged** (nothing double-counted).
+
+Browser-verified at a real viewport: all four flows render with their stage frames, branch labels and detail panels, and play step-by-step; no broken node references across any of the nine flows.
+
 ## v0.2.27 — 2026-05-11
 
 ### Much denser, technical-depth flow diagrams + a full system map

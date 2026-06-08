@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "0.2.27",
+  "version": "0.2.28",
   "description": "Viessmann B2B Loyalty — installer-side PWA + admin web for receipt-driven loyalty in Croatia.",
   "license": "UNLICENSED",
   "repository": {
