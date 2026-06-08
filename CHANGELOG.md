@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.2.23 — 2026-05-11
+
+### Architecture report rebuilt for non-technical viewers — an animated, plain-language tour
+
+The previous report was accurate but far too dense and technical for the CEO and Frane. Replaced it entirely with a clean, friendly, **animated workflow** anyone can follow at a glance — still at `/architecture.html`.
+
+- **It plays itself.** Each flow auto-runs: a glowing token travels from step to step while a caption bar narrates in plain English ("Step 2 of 6 — The app reads it…"). Play / Pause / Replay controls.
+- **Plain language, zero jargon on the surface.** Nodes read "Snap the invoice", "The app reads it", "Finds the products", "Checks it's genuine", "Points awarded", "Rewards unlocked" — no file names, regexes, or formulas.
+- **Five short tours** via simple tabs: *The big picture · Reading an invoice · Earning points · Keeping it fair · Behind the scenes.* Each one animates.
+- **n8n-style controls.** Clean node cards with colour-coded icons, smooth connector wires, branch labels ("looks good" / "unsure" / "failed"), drag-to-pan, scroll-to-zoom, and a Fit button — but it auto-fits so they never *have* to touch the controls.
+- **Tap any step** for a friendly one-paragraph explanation and a concrete example (e.g. "A boiler might earn 350 points, +50 in a spring campaign"). Previous/Next walk through the steps.
+- New self-contained design (Inter type, soft cards, dot-grid canvas, Viessmann red accents) — ~38 KB, opens standalone too.
+
+Browser-verified at a real viewport (play animation, branch rendering, flow switching, and the detail panel all confirmed visually).
+
 ## v0.2.22 — 2026-05-11
 
 ### Per-section interactive flow diagrams in the architecture report
