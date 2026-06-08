@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.2.21 — 2026-05-11
+
+### Interactive architecture report — `/architecture.html`
+
+A self-contained, interactive HTML walkthrough of the whole system, built so the CEO and Frane can understand the end-to-end flow at a glance and drill into any subsystem. Shipped as a single static file in `public/` (also opens standalone — emailable, no server needed).
+
+Seven tabs:
+
+- **Overview** — executive summary: hero stats, the 7-stage pipeline at a glance, deterministic-core-vs-optional-AI, design principles, and the tech stack.
+- **Architecture** — an interactive pan / zoom SVG map of the entire system (9 stages, 37 nodes, 41 edges). Toggle **Summary ↔ Detailed**, filter by node type (deterministic / AI / data / guard / decision / output / audit), hover to trace flow, click any node for a formula-level inspector panel, plus minimap + search + "play" flow animation.
+- **Receipt Pipeline** — the four parse tiers (unpdf PDF-text · fast-xml-parser UBL/HR-CIUS/PEPPOL · on-device Tesseract OCR · optional Claude vision), the Croatian invoice parser (real regexes), and SKU matching.
+- **Loyalty Engine** — append-only ledger (`balance = Σ delta`), the tier ladder, campaign/SPIFF selection with per-installer caps, rewards & redemptions with refund-on-cancel.
+- **Dedupe & Fraud** — the OIB mod-11-10 checksum, the duplicate tuple index, every fraud-flag signal, and the status decision tree.
+- **Admin Console** — review queue & decision workflow (re-decide auto-reverses prior accrual), directory, fulfillment, intelligence dashboards, audit log, account lifecycle.
+- **Platform & Data** — the 10-table data model / ERD, iron-session + scrypt auth, the EN/HR i18n system, PWA, and the Vercel + Neon (Frankfurt EU) deployment.
+
+Every figure, threshold, formula, and file name in the report was read from the real source — it documents what the code actually does, not a sketch. Design language adapted from a reference report into the Viessmann red palette with the IBM Plex type system.
+
+> Note: this report is served publicly at `/architecture.html` (no login). It can be gated behind admin auth or removed if it shouldn't be public.
+
 ## v0.2.20 — 2026-05-11
 
 ### Phase 2 Croatian translation: admin side + marketing pages + shared components
