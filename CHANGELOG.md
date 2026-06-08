@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.2.22 — 2026-05-11
+
+### Per-section interactive flow diagrams in the architecture report
+
+Every subsystem tab in `/architecture.html` now has its **own** interactive working diagram with a **worked example**, not just the one whole-system map on the Architecture tab. Each diagram: hover a node to trace its links, click any node for a formula-level inspector, and hover a worked-example step to light up the nodes it touches. Built on a new reusable, responsive `mountFlow()` engine (auto-scaling SVG — works in any viewport, reuses the shared node/edge styling and the global inspector panel).
+
+The five new diagrams (every figure read from the real source):
+
+- **Receipt Pipeline** — Input → Route → Extract → Parse → Match → Result (12 nodes). Worked example: a real demo invoice (Agria d.o.o.) → `unpdf` text → Croatian parser pulls OIB + `Ukupan iznos 1.299,00 €` + the line → SKU match (model-substring, conf 90 — the KPD code is non-unique across SKUs, so it correctly falls through the exact tier).
+- **Loyalty Engine** — Matched line → Base → Campaigns → Accrual → Balance & tier → Member (13 nodes). Worked example: a Vitodens 200-W line, 350 base + 50 flat campaign = 400 pts → one `accrual` ledger row → balance 1 800 → 2 200 → crosses the 2 000 Silver threshold.
+- **Dedupe & Fraud** — Parsed → Validate → Dedupe → Decide → Outcome (13 nodes). Worked example: a resubmission whose tuple `(sellerOIB, invoiceNo, buyerOIB, total)` matches an already-approved receipt → `status = duplicate`, `reviewerNote = "Duplicate of receipt …"` → 0 points. The OIB node shows the real mod-11-10 loop; FLAGS lists every real fraud-flag string.
+- **Admin Console** — Queue → Review → Decision → Ledger → Member (11 nodes). Worked example: the idempotent re-decide — a receipt approved at 400 pts re-approved with override 700 → `reversal −400` then `accrual +700` → net +300, never double-counted.
+- **Platform & Data** — an ERD: 10 tables + the iron-session and i18n infra nodes, with foreign-key edges and the dedupe tuple index called out. Worked example: how a balance is derived — installer → `points_ledger` rows → `SUM(delta)` → tier (balance is never stored).
+
+Authored by 5 parallel agents against a shared engine contract; integrated and browser-verified (every diagram's nodes/edges, hover-trace, click-inspector, and worked-example highlighting confirmed via DOM, plus responsive SVG scaling).
+
 ## v0.2.21 — 2026-05-11
 
 ### Interactive architecture report — `/architecture.html`

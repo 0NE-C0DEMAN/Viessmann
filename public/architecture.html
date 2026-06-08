@@ -1807,6 +1807,86 @@
     fill: var(--ink-muted);
     font-weight: 500;
   }
+
+  /* ==================================================================
+     PER-SECTION FLOW DIAGRAMS (mountFlow) — embedded, responsive
+     ================================================================== */
+  .flow-embed { margin: 6px 0 2px; }
+  .flow-svg {
+    width: 100%; height: auto; display: block;
+    background: #fbfaf5;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .flow-stage { fill: #f7f6f1; stroke: var(--line); stroke-width: 1; }
+  .flow-stage-label {
+    font-family: var(--mono); font-size: 10.5px; fill: var(--ink-muted);
+    letter-spacing: 0.13em; text-transform: uppercase;
+  }
+  .flow-node { cursor: pointer; }
+  .flow-node .fn-shape {
+    fill: var(--bg-card); stroke: var(--line-strong); stroke-width: 1;
+    transition: stroke 0.15s, stroke-width 0.15s, filter 0.15s;
+  }
+  .flow-node.is-store .fn-shape { fill: var(--data-bg); }
+  .flow-node.is-dec .fn-shape { fill: var(--dec-bg); }
+  .flow-node .fn-label { font-family: var(--sans); font-size: 12px; font-weight: 600; fill: var(--ink); pointer-events: none; }
+  .flow-node .fn-sub { font-family: var(--mono); font-size: 8.5px; fill: var(--ink-faint); pointer-events: none; }
+  .flow-node .fn-glyph { opacity: 0.85; }
+  .flow-node:hover .fn-shape, .flow-node:focus .fn-shape {
+    stroke: var(--ink); stroke-width: 1.6; outline: none;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.10));
+  }
+  .flow-node.hl .fn-shape { stroke: var(--ink); stroke-width: 2; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.14)); }
+  .flow-node.dim { opacity: 0.22; }
+  .flow-edge { fill: none; stroke: var(--line-strong); stroke-width: 1.4; transition: stroke 0.15s, opacity 0.15s; }
+  .flow-edge.dotted { stroke-dasharray: 3 3; stroke: var(--guard); opacity: 0.6; }
+  .flow-edge.feedback { stroke-dasharray: 4 4; stroke: var(--audit); opacity: 0.6; }
+  .flow-edge.hl { stroke: var(--ink); stroke-width: 2; opacity: 1; }
+  .flow-edge.dim { opacity: 0.08; }
+  .flow-edge-label { font-family: var(--mono); font-size: 8.5px; fill: var(--ink-muted); }
+  .flow-legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 11px 4px 2px; align-items: center; }
+  .fl-item { font-family: var(--mono); font-size: 10px; color: var(--ink-muted); display: flex; align-items: center; gap: 6px; }
+  .fl-sw { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+  .fl-hint { margin-left: auto; color: var(--ink-faint); font-style: italic; }
+
+  /* Worked example strip */
+  .worked-example {
+    margin-top: 16px; background: var(--bg-card);
+    border: 1px solid var(--line); border-radius: 8px;
+    padding: 16px 18px 18px; box-shadow: var(--shadow-sm);
+  }
+  .we-title {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--ink-muted);
+    display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+  }
+  .we-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--source); display: inline-block; }
+  .we-track { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
+  .we-step {
+    flex: 1; min-width: 124px; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 6px;
+    padding: 11px 13px; border-top: 3px solid var(--line-strong);
+    transition: border-color 0.15s, box-shadow 0.15s; cursor: default;
+  }
+  .we-step:hover { border-top-color: var(--source); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+  .we-step .we-k {
+    font-family: var(--mono); font-size: 9px; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--ink-muted); margin-bottom: 6px;
+  }
+  .we-step .we-v { font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ink); letter-spacing: -0.01em; line-height: 1.3; }
+  .we-step .we-v code { font-family: var(--mono); font-size: 11px; background: rgba(0,0,0,0.05); padding: 1px 4px; border-radius: 3px; }
+  .we-step.result { border-top-color: var(--det); background: var(--det-bg); }
+  .we-step.result .we-v { color: var(--det); }
+  .we-arrow { display: flex; align-items: center; color: var(--ink-faint); font-size: 15px; flex-shrink: 0; }
+  .we-note { font-size: 11.5px; color: var(--ink-muted); margin-top: 13px; line-height: 1.55; }
+  .we-note code { font-family: var(--mono); font-size: 11px; background: rgba(0,0,0,0.05); padding: 1px 4px; border-radius: 3px; }
+  .we-note strong { color: var(--ink); font-weight: 600; }
+  @media (max-width: 900px) {
+    .we-track { flex-direction: column; }
+    .we-arrow { transform: rotate(90deg); align-self: center; }
+  }
 </style>
 </head>
 <body>
@@ -3653,6 +3733,184 @@ window.addEventListener('resize', () => {
 // the view:shown listener re-fits when it opens).
 requestAnimationFrame(initArchDiagram);
 </script>
+<script>
+// =====================================================================
+// mountFlow — compact, responsive per-section flow-diagram engine.
+// Renders an auto-scaling SVG (viewBox → no JS measurement, works even
+// while its tab is hidden). Hover a node to trace its links; click to
+// open the shared inspector #panel. Optional worked-example stepper that
+// highlights nodes as you hover each step.
+//   mountFlow('#mountId', { stages?, nodes, edges, example?, legend? })
+//   node:  { id, stage|col, row, type, shape?, label, sub?, detail? }
+//   edge:  [ 'A', 'B', { label?, dotted?, feedback? } ]
+//   example: { title, steps:[ { label, value(html), nodes?:[ids], result? } ], note? }
+// types: source det llm data guard dec out audit  (colour-coded)
+// =====================================================================
+(function () {
+  const TYPE_HEX = { source:'#ff3e17', det:'#047857', llm:'#b45309', data:'#1d4ed8',
+                     guard:'#be185d', dec:'#b91c1c', out:'#6d28d9', audit:'#4b5563' };
+  const TYPE_NAME = { source:'input', det:'deterministic', llm:'ai / ocr', data:'data store',
+                      guard:'guard', dec:'decision', out:'output', audit:'audit' };
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
+
+  // Wire the global inspector close affordances once.
+  function ensurePanel() {
+    const panel = document.getElementById('panel');
+    if (!panel || panel.dataset.flowWired) return;
+    panel.dataset.flowWired = '1';
+    const overlay = document.getElementById('overlay');
+    const close = () => { panel.classList.remove('open'); overlay && overlay.classList.remove('open'); };
+    const cb = document.getElementById('closeBtn');
+    cb && cb.addEventListener('click', close);
+    overlay && overlay.addEventListener('click', close);
+  }
+  function openPanel(n) {
+    const panel = document.getElementById('panel'); if (!panel) return;
+    document.getElementById('panelTitle').textContent = n.label;
+    document.getElementById('panelStage').textContent = n.stageTitle || (TYPE_NAME[n.type] || '');
+    document.getElementById('panelBody').innerHTML =
+      '<span class="type-badge" data-type="' + n.type + '">' + (TYPE_NAME[n.type] || n.type) + '</span>' +
+      '<div class="panel-section">' + (n.detail || ('<p>' + esc(n.sub || '') + '</p>')) + '</div>';
+    const overlay = document.getElementById('overlay'); overlay && overlay.classList.add('open');
+    panel.classList.add('open');
+  }
+
+  window.mountFlow = function (sel, cfg) {
+    ensurePanel();
+    const host = typeof sel === 'string' ? document.querySelector(sel) : sel;
+    if (!host) return;
+
+    const NODE_W = cfg.nodeW || 196, NODE_H = cfg.nodeH || 48,
+          COL_GAP = cfg.colGap || 92, ROW_GAP = cfg.rowGap || 26,
+          PAD = 34, HEAD = cfg.stages ? 36 : 14;
+
+    const stageIdx = {}; (cfg.stages || []).forEach((s, i) => stageIdx[s.id] = i);
+    const byId = {};
+    cfg.nodes.forEach(n => {
+      const col = cfg.stages ? (stageIdx[n.stage] || 0) : (n.col || 0);
+      n._col = col;
+      n._x = PAD + col * (NODE_W + COL_GAP);
+      n._y = PAD + HEAD + (n.row || 0) * (NODE_H + ROW_GAP);
+      n._cx = n._x + NODE_W / 2; n._cy = n._y + NODE_H / 2;
+      n.stageTitle = (cfg.stages && cfg.stages[col]) ? cfg.stages[col].title : '';
+      byId[n.id] = n;
+    });
+    const cols = cfg.stages ? cfg.stages.length : (Math.max(...cfg.nodes.map(n => n.col || 0)) + 1);
+    const maxRow = Math.max(...cfg.nodes.map(n => n.row || 0));
+    const worldW = PAD * 2 + cols * NODE_W + (cols - 1) * COL_GAP;
+    const worldH = PAD * 2 + HEAD + (maxRow + 1) * NODE_H + maxRow * ROW_GAP + 20;
+
+    let svg = '<svg class="flow-svg" viewBox="0 0 ' + worldW + ' ' + worldH +
+              '" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img">';
+
+    if (cfg.stages) cfg.stages.forEach((s, i) => {
+      const x = PAD + i * (NODE_W + COL_GAP) - 16;
+      svg += '<rect class="flow-stage" x="' + x + '" y="' + (PAD - 8) + '" width="' + (NODE_W + 32) +
+             '" height="' + (worldH - PAD * 2 + 16) + '" rx="12"/>' +
+             '<text class="flow-stage-label" x="' + (x + (NODE_W + 32) / 2) + '" y="' + (PAD + 9) +
+             '" text-anchor="middle">' + esc(s.title) + '</text>';
+    });
+
+    (cfg.edges || []).forEach(e => {
+      const a = byId[e[0]], b = byId[e[1]], o = e[2] || {}; if (!a || !b) return;
+      let d;
+      if (b._x > a._x) {                       // forward
+        const x1 = a._x + NODE_W, y1 = a._cy, x2 = b._x, y2 = b._cy, mx = (x1 + x2) / 2;
+        d = 'M' + x1 + ' ' + y1 + ' C' + mx + ' ' + y1 + ' ' + mx + ' ' + y2 + ' ' + x2 + ' ' + y2;
+      } else if (b._x < a._x) {                // backward / feedback — loop under
+        const dip = Math.max(a._y, b._y) + NODE_H + (o.feedback ? 46 : 30);
+        d = 'M' + a._cx + ' ' + (a._y + NODE_H) + ' C' + a._cx + ' ' + dip + ' ' + b._cx + ' ' + dip +
+            ' ' + b._cx + ' ' + (b._y + NODE_H);
+      } else {                                 // same column — side step
+        const x1 = a._x + NODE_W, y1 = a._cy, y2 = b._cy, bx = x1 + 34;
+        d = 'M' + x1 + ' ' + y1 + ' C' + bx + ' ' + y1 + ' ' + bx + ' ' + y2 + ' ' + (b._x + NODE_W) + ' ' + y2;
+      }
+      svg += '<path class="flow-edge' + (o.dotted ? ' dotted' : '') + (o.feedback ? ' feedback' : '') +
+             '" data-a="' + e[0] + '" data-b="' + e[1] + '" d="' + d + '" marker-end="url(#arrow)"/>';
+      if (o.label) {
+        const lx = (a._x + NODE_W + b._x) / 2, ly = (a._cy + b._cy) / 2 - 7;
+        svg += '<text class="flow-edge-label" x="' + lx + '" y="' + ly + '" text-anchor="middle">' + esc(o.label) + '</text>';
+      }
+    });
+
+    cfg.nodes.forEach(n => {
+      const accent = TYPE_HEX[n.type] || '#71717a';
+      const isStore = n.shape === 'cylinder', isDec = n.shape === 'diamond';
+      svg += '<g class="flow-node' + (isStore ? ' is-store' : '') + (isDec ? ' is-dec' : '') +
+             '" data-id="' + n.id + '" data-type="' + n.type + '" tabindex="0">' +
+             '<rect class="fn-shape" x="' + n._x + '" y="' + n._y + '" width="' + NODE_W + '" height="' + NODE_H + '" rx="' + (isDec ? 14 : 9) + '"/>' +
+             '<rect class="fn-accent" x="' + n._x + '" y="' + n._y + '" width="5" height="' + NODE_H + '" rx="2.5" fill="' + accent + '"/>' +
+             '<circle class="fn-glyph" cx="' + (n._x + NODE_W - 15) + '" cy="' + (n._y + 15) + '" r="3.5" fill="' + accent + '"/>' +
+             '<text class="fn-label" x="' + (n._x + 17) + '" y="' + (n._y + (n.sub ? 20 : 28)) + '">' + esc(n.label) + '</text>' +
+             (n.sub ? '<text class="fn-sub" x="' + (n._x + 17) + '" y="' + (n._y + 35) + '">' + esc(n.sub) + '</text>' : '') +
+             '</g>';
+    });
+    svg += '</svg>';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'flow-embed';
+    let legend = '';
+    if (cfg.legend !== false) {
+      const types = [...new Set(cfg.nodes.map(n => n.type))];
+      legend = '<div class="flow-legend">' + types.map(t =>
+        '<span class="fl-item"><span class="fl-sw" style="background:' + (TYPE_HEX[t] || '#999') + '"></span>' +
+        (TYPE_NAME[t] || t) + '</span>').join('') +
+        '<span class="fl-item fl-hint">hover to trace · click to inspect</span></div>';
+    }
+    wrap.innerHTML = svg + legend;
+    host.appendChild(wrap);
+    const svgEl = wrap.querySelector('svg');
+
+    // adjacency + interactions
+    const adj = {}; cfg.nodes.forEach(n => adj[n.id] = new Set());
+    (cfg.edges || []).forEach(e => { if (adj[e[0]] && adj[e[1]]) { adj[e[0]].add(e[1]); adj[e[1]].add(e[0]); } });
+    const nodeEls = {}; svgEl.querySelectorAll('.flow-node').forEach(g => nodeEls[g.dataset.id] = g);
+    const edgeEls = [...svgEl.querySelectorAll('.flow-edge')];
+
+    function trace(id) {
+      const keep = new Set([id, ...adj[id]]);
+      svgEl.querySelectorAll('.flow-node').forEach(g => {
+        g.classList.toggle('hl', g.dataset.id === id);
+        g.classList.toggle('dim', !keep.has(g.dataset.id));
+      });
+      edgeEls.forEach(p => {
+        const on = p.dataset.a === id || p.dataset.b === id;
+        p.classList.toggle('hl', on); p.classList.toggle('dim', !on);
+        p.setAttribute('marker-end', on ? 'url(#arrow-hl)' : 'url(#arrow)');
+      });
+    }
+    function clearTrace() {
+      svgEl.querySelectorAll('.flow-node').forEach(g => g.classList.remove('hl', 'dim'));
+      edgeEls.forEach(p => { p.classList.remove('hl', 'dim'); p.setAttribute('marker-end', 'url(#arrow)'); });
+    }
+    Object.values(nodeEls).forEach(g => {
+      const n = byId[g.dataset.id];
+      g.addEventListener('mouseenter', () => trace(g.dataset.id));
+      g.addEventListener('mouseleave', clearTrace);
+      g.addEventListener('click', () => openPanel(n));
+      g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openPanel(n); } });
+    });
+
+    // worked example
+    if (cfg.example) {
+      const ex = document.createElement('div'); ex.className = 'worked-example';
+      let h = '<div class="we-title"><span class="we-dot"></span>' + esc(cfg.example.title) + '</div><div class="we-track">';
+      cfg.example.steps.forEach((st, i) => {
+        if (i) h += '<div class="we-arrow">→</div>';
+        h += '<div class="we-step' + (st.result ? ' result' : '') + '" data-nodes="' + ((st.nodes || []).join(',')) +
+             '"><div class="we-k">' + esc(st.label) + '</div><div class="we-v">' + st.value + '</div></div>';
+      });
+      h += '</div>' + (cfg.example.note ? '<div class="we-note">' + cfg.example.note + '</div>' : '');
+      ex.innerHTML = h; wrap.appendChild(ex);
+      ex.querySelectorAll('.we-step').forEach(stp => {
+        const ids = (stp.dataset.nodes || '').split(',').filter(Boolean);
+        stp.addEventListener('mouseenter', () => ids.forEach(id => nodeEls[id] && nodeEls[id].classList.add('hl')));
+        stp.addEventListener('mouseleave', () => ids.forEach(id => nodeEls[id] && nodeEls[id].classList.remove('hl')));
+      });
+    }
+  };
+})();
+</script>
 <section id="pipelineView" class="view">
   <div class="ov-page">
 
@@ -3662,6 +3920,83 @@ requestAnimationFrame(initArchDiagram);
       <h1 class="ov-title">Four ways to read an invoice — <em>none of them need a paid API.</em></h1>
       <p class="ov-sub">A Croatian installer uploads a wholesaler invoice as a <strong>digital PDF</strong>, a <strong>phone photo</strong>, or an <strong>e-invoice XML</strong>. A four-tier strategy turns each into the <em>same</em> structured <code>ParsedReceipt</code> — seller, buyer, invoice number, dates, totals, and line items — then matches every line to a Viessmann product and scores it. Tiers 1–3 are deterministic, free, and run by default; the paid AI tier is <strong>off unless an API key is set</strong> and the PWA never reaches it.</p>
     </div>
+
+    <!-- ── INTERACTIVE FLOW DIAGRAM ──────────────────────────── -->
+    <section class="ov-section">
+      <div class="ov-section-head">
+        <span class="ov-section-num">FLOW</span>
+        <h2 class="ov-section-title">An invoice becoming scored line items</h2>
+        <p class="ov-section-desc">One document — PDF, photo, or XML — routed to the right reader, flattened to text, parsed by one Croatian-invoice regex engine, then matched to a Viessmann SKU. Hover any node to trace its links · click to inspect the exact rule · follow the worked example below.</p>
+      </div>
+      <div id="flow-pipeline"></div>
+    </section>
+    <script>
+    mountFlow('#flow-pipeline', {
+      stages: [
+        { id:'input',   title:'Input' },
+        { id:'route',   title:'Route' },
+        { id:'extract', title:'Extract' },
+        { id:'parse',   title:'Parse' },
+        { id:'match',   title:'Match' },
+        { id:'result',  title:'Result' }
+      ],
+      nodes: [
+        { id:'IN_PDF', stage:'input', row:0, type:'source', label:'Digital PDF', sub:'text layer · multipart',
+          detail:`<p>An accounting-software / e-invoice <strong>PDF export</strong> with a real text layer — the recommended path.</p><p>Sent <strong>multipart</strong> to <code>POST /api/receipts</code> as a <code>file</code> field. Every POST runs <code>requireInstaller()</code> first, so the receipt is scoped to the signed-in installer.</p>` },
+        { id:'IN_IMG', stage:'input', row:1, type:'source', label:'Phone photo', sub:'JPEG/PNG/HEIC · camera',
+          detail:`<p>A photo from the in-app camera (<code>capture="environment"</code>).</p><p><strong>Never uploaded as an image.</strong> A phone photo is routinely 5+ MB and a Vercel serverless function rejects request bodies over <strong>4.5 MB</strong>. So <code>submit/page.tsx</code> OCRs the image <em>in the browser</em> and posts only the extracted text.</p>` },
+        { id:'IN_XML', stage:'input', row:2, type:'source', label:'e-invoice XML', sub:'UBL · HR-CIUS · PEPPOL',
+          detail:`<p>A structured e-invoice: <strong>UBL 2.1 / HR-CIUS / PEPPOL BIS 3.0</strong>.</p><p>Detected by <code>text/xml</code>, <code>application/xml</code>, or a <code>.xml</code> extension. Sent multipart to <code>/api/receipts</code> and parsed losslessly — no OCR, no regex.</p>` },
+        { id:'ROUTE', stage:'route', row:1, type:'dec', shape:'diamond', label:'Route by type', sub:'MIME + extension sniff',
+          detail:`<p>The entry point branches on file type (MIME + filename):</p><ul><li><code>isXml</code> → XML parser</li><li><code>isPdf</code> → unpdf text extraction</li><li><code>isImage</code> → on-device OCR (the browser already did this and posted text to <code>/api/receipts/from-text</code>)</li></ul><div class="formula">isXml = type==="text/xml" || type==="application/xml" || /\\.xml$/<br>isPdf = type==="application/pdf" || /\\.pdf$/<br>isImage = type.startsWith("image/")</div>` },
+        { id:'UNPDF', stage:'extract', row:0, type:'det', label:'unpdf', sub:'extractText · mergePages',
+          detail:`<p><strong>Tier 1 — digital PDF.</strong> Pulls the embedded text layer with <code>unpdf</code>:</p><div class="formula">extractText(pdf, { mergePages: true })</div><p>If the PDF is scanned/image-only there is <em>no</em> text layer — <code>parsePdfTextLight()</code> returns <code>null</code> and the route falls through to the AI fallback (only if a key is set).</p>` },
+        { id:'TESS', stage:'extract', row:1, type:'llm', label:'Tesseract OCR', sub:'hrv+eng · on-device',
+          detail:`<p><strong>Tier 3 — phone photo, OCR'd in the browser.</strong> Uses <code>tesseract.js</code> (open-source, no API key) with Croatian + English language data:</p><div class="formula">createWorker(["hrv", "eng"], 1, …)</div><p>WASM is dynamically <code>import()</code>ed — nothing ships in the initial bundle for PDF users. Only the resulting <strong>text</strong> is POSTed to <code>/api/receipts/from-text</code> (capped at <code>z.string().min(20).max(50_000)</code>); the multi-MB image never leaves the phone.</p>` },
+        { id:'XMLP', stage:'extract', row:2, type:'det', label:'fast-xml-parser', sub:'removeNSPrefix · UBL',
+          detail:`<p><strong>Tier 2 — e-invoice XML.</strong> <code>parseEInvoiceXml()</code> via <code>fast-xml-parser</code> with <code>removeNSPrefix:true</code> for dialect tolerance across UBL 2.1 / HR-CIUS / PEPPOL.</p><p>Handles both <code>Invoice</code> and <code>CreditNote</code> roots, maps each <code>InvoiceLine</code> straight to a <code>ParsedLineItem</code>, and skips the Croatian regex engine entirely — XML already carries canonical fields and decimal strings.</p>` },
+        { id:'CLAUDE', stage:'extract', row:3, type:'llm', label:'Claude vision', sub:'optional · OFF by default',
+          detail:`<p><strong>Tier 4 — AI fallback, normally dark.</strong> Only runs <code>if (process.env.ANTHROPIC_API_KEY)</code>; unset by default, so the path is dead.</p><p>Narrow scope: scanned/image-only PDFs (no text layer) and <em>direct</em> image POSTs. The PWA never hits it — its camera flow OCRs on-device. With no key and no text layer the route returns a clean <code>422</code> asking the user to scan to PDF, never a silent paid call.</p>` },
+        { id:'CROAT', stage:'parse', row:0, type:'det', label:'Croatian parser', sub:'OIB · total · lines · KPD',
+          detail:`<p>One regex/heuristic engine in <code>croatian-invoice-parser.ts</code> serves <strong>both</strong> the unpdf and Tesseract text paths. It first flattens all whitespace (<code>text.replace(/\\s+/g, " ")</code>) so the same patterns work for newline- or space-separated source.</p><h4>Gate (else returns null)</h4><div class="formula">if (flat.replace(/\\s/g,"").length &lt; 50) return null;<br>if (!FIRST_OIB_RE.test(flat) || !TOTAL_PLATITI_RE.test(flat)) return null;</div><h4>Real extraction regexes</h4><ul><li>OIB: <code>/OIB\\s*:?\\s*(?:HR)?\\s*(\\d{11})/</code></li><li>Invoice №: <code>/Racun:?\\s*(\\S+(?:\\/\\S+)?)/i</code></li><li>Issue date: <code>/Datum\\s+izdavanja:?\\s*(\\d{1,2}\\.\\d{1,2}\\.\\d{4})/i</code> → ISO</li><li>Total: <code>/Ukupan\\s+iznos\\s+za\\s+platiti[^:]*:?\\s*([\\d.,]+)/i</code></li><li>Line tail (KPD·unit·qty·VAT·price·amount): <code>/(\\d{2}\\.\\d{2}\\.\\d{2})\\s+([A-Za-zÀ-ſ]{1,5})\\s+([\\d.,]+)\\s+([\\d.,]+)\\s+([\\d.,]+)\\s+([\\d.,]+)/g</code></li></ul><h4>Croatian numbers</h4><div class="formula">"1.299,00"  →  parseFloat(s.replace(/\\./g,"").replace(",", "."))  =  1299.00</div><p>The original string is preserved at parse time; conversion happens only at display.</p>` },
+        { id:'SKU', stage:'match', row:0, type:'det', label:'SKU matcher', sub:'KPD → model → fuzzy',
+          detail:`<p><code>matchLine()</code> in <code>sku-matcher.ts</code>. First a brand gate — <code>isLikelyViessmann(desc)</code> scans 14 family keywords (Vitodens, Vitocal, Vitocell…). Non-Viessmann lines short-circuit to <strong>0 points</strong> but stay on the invoice. If Viessmann, it walks a confidence ladder:</p><ul><li><strong>Exact KPD · conf 95</strong> — <code>p.isViessmann &amp;&amp; p.kpdSifra === kpdSifra</code>, only when the hit is <em>unique</em> (<code>kpdMatches.length === 1</code>).</li><li><strong>Model substring · conf 90</strong> — <code>descLower.includes(normalise(p.model))</code>.</li><li><strong>Fuzzy · conf round(score×100)</strong> — token-set Jaccard over family+model+description, accept ≥ 0.35:<div class="formula">inter / (a.size + b.size − inter)  ≥  0.35</div></li><li><strong>Family · conf 50</strong> — known Viessmann word but no SKU pinned; still counts.</li></ul><p><em>Note:</em> KPD codes repeat across SKUs (e.g. <code>28.21.11</code> covers many Vitodens/Vitocell), so a non-unique KPD deliberately falls through to the model / fuzzy tiers rather than mis-matching.</p>` },
+        { id:'CAT', stage:'match', row:1, type:'data', shape:'cylinder', label:'Viessmann catalog', sub:'products · KPD · pts',
+          detail:`<p>The product table the matcher resolves against (<code>seed-data.ts</code>), e.g.:</p><ul><li><code>Vitodens 200-W B2HH 19kW</code> — KPD <code>28.21.11</code> · 350 pts</li><li><code>Vitocal 150-A 8.6kW</code> — KPD <code>28.21.13</code> · 500 pts</li><li><code>Vitocell 100-E 300L</code> — KPD <code>28.21.11</code> · 120 pts</li></ul><p>Each row carries <code>family</code>, <code>model</code>, <code>kpdSifra</code>, <code>isViessmann</code>, and <code>pointsPerUnit</code>.</p>` },
+        { id:'OUT', stage:'result', row:0, type:'out', label:'Parsed receipt', sub:'one canonical shape',
+          detail:`<p>Whichever tier ran, the pipeline emits a single <code>ParsedReceipt</code> — seller, buyer, invoice №, dates, totals, and matched line items — plus a <code>parserUsed</code> tag the UI shows as a coloured pill (<code>pdf-text</code> · <code>xml</code> · <code>tesseract-ocr</code> · <code>claude-vision</code>).</p><p>The submit screen renders what we read for the installer to confirm, then the downstream loyalty pipeline scores points and runs fraud / dedup checks.</p>` }
+      ],
+      edges: [
+        ['IN_PDF','ROUTE'],
+        ['IN_IMG','ROUTE'],
+        ['IN_XML','ROUTE'],
+        ['ROUTE','UNPDF', { label:'pdf' }],
+        ['ROUTE','TESS',  { label:'photo' }],
+        ['ROUTE','XMLP',  { label:'xml' }],
+        ['UNPDF','CROAT'],
+        ['TESS','CROAT'],
+        ['XMLP','OUT'],
+        ['UNPDF','CLAUDE', { dotted:true, label:'no text layer' }],
+        ['CLAUDE','CROAT', { dotted:true }],
+        ['CROAT','SKU'],
+        ['SKU','OUT'],
+        ['CAT','SKU', { dotted:true, label:'catalog' }]
+      ],
+      example: {
+        title: 'Worked example — a Vitodens line on an Agria invoice',
+        steps: [
+          { label:'Upload',        value:'<code>racun-123.pdf</code> · digital PDF', nodes:['IN_PDF','ROUTE'] },
+          { label:'Route',         value:'isPdf → <strong>unpdf</strong>', nodes:['ROUTE','UNPDF'] },
+          { label:'Extract text',  value:'<code>extractText(…, {mergePages:true})</code>', nodes:['UNPDF'] },
+          { label:'Croatian parse',value:'OIB <code>76958388708</code> · Račun <code>123/01/1</code> · <code>Ukupan iznos za platiti 1.299,00 €</code>', nodes:['CROAT'] },
+          { label:'Line tail',     value:'KPD <code>28.21.11</code> · <code>kom</code> · qty <code>1</code> · “Vitodens 200-W B2HH 19kW”', nodes:['CROAT'] },
+          { label:'SKU match',     value:'KPD <code>28.21.11</code> non-unique → model substring · <strong>conf 90</strong>', nodes:['SKU','CAT'] },
+          { label:'Parsed receipt',value:'Vitodens 200-W · 350 pts · <code>parserUsed: pdf-text</code>', result:true, nodes:['OUT'] }
+        ],
+        note: 'The whole default path is <strong>free and deterministic</strong> — no API key touched. The line carries KPD <code>28.21.11</code>, but that code is shared across several Viessmann SKUs, so the exact-KPD tier (which requires a <em>unique</em> hit) is skipped and the matcher lands on the <strong>model-substring</strong> tier at confidence 90 — “Vitodens 200-W” appears verbatim in the description. Croatian <code>1.299,00</code> is preserved as a string and only converted to <code>1299.00</code> at display.'
+      }
+    });
+    </script>
 
     <!-- ── HERO STATS ────────────────────────────────────────── -->
     <div class="ov-stats">
@@ -4104,6 +4439,83 @@ if (!FIRST_OIB_RE.test(flat) || !TOTAL_PLATITI_RE.test(flat)) return null;</div>
       <p class="ov-sub">A purpose-built loyalty core for Croatian installers. Every credit lands in an <strong>append-only ledger</strong> where the balance is simply <strong>Σ(delta)</strong> — never an editable counter. Campaigns layer multipliers and per-unit bonuses on top, the engine picks the <strong>single best non-stackable campaign</strong> per line and enforces a per-installer cap, and four tiers unlock progressively richer rewards. We <strong>built this rather than license Open Loyalty</strong> — fewer moving parts, full control of the audit trail, zero per-seat fees.</p>
     </div>
 
+    <!-- ── INTERACTIVE FLOW DIAGRAM ──────────────────────────── -->
+    <section class="ov-section">
+      <div class="ov-section-head">
+        <span class="ov-section-num">FLOW</span>
+        <h2 class="ov-section-title">How the engine works</h2>
+        <p class="ov-section-desc">A line item becoming points, a ledger entry, a balance, and a tier. Hover any node to trace its links · click to inspect the exact rule · follow the worked example below.</p>
+      </div>
+      <div id="flow-loyalty"></div>
+    </section>
+    <script>
+    mountFlow('#flow-loyalty', {
+      stages: [
+        { id:'line',   title:'Matched line' },
+        { id:'base',   title:'Base' },
+        { id:'camp',   title:'Campaigns' },
+        { id:'accrue', title:'Accrual' },
+        { id:'tier',   title:'Balance & tier' },
+        { id:'member', title:'Member' }
+      ],
+      nodes: [
+        { id:'MLINE', stage:'line',   row:0, type:'data', shape:'cylinder', label:'Matched line', sub:'Viessmann SKU · qty',
+          detail:`<p>A receipt line matched to a Viessmann product (KPD code → model → fuzzy). Non-Viessmann lines stay on the invoice at <strong>0 points</strong>.</p><p>Carries <code>matchedProductId</code>, <code>quantity</code>, and the product's base point value.</p>` },
+        { id:'BASE',  stage:'base',   row:0, type:'det', label:'Base points', sub:'product pts × qty',
+          detail:`<p>Base points for the line.</p><div class="formula">pointsBase = productPoints × quantity</div><p>Stored on <code>receiptLineItems.pointsBase</code> so the campaign bonus can always be separated from the base later.</p>` },
+        { id:'CAMP',  stage:'camp',   row:0, type:'det', label:'Active campaigns', sub:'mult % · flat · family',
+          detail:`<p>Active campaigns at submission time. Each carries:</p><ul><li><code>bonusMultiplier</code> — % (100 = no change)</li><li><code>bonusFlatPerUnit</code> — flat bonus × qty</li><li><code>productFamily</code> — scope (e.g. <code>vitocal</code>) or all families</li><li><code>capPerInstaller</code> · <code>endsAt</code> · <code>active</code></li></ul>` },
+        { id:'BEST',  stage:'camp',   row:1, type:'dec', shape:'diamond', label:'Best non-stackable', sub:'argmax · must beat base',
+          detail:`<p>Per line the engine evaluates every applicable campaign and keeps the <strong>single best</strong> — campaigns are <strong>non-stackable</strong>.</p><div class="formula">final = round(base × mult / 100) + round(flat × qty)<br>keep argmax(final), only if final &gt; base</div><p>If no campaign beats the base, the base stands.</p>` },
+        { id:'CAP',   stage:'camp',   row:2, type:'dec', shape:'diamond', label:'Cap / installer', sub:'clamp to remaining',
+          detail:`<p>Per-installer cap on the campaign <em>bonus</em>.</p><div class="formula">alreadyClaimed = Σ(pointsAwarded − pointsBase)  ·  approved receipts<br>remaining = max(0, capPerInstaller − alreadyClaimed)<br>final = base + min(bonus, remaining)</div><p><code>capPerInstaller = 0</code> ⇒ unlimited.</p>` },
+        { id:'ACC',   stage:'accrue', row:0, type:'det', label:'Accrual write', sub:'delta = final pts',
+          detail:`<p>On an <strong>approved</strong> receipt the engine writes one ledger row per credit.</p><div class="formula">delta = finalPoints   ·   reason = 'accrual'</div><p>Links back to the receipt; the chosen <code>campaignId</code> / <code>campaignName</code> are stamped on the line.</p>` },
+        { id:'LED',   stage:'accrue', row:1, type:'data', shape:'cylinder', label:'points_ledger', sub:'append-only · 4 reasons',
+          detail:`<p><code>points_ledger</code> — <strong>append-only</strong>. Rows are never updated or deleted.</p><h4>Four reasons</h4><ul><li><code>accrual</code> — points earned</li><li><code>redemption</code> — reward spend (−)</li><li><code>reversal</code> — undo an accrual (re-decide / cancel)</li><li><code>adjustment</code> — admin manual, reason required</li></ul>` },
+        { id:'ADJ',   stage:'accrue', row:2, type:'audit', label:'Admin adjust', sub:'reason required',
+          detail:`<p>Admins can adjust a balance with a <strong>mandatory reason</strong>. Writes an <code>adjustment</code> ledger row and an audit entry (<code>points.adjust</code>).</p>` },
+        { id:'BAL',   stage:'tier',   row:0, type:'det', label:'Balance', sub:'Σ(delta)',
+          detail:`<p>Balance is never stored — it is derived.</p><div class="formula">balance = COALESCE(SUM(delta), 0)</div><p>Fully reproducible and auditable from the ledger alone.</p>` },
+        { id:'TIER',  stage:'tier',   row:1, type:'dec', shape:'diamond', label:'Tier ladder', sub:'0 · 2k · 8k · 25k',
+          detail:`<p>Tier is a pure function of balance (<code>tier.ts</code>).</p><div class="formula">Bronze ≥ 0 · Silver ≥ 2 000 · Gold ≥ 8 000 · Platinum ≥ 25 000</div><p>A tier change after accrual is recorded in <code>auditLog</code> as <code>tier.changed {from, to}</code>.</p>` },
+        { id:'CARD',  stage:'member', row:0, type:'out', label:'Tier card', sub:'balance + progress',
+          detail:`<p>The installer's home card: live balance, current tier, and the points-to-next-tier progress bar.</p>` },
+        { id:'REW',   stage:'member', row:1, type:'out', label:'Rewards', sub:'tier-gated unlocks',
+          detail:`<p>Rewards have <code>pointCost</code>, <code>inventory</code>, <code>tierRequired</code>, <code>active</code>. A reward stays <strong>locked</strong> until the installer reaches its required tier.</p>` },
+        { id:'REDEEM',stage:'member', row:2, type:'out', label:'Redemption', sub:'−pointCost → ledger',
+          detail:`<p>Redeeming reserves inventory and writes a <code>redemption</code> ledger row of <code>−pointCost</code>.</p><p><strong>Refund-on-cancel:</strong> cancelling a not-yet-shipped redemption writes a <code>reversal</code> of <code>+pointCost</code> and restocks inventory.</p>` }
+      ],
+      edges: [
+        ['MLINE','BASE'],
+        ['BASE','CAMP'],
+        ['CAMP','BEST', { label:'per line' }],
+        ['BEST','CAP'],
+        ['CAP','ACC', { label:'final pts' }],
+        ['ACC','LED', { label:'accrual' }],
+        ['ADJ','LED', { label:'adjustment' }],
+        ['LED','BAL'],
+        ['BAL','TIER'],
+        ['TIER','CARD'],
+        ['TIER','REW', { label:'unlock' }],
+        ['REDEEM','LED', { feedback:true, label:'redemption −pts' }]
+      ],
+      example: {
+        title: 'Worked example — a Vitodens line crosses a tier',
+        steps: [
+          { label:'Matched line',  value:'Vitodens 200-W · ×1', nodes:['MLINE'] },
+          { label:'Base points',   value:'<code>350</code> pts', nodes:['BASE'] },
+          { label:'Campaign',      value:'All-family Spring · +50/unit', nodes:['CAMP','BEST'] },
+          { label:'Best, capped',  value:'<code>350 + 50 = 400</code>', nodes:['BEST','CAP'] },
+          { label:'Ledger accrual',value:'+400 · <code>accrual</code>', nodes:['ACC','LED'] },
+          { label:'Balance Σ(delta)', value:'1 800 → <code>2 200</code>', nodes:['BAL'] },
+          { label:'Tier', value:'Bronze → Silver', result:true, nodes:['TIER','CARD'] }
+        ],
+        note: 'Campaigns are <strong>non-stackable</strong> — the engine keeps the single best result per line (here the +50 flat beats the 350 base), then clamps the bonus to <code>capPerInstaller</code> (0 = unlimited). The +400 is one <code>accrual</code> row; the new balance is just the sum of all deltas, which now clears the <code>2 000</code> Silver threshold.'
+      }
+    });
+    </script>
+
     <!-- ── HERO STATS · THE FOUR TIERS (real thresholds) ─────── -->
     <div class="ov-stats">
       <div class="stat-card s1">
@@ -4457,6 +4869,88 @@ if (!FIRST_OIB_RE.test(flat) || !TOTAL_PLATITI_RE.test(flat)) return null;</div>
       <p class="ov-sub">Points are real money to the business, so the gate between a submitted invoice and a ledger credit is strict and deterministic. The cornerstone is the <strong>Croatian OIB</strong>: the buyer OIB printed on the invoice must match the installer's own account OIB, so a contractor can't claim a colleague's purchase. On top of that sits a duplicate lookup over an indexed invoice tuple, a battery of risk signals, and a four-way status decision that routes the clean ones through and parks the doubtful ones for a human.</p>
     </div>
 
+    <!-- ── INTERACTIVE FLOW DIAGRAM ──────────────────────────── -->
+    <section class="ov-section">
+      <div class="ov-section-head">
+        <span class="ov-section-num">FLOW</span>
+        <h2 class="ov-section-title">From parsed receipt to a credit-or-block verdict</h2>
+        <p class="ov-section-desc">A parsed invoice running the deterministic gauntlet — checksum, currency, velocity, arithmetic, date, then the tuple dedupe and the four-way status decision. Hover any node to trace its links · click to inspect the exact rule · follow the worked example below.</p>
+      </div>
+      <div id="flow-dedupe"></div>
+    </section>
+    <script>
+    mountFlow('#flow-dedupe', {
+      stages: [
+        { id:'parsed',   title:'Parsed' },
+        { id:'validate', title:'Validate' },
+        { id:'dedupe',   title:'Dedupe' },
+        { id:'decide',   title:'Decide' },
+        { id:'outcome',  title:'Outcome' }
+      ],
+      nodes: [
+        { id:'RCPT', stage:'parsed', row:1, type:'data', shape:'cylinder', label:'Parsed receipt', sub:'OCR / XML → JSON',
+          detail:`<p>The <code>ParsedReceipt</code> coming out of Claude vision OCR or the e-invoice XML parser. Drives the whole gauntlet.</p><ul><li><code>wholesaler.oib</code> · <code>buyer.oib</code> — normalised to digits</li><li><code>invoice_number</code> · <code>issue_date</code> · <code>currency</code></li><li><code>subtotal</code> · <code>vat_total</code> · <code>total</code> → cents</li><li><code>line_items[]</code> → matched against the Viessmann SKU catalog</li></ul><p>The submitting installer's account <code>oib</code> is loaded alongside — that is what the buyer OIB is checked against.</p>` },
+
+        { id:'OIBV', stage:'validate', row:0, type:'guard', label:'OIB checksum', sub:'mod 11,10',
+          detail:`<p>Both the seller and buyer OIB are run through <code>isValidOib()</code> — an 11-digit ISO 7064 <strong>MOD 11,10</strong> checksum (<code>oib.ts</code>). Then the buyer OIB is asserted to equal the installer's account OIB.</p><div class="formula">remainder = 10<br>for i in 0..9:<br>&nbsp;&nbsp;remainder = (remainder + digit[i]) % 10<br>&nbsp;&nbsp;if remainder == 0: remainder = 10<br>&nbsp;&nbsp;remainder = (remainder * 2) % 11<br>check = 11 − remainder<br>if check == 10: check = 0<br>valid ⟺ check == digit[10]</div><p>Emits <code>seller_oib_invalid_checksum</code> · <code>buyer_oib_invalid_checksum</code> · <code>seller_oib_missing</code> · <code>buyer_oib_missing</code> · <code>buyer_oib_mismatch</code> as applicable.</p>` },
+        { id:'CURR', stage:'validate', row:1, type:'guard', label:'Currency', sub:'EUR only',
+          detail:`<p>Croatia adopted the euro on 01.01.2023, so a B2B invoice in any other currency is suspect.</p><div class="formula">currency = (parsed.currency || 'EUR').toUpperCase()<br>if currency !== 'EUR' → flag</div><p>Emits <code>currency_not_eur:XXX</code> (advisory — recorded, doesn't force a branch on its own).</p>` },
+        { id:'VEL', stage:'validate', row:2, type:'guard', label:'Velocity', sub:'30 / 1h',
+          detail:`<p>Per-installer rate limit over a rolling window — a burst of submissions is worth flagging for a reviewer.</p><div class="formula">n = COUNT(receipts) WHERE installer_id = me<br>&nbsp;&nbsp;&nbsp;&nbsp;AND created_at > NOW() − 1 hour<br>if n ≥ 30 → flag</div><p>Emits <code>velocity_exceeded:N_in_1h</code> (advisory).</p>` },
+        { id:'TOT', stage:'validate', row:3, type:'guard', label:'Total arithmetic', sub:'|sub+VAT−total| ≤ 5¢',
+          detail:`<p>Checks the invoice adds up — subtotal plus VAT should equal the stated total, in cents, allowing a 5-cent rounding tolerance. Only runs when all three values parsed.</p><div class="formula">if |（subtotalCents + vatCents) − totalCents| > 5 → flag</div><p>Emits <code>total_arithmetic_mismatch</code> (advisory).</p>` },
+        { id:'DATE', stage:'validate', row:4, type:'guard', label:'Issue date', sub:'≤ 90d · not future',
+          detail:`<p>The invoice date is range-checked: not implausibly in the future, and recent enough to credit.</p><div class="formula">if issueDate > now + 24h → issue_date_in_future<br>if now − issueDate > 90 days → issue_date_older_than_90d<br>if no date at all → issue_date_missing</div><p><code>issue_date_in_future</code> &amp; <code>issue_date_older_than_90d</code> are advisory; <code>issue_date_missing</code> forces <strong>needs_review</strong>.</p>` },
+
+        { id:'DUP', stage:'dedupe', row:1, type:'dec', shape:'diamond', label:'Duplicate lookup', sub:'tuple index',
+          detail:`<p>Pre-flight lookup on the indexed invoice fingerprint, scoped to already-credited receipts — "no invoice earns points twice".</p><div class="formula">receipts_tuple_idx (non-unique) on<br>(wholesalerOib, invoiceNumber, buyerOib, totalCents)</div><p>Queried <code>WHERE status = 'approved'</code> so only an already-credited receipt counts as the original. Runs only when all four key parts are present. A hit emits <code>duplicate_of_existing_receipt</code> and sets <code>existingReceiptId</code>.</p><p>The index is <strong>non-unique on purpose</strong> — the duplicate is still stored (as a <code>duplicate</code> row), never lost to a constraint error.</p>` },
+
+        { id:'DECIDE', stage:'decide', row:1, type:'dec', shape:'diamond', label:'Status decision', sub:'optimistic → demote',
+          detail:`<p>Starts at <code>approved</code> and demotes through a fixed order; the duplicate test runs last and overrides everything.</p><ul><li><strong>rejected</strong> — <code>buyer_oib_mismatch</code> (buyer OIB ≠ account), <em>or</em> no Viessmann line on the invoice.</li><li><strong>needs_review</strong> — <code>seller_oib_invalid_checksum</code>, <code>seller_oib_missing</code>, <code>buyer_oib_missing</code>, <code>issue_date_missing</code>, or any <code>line_unmatched_viessmann:…</code>.</li><li><strong>approved</strong> — none of the above; all clean.</li><li><strong>duplicate</strong> — tuple matched an approved receipt (overrides any prior verdict).</li></ul><p>Advisory flags (velocity, currency, total, future/old date, bad buyer checksum) are recorded but do <em>not</em> by themselves change the branch.</p>` },
+
+        { id:'APPROVED', stage:'outcome', row:0, type:'out', label:'approved', sub:'+pts → ledger',
+          detail:`<p>All checks pass and at least one Viessmann line is present. <code>pointsAwarded = totalPoints</code> and one <code>accrual</code> row is appended to <code>points_ledger</code>; a tier crossing is logged as <code>tier.changed</code>.</p>` },
+        { id:'REVIEW', stage:'outcome', row:1, type:'out', label:'needs_review', sub:'human queue · 0 pts',
+          detail:`<p>A trust gap a person must resolve — missing/invalid seller OIB, missing buyer OIB, missing issue date, or a line that looks Viessmann but matched no SKU. Held with <code>pointsAwarded = 0</code>; nothing accrues until a reviewer acts.</p>` },
+        { id:'REJECTED', stage:'outcome', row:2, type:'out', label:'rejected', sub:'no points',
+          detail:`<p>A hard block: the buyer OIB on the invoice does not match the installer's account (<code>buyer_oib_mismatch</code>), or the invoice has no Viessmann products to award. <code>pointsAwarded = 0</code>, no ledger row.</p>` },
+        { id:'DUPLICATE', stage:'outcome', row:3, type:'out', label:'duplicate', sub:'note → original id',
+          detail:`<p>The tuple matched an already-approved receipt. Persisted (not dropped) with <code>status = 'duplicate'</code>, <code>pointsAwarded = 0</code>, and <code>reviewerNote = "Duplicate of receipt {id}"</code> pointing at the original.</p>` },
+
+        { id:'FLAGS', stage:'decide', row:3, type:'audit', label:'fraudFlags[]', sub:'jsonb · machine-readable',
+          detail:`<p>Every check appends to a <code>fraudFlags: string[]</code> stored as <code>jsonb</code> on the receipt and echoed into the <code>receipt.{status}</code> audit row — the verdict is fully explainable from these strings.</p><h4>The exact flag strings</h4><ul><li><code>velocity_exceeded:N_in_1h</code></li><li><code>currency_not_eur:XXX</code></li><li><code>seller_oib_invalid_checksum</code></li><li><code>buyer_oib_invalid_checksum</code></li><li><code>seller_oib_missing</code> · <code>buyer_oib_missing</code></li><li><code>buyer_oib_mismatch</code></li><li><code>total_arithmetic_mismatch</code></li><li><code>issue_date_in_future</code> · <code>issue_date_older_than_90d</code> · <code>issue_date_missing</code></li><li><code>line_unmatched_viessmann:&lt;desc&gt;</code></li><li><code>duplicate_of_existing_receipt</code></li></ul>` }
+      ],
+      edges: [
+        ['RCPT','OIBV'],
+        ['OIBV','CURR'],
+        ['CURR','VEL'],
+        ['VEL','TOT'],
+        ['TOT','DATE'],
+        ['DATE','DUP'],
+        ['DUP','DECIDE', { label:'no match' }],
+        ['DUP','DUPLICATE', { label:'tuple match' }],
+        ['DECIDE','APPROVED', { label:'clean' }],
+        ['DECIDE','REVIEW', { label:'soft flag' }],
+        ['DECIDE','REJECTED', { label:'OIB mismatch / no Viessmann' }],
+        ['OIBV','FLAGS', { feedback:true, label:'oib flags' }],
+        ['DATE','FLAGS', { feedback:true, label:'date flags' }]
+      ],
+      example: {
+        title: 'Worked example — a resubmitted invoice can\'t earn points twice',
+        steps: [
+          { label:'Parsed receipt', value:'buyer OIB <code>12345678903</code> · invoice <code>2024-00417</code> · total <code>€1 240,00</code>', nodes:['RCPT'] },
+          { label:'OIB · mod 11,10', value:'<code>1234567890</code> → check <code>3</code> = 11th digit → <strong>valid ✓</strong>, and equals the installer\'s account OIB', nodes:['OIBV'] },
+          { label:'Guards', value:'EUR ✓ · velocity 4/30 ✓ · subtotal+VAT=total ✓ · dated 12 days ago ✓', nodes:['CURR','VEL','TOT','DATE'] },
+          { label:'Tuple key built', value:'<code>(99999999927, 2024-00417, 12345678903, 124000)</code>', nodes:['DUP'] },
+          { label:'Lookup vs approved', value:'matches already-approved receipt <code>#a1f3…e7</code> → <code>duplicate_of_existing_receipt</code>', nodes:['DUP','FLAGS'] },
+          { label:'Decision overridden', value:'would-be <code>approved</code> → <strong><code>status = duplicate</code></strong>', nodes:['DECIDE'] },
+          { label:'Persisted', value:'<code>duplicate</code> · 0 pts · <code>reviewerNote = "Duplicate of receipt a1f3…e7"</code>', result:true, nodes:['DUPLICATE'] }
+        ],
+        note: 'Every check passes — valid OIBs, euros, in-window, arithmetic clean — so on its own this receipt would be <code>approved</code>. But the tuple <code>(sellerOIB, invoiceNo, buyerOIB, total)</code> already matches a <strong>credited</strong> receipt, and the duplicate test runs <strong>last and overrides</strong>: the new row is saved as <code>duplicate</code> with <strong>zero points</strong> and a <code>reviewerNote</code> pointing at the original. The non-unique <code>receipts_tuple_idx</code> means the resubmission is recorded rather than rejected by a constraint — visible, auditable, and not credited.'
+      }
+    });
+    </script>
+
     <!-- ── HERO STATS ────────────────────────────────────────── -->
     <div class="ov-stats">
       <div class="stat-card s1">
@@ -4796,6 +5290,80 @@ if (!FIRST_OIB_RE.test(flat) || !TOTAL_PLATITI_RE.test(flat)) return null;</div>
       <h1 class="ov-title">Where every invoice becomes <em>a reviewed, points-backed fact.</em></h1>
       <p class="ov-sub">The admin console is the control room behind the installer app. A reviewer opens a submission, sees the <strong>parsed invoice, the line-by-line product match, and the points the pipeline computed</strong>, then makes one decision — <strong>approve</strong> or <strong>reject</strong>. Every accrual flows through an append-only ledger, every action is written to an audit log, and every intelligence chart is computed from <strong>approved data only</strong>. Admins also run the directory, fulfil reward redemptions, manage campaigns and the catalogue, and own the account lifecycle.</p>
     </div>
+
+    <!-- ── INTERACTIVE FLOW DIAGRAM ──────────────────────────── -->
+    <section class="ov-section">
+      <div class="ov-section-head">
+        <span class="ov-section-num">FLOW</span>
+        <h2 class="ov-section-title">A receipt decision, end to end</h2>
+        <p class="ov-section-desc">From the review queue to the member's balance — one POST that validates, idempotently reverses any prior accrual, accrues the new figure, and audits everything. Hover any node to trace its links · click to inspect the exact rule · follow the worked example below.</p>
+      </div>
+      <div id="flow-admin"></div>
+    </section>
+    <script>
+    mountFlow('#flow-admin', {
+      stages: [
+        { id:'queue',  title:'Queue' },
+        { id:'review', title:'Review' },
+        { id:'decide', title:'Decision' },
+        { id:'ledger', title:'Ledger' },
+        { id:'member', title:'Member' }
+      ],
+      nodes: [
+        { id:'QUEUE', stage:'queue', row:0, type:'out', label:'Review queue', sub:'needs_review default',
+          detail:`<p>The admin queue lands on <code>needs_review</code> by default and is full-text searchable across installer company, wholesaler, invoice number and <strong>OIB</strong>.</p><p>Filters: <code>review · approved · rejected · duplicate · all</code>. A reviewer picks one receipt to open.</p>` },
+        { id:'DETAIL', stage:'review', row:0, type:'out', label:'Receipt detail', sub:'lines · OIB · flags',
+          detail:`<p>The receipt page shows the parsed header, every <code>receiptLineItems</code> row with its Viessmann product match + confidence, the fraud flags, and a <strong>sticky decision panel</strong>.</p><p>The panel pre-fills the <em>computed</em> points so the reviewer sees exactly what the pipeline proposed before deciding.</p>` },
+        { id:'OVERRIDE', stage:'review', row:1, type:'det', label:'Points override', sub:'default = Σ line pts',
+          detail:`<p>An editable points field on the panel. It is initialised to the computed total and only replaces it when the reviewer changes it.</p><div class="formula">default = Σ receiptLineItems.pointsAwarded<br>override → Math.round(n), n ≥ 0</div><p>Sent as <code>pointsOverride</code>; the client rounds and drops it if blank or negative.</p>` },
+        { id:'NOTE', stage:'review', row:2, type:'det', label:'Reviewer note', sub:'audited free text',
+          detail:`<p>Optional free-text <code>note</code>. Stored on <code>receipts.reviewerNote</code>, copied into the accrual ledger row's <code>note</code>, and echoed into the audit payload.</p><p>Optional at the API, but the UI can make it <strong>mandatory</strong> for reject / override flows.</p>` },
+        { id:'DECIDE', stage:'decide', row:0, type:'dec', shape:'diamond', label:'Approve / reject', sub:'requireAdmin · Zod',
+          detail:`<p>One guarded endpoint: <code>POST /api/admin/receipts/[id]/decision</code>.</p><h4>Contract</h4><ul><li><code>requireAdmin()</code> — non-admins get <code>403</code> before any read.</li><li>Zod body: <code>{ decision: "approved"|"rejected", note?, pointsOverride?: int ≥ 0 }</code>.</li><li>A <strong>reject</strong> still reverses any prior approval, writes status, and accrues nothing.</li></ul>` },
+        { id:'ALREADY', stage:'decide', row:1, type:'dec', shape:'diamond', label:'Already approved?', sub:'idempotency gate',
+          detail:`<p>The route re-reads the receipt. <strong>If its current status is already <code>approved</code></strong>, every prior accrual must be undone before re-deciding — this is what makes the decision idempotent.</p><div class="formula">if receipt.status === 'approved':<br>&nbsp;&nbsp;reverse all prior <code>accrual</code> rows first</div><p>So a reviewer can flip approve → reject → approve repeatedly and the balance never drifts.</p>` },
+        { id:'REVERSE', stage:'decide', row:2, type:'det', label:'Reverse prior accrual', sub:'−old delta',
+          detail:`<p>For each prior <code>accrual</code> row on the receipt, the route inserts a matching <code>reversal</code> row that cancels it exactly.</p><div class="formula">for each prior accrual a:<br>&nbsp;&nbsp;insert reversal { delta: −a.delta,<br>&nbsp;&nbsp;&nbsp;&nbsp;reason:'reversal', reversedBy: a.id,<br>&nbsp;&nbsp;&nbsp;&nbsp;note:'Admin decision change to …' }</div><p>Nothing is updated or deleted — the old accrual stays, neutralised by a signed-opposite row that links back via <code>reversedBy</code>. Net effect on balance: zero from the old decision.</p>` },
+        { id:'ACCRUE', stage:'decide', row:3, type:'det', label:'Accrual', sub:'+new pts',
+          detail:`<p>Only after any reversals does the route post the new credit (on approve, when the figure is <code>&gt; 0</code>).</p><div class="formula">newPoints = pointsOverride ?? Σ pointsAwarded<br>insert accrual { delta: newPoints,<br>&nbsp;&nbsp;reason:'accrual', receiptId, actorId, note }</div><p>The receipt row is then updated: <code>status</code>, <code>pointsAwarded = newPoints</code>, <code>reviewerNote</code>, <code>reviewedBy</code>, <code>reviewedAt = NOW()</code>.</p>` },
+        { id:'LED', stage:'ledger', row:0, type:'data', shape:'cylinder', label:'points_ledger', sub:'append-only · Σ(delta)',
+          detail:`<p><code>points_ledger</code> — <strong>append-only</strong>; rows are never updated or deleted.</p><h4>Reasons in play here</h4><ul><li><code>accrual</code> — the new award (+)</li><li><code>reversal</code> — undo of a prior accrual (−), carrying <code>reversedBy</code></li></ul><div class="formula">balance = COALESCE(SUM(delta), 0)</div><p>Because every decision is just signed rows, re-deciding can never double-count.</p>` },
+        { id:'AUDIT', stage:'ledger', row:1, type:'audit', shape:'cylinder', label:'audit_log', sub:'actor · action · ts',
+          detail:`<p>Every decision appends one immutable <code>audit_log</code> row.</p><ul><li><code>actorId</code> / <code>actorEmail</code> — the admin</li><li><code>action</code> = <code>admin.receipt.approved</code> | <code>admin.receipt.rejected</code></li><li><code>entityType</code> = <code>receipt</code>, <code>entityId</code></li><li><code>payload</code> (jsonb) = <code>{ note, pointsOverride, awarded }</code></li><li><code>createdAt</code> — timestamptz, defaults <code>NOW()</code></li></ul>` },
+        { id:'NOTIFY', stage:'member', row:0, type:'out', label:'Installer notified', sub:'balance reflects net',
+          detail:`<p>The decision lands on the installer: their receipt status flips and the live balance — a pure <code>SUM(delta)</code> over the ledger — reflects the <strong>net</strong> of the reversal and the new accrual.</p><p>A tier change triggered by the new balance is recorded separately as <code>tier.changed</code>.</p>` }
+      ],
+      edges: [
+        ['QUEUE','DETAIL'],
+        ['DETAIL','DECIDE'],
+        ['OVERRIDE','ACCRUE', { dotted:true, label:'sets +pts' }],
+        ['NOTE','DECIDE', { dotted:true }],
+        ['DECIDE','ALREADY', { label:'approve' }],
+        ['DECIDE','NOTIFY', { label:'reject' }],
+        ['ALREADY','REVERSE', { label:'yes' }],
+        ['ALREADY','ACCRUE', { label:'no' }],
+        ['REVERSE','ACCRUE', { label:'then accrue' }],
+        ['ACCRUE','LED', { label:'accrual +' }],
+        ['REVERSE','LED', { label:'reversal −' }],
+        ['DECIDE','AUDIT', { feedback:true, label:'audit' }],
+        ['LED','NOTIFY']
+      ],
+      example: {
+        title: 'Worked example — re-deciding an already-approved receipt',
+        steps: [
+          { label:'Queue', value:'Open receipt · status <code>approved</code> @ 400 pts', nodes:['QUEUE','DETAIL'] },
+          { label:'Reviewer sets override', value:'<code>pointsOverride = 700</code>', nodes:['OVERRIDE','DETAIL'] },
+          { label:'Approve', value:'POST decision · <code>requireAdmin()</code>', nodes:['DECIDE'] },
+          { label:'Already approved at 400?', value:'<strong>yes</strong> → reverse first', nodes:['ALREADY'] },
+          { label:'Reverse prior accrual', value:'<code>reversal −400</code> · <code>reversedBy</code> = orig id', nodes:['REVERSE','LED'] },
+          { label:'Accrue the new figure', value:'<code>accrual +700</code>', nodes:['ACCRUE','LED'] },
+          { label:'Audit row', value:'<code>admin.receipt.approved</code> · {awarded: 700}', nodes:['AUDIT'] },
+          { label:'Net to member', value:'−400 +700 = <code>net +300</code> · no double-count', result:true, nodes:['NOTIFY'] }
+        ],
+        note: 'The receipt was already <code>approved</code> at 400, so the route inserts a <code>reversal</code> of <code>−400</code> (linking <code>reversedBy</code> the original accrual) <strong>before</strong> posting the new <code>accrual</code> of <code>+700</code>. The ledger now holds three rows for this receipt — <code>+400, −400, +700</code> — and balance is just their sum, so the member nets exactly <code>+300</code> and the old award is never double-counted. Flip approve → reject → approve all day; the math always reconciles.'
+      }
+    });
+    </script>
 
     <!-- ── HERO STATS ────────────────────────────────────────── -->
     <div class="ov-stats">
@@ -5147,6 +5715,82 @@ if (!FIRST_OIB_RE.test(flat) || !TOTAL_PLATITI_RE.test(flat)) return null;</div>
       <h1 class="ov-title">One Postgres, one ledger, <em>one source of truth.</em></h1>
       <p class="ov-sub">Under the installer app and the admin console sits a small, deliberate platform: a <strong>Drizzle / Neon Postgres</strong> schema in the EU, an <strong>append-only points ledger</strong>, encrypted <strong>iron-session</strong> cookies over <strong>scrypt</strong>-hashed passwords, a flat <strong>EN/HR</strong> dictionary that flips with zero flicker, and an installable <strong>PWA</strong>. Everything is EU-hosted, GDPR-minded, and reproducible from code.</p>
     </div>
+
+    <!-- ── INTERACTIVE FLOW DIAGRAM ──────────────────────────── -->
+    <section class="ov-section">
+      <div class="ov-section-head">
+        <span class="ov-section-num">ERD</span>
+        <h2 class="ov-section-title">The data model, as a graph</h2>
+        <p class="ov-section-desc">Eleven tables grouped by domain, plus two cross-cutting infra concerns. Solid edges are foreign keys; dotted edges are soft / derived references. Hover any table to trace its relationships · click to read its real key columns · follow the worked example below to see how a balance is computed.</p>
+      </div>
+      <div id="flow-platform"></div>
+    </section>
+    <script>
+    mountFlow('#flow-platform', {
+      stages: [
+        { id:'identity', title:'Identity' },
+        { id:'submit',   title:'Submission' },
+        { id:'loyalty',  title:'Loyalty' },
+        { id:'catalog',  title:'Catalog' },
+        { id:'system',   title:'System' }
+      ],
+      nodes: [
+        { id:'INST', stage:'identity', row:0, type:'data', shape:'cylinder', label:'installers', sub:'the member · auth + identity',
+          detail:`<p>The installer (and admin) account — auth, identity and lifecycle in one table.</p><ul><li><code>id</code> uuid PK · <code>email</code> unique</li><li><code>passwordHash</code> — <code>scrypt$N$r$p$salt$hash</code></li><li><code>role</code> — <code>installer</code> | <code>admin</code></li><li><code>oib</code> — Croatian tax id · <strong>unique index <code>installers_oib_idx</code></strong></li><li><code>companyName</code> · address · <code>country</code> (HR)</li><li><code>tier</code> — cached label (Bronze…Platinum)</li><li><code>disabled</code> + <code>disabledReason</code> — lifecycle</li><li><code>viesValidated</code> · <code>viesCheckedAt</code> — EU VAT check</li></ul><p>Cascade-deletes its receipts, ledger and redemptions.</p>` },
+        { id:'WHOLE', stage:'identity', row:1, type:'data', shape:'cylinder', label:'wholesalers', sub:'the sellers · OIB registry',
+          detail:`<p>Distribution channel seen on invoices — recognised and ranked at parse time.</p><ul><li><code>id</code> uuid PK · <code>oib</code> <strong>unique</strong></li><li><code>name</code> · <code>address</code> · <code>city</code></li><li><code>iban</code></li><li><code>trusted</code> — bool, default true</li></ul><p>Matched to a receipt by <code>wholesalerOib</code> (soft string ref, not an FK).</p>` },
+        { id:'RCPT', stage:'submit', row:0, type:'data', shape:'cylinder', label:'receipts', sub:'the submission · status machine',
+          detail:`<p>One uploaded invoice. FK <code>installerId</code> (cascade).</p><ul><li><code>source</code> — <code>ocr</code> | <code>xml</code></li><li><code>status</code> — <code>processing</code> → <code>needs_review</code> → <code>approved</code> | <code>rejected</code> | <code>duplicate</code></li><li><code>wholesalerOib</code> / <code>buyerOib</code> · <code>invoiceNumber</code></li><li><code>subtotalCents</code> · <code>vatCents</code> · <code>totalCents</code> (bigint cents)</li><li><code>pointsAwarded</code> · <code>fraudFlags</code> (jsonb)</li><li><code>reviewerNote</code> · <code>reviewedBy</code> · <code>reviewedAt</code></li></ul><h4>Dedupe index</h4><p><strong><code>receipts_tuple_idx (wholesalerOib, invoiceNumber, buyerOib, totalCents)</code></strong> — non-unique, speeds the duplicate pre-check; deliberately not UNIQUE so a duplicate is still stored with <code>status='duplicate'</code> beside the original.</p>` },
+        { id:'LINES', stage:'submit', row:1, type:'data', shape:'cylinder', label:'receiptLineItems', sub:'one row per invoice line',
+          detail:`<p>A single parsed invoice line. FK <code>receiptId</code> (cascade).</p><ul><li><code>lineNumber</code> · <code>rawDescription</code> · <code>kpdSifra</code></li><li><code>quantity</code> — text, to keep precision</li><li><code>unitPriceCents</code> · <code>amountCents</code></li><li><code>matchedProductId</code> → products · <code>matchConfidence</code> 0–100 · <code>matchKind</code></li><li><code>isViessmann</code></li><li><code>pointsBase</code> · <code>pointsAwarded</code> (base + campaign split)</li><li><code>campaignId</code> · <code>campaignName</code> — the bonus that lifted it</li></ul>` },
+        { id:'PROD', stage:'submit', row:2, type:'data', shape:'cylinder', label:'products', sub:'Viessmann catalogue',
+          detail:`<p>The Viessmann product catalogue the matcher resolves lines against.</p><ul><li><code>id</code> uuid PK</li><li><code>family</code> — indexed (<code>products_family_idx</code>)</li><li><code>model</code> · <code>description</code></li><li><code>kpdSifra</code> — Croatian product code</li><li><code>pointsPerUnit</code> — base points</li><li><code>isViessmann</code></li></ul>` },
+        { id:'LED', stage:'loyalty', row:0, type:'data', shape:'cylinder', label:'points_ledger', sub:'append-only · balance = Σ(delta)',
+          detail:`<p><strong>Append-only.</strong> Rows are only ever inserted — never UPDATE / DELETE. FK <code>installerId</code> (cascade).</p><ul><li><code>delta</code> — signed integer points</li><li><code>reason</code> — <code>accrual</code> | <code>redemption</code> | <code>reversal</code> | <code>adjustment</code></li><li><code>receiptId</code> — origin of an accrual</li><li><code>redemptionId</code> · <code>reversedBy</code> — spend / undo links</li><li><code>note</code> · <code>actorId</code> — admin trail</li></ul><div class="formula">balance(installer) = COALESCE(SUM(delta), 0)</div>` },
+        { id:'CAMP', stage:'loyalty', row:1, type:'data', shape:'cylinder', label:'campaigns', sub:'bonus rules · per-installer cap',
+          detail:`<p>Time-boxed bonus programs applied per line (single best, non-stackable).</p><ul><li><code>productFamily</code> — scope (NULL = all)</li><li><code>bonusMultiplier</code> — percent, 200 = 2×</li><li><code>bonusFlatPerUnit</code> — flat bonus × qty</li><li><strong><code>capPerInstaller</code></strong> — max bonus per installer · 0 = unlimited</li><li><code>startsAt</code> · <code>endsAt</code> · <code>active</code></li></ul><p>Stamped onto a line via <code>campaignId</code> (soft ref).</p>` },
+        { id:'REW', stage:'catalog', row:0, type:'data', shape:'cylinder', label:'rewards', sub:'redeemable catalogue',
+          detail:`<p>The redeemable reward catalogue.</p><ul><li><code>name</code> · <code>description</code> · <code>imageUrl</code></li><li><code>pointCost</code></li><li><code>inventory</code> — decremented on redeem, restored on cancel</li><li><code>tierRequired</code> — lowest tier that may redeem (default Bronze)</li><li><code>active</code></li></ul>` },
+        { id:'RED', stage:'catalog', row:1, type:'data', shape:'cylinder', label:'redemptions', sub:'fulfilment queue',
+          detail:`<p>A claim against a reward. FK <code>installerId</code> (cascade) + <code>rewardId</code>.</p><ul><li><code>pointCost</code> — captured at redeem time</li><li><code>status</code> — <code>requested</code> | <code>shipped</code> | <code>cancelled</code></li></ul><p>Redeeming writes a <code>redemption</code> ledger row of <code>−pointCost</code>; cancelling an un-shipped one writes a <code>reversal</code> of <code>+pointCost</code>.</p>` },
+        { id:'AUDIT', stage:'system', row:0, type:'audit', shape:'cylinder', label:'auditLog', sub:'immutable system-of-record',
+          detail:`<p>The immutable record of every admin mutation.</p><ul><li><code>actorId</code> · <code>actorEmail</code></li><li><code>action</code> — dotted, e.g. <code>points.adjust</code>, <code>tier.changed</code></li><li><code>entityType</code> · <code>entityId</code></li><li><code>payload</code> — jsonb (the full before/after)</li><li><code>createdAt</code></li></ul>` },
+        { id:'SESS', stage:'system', row:1, type:'guard', label:'iron-session', sub:'scrypt · encrypted cookie',
+          detail:`<p>Cross-cutting auth infra (<code>lib/session.ts</code>) — not a table.</p><ul><li>Cookie <code>viessmann_session</code>, encrypted with <code>SESSION_SECRET</code></li><li>Carries <code>installerId</code> · <code>email</code> · <code>companyName</code> · <code>role</code></li><li><code>httpOnly</code> · <code>sameSite:"lax"</code> · <code>secure</code> in prod</li><li>Decryption memoised per request via React <code>cache()</code></li><li>Passwords: <code>scryptSync</code> N=16384, r=8, p=1; verified with <code>timingSafeEqual</code></li></ul><p>Resolves the active <code>installers</code> row on every request.</p>` },
+        { id:'I18N', stage:'system', row:2, type:'guard', label:'i18n locale', sub:'EN / HR cookie',
+          detail:`<p>Cross-cutting locale infra (<code>lib/i18n/server.ts</code>) — not a table.</p><ul><li>Cookie <code>lang</code> · <code>SUPPORTED = en, hr</code> · default <code>en</code></li><li>Server: <code>getLocale()</code> reads the cookie, <code>getT()</code> binds <code>t()</code></li><li><code>&lt;html lang&gt;</code> follows the cookie — no client flicker</li></ul><p>Frames every page rendered for an <code>installers</code> session.</p>` }
+      ],
+      edges: [
+        ['INST','RCPT', { label:'1·n' }],
+        ['RCPT','LINES', { label:'1·n' }],
+        ['LINES','PROD', { dotted:true, label:'matched' }],
+        ['INST','LED', { label:'1·n' }],
+        ['RCPT','LED', { dotted:true, label:'accrual' }],
+        ['CAMP','LINES', { dotted:true, label:'bonus' }],
+        ['WHOLE','RCPT', { dotted:true, label:'seller' }],
+        ['INST','RED', { label:'1·n' }],
+        ['REW','RED', { label:'1·n' }],
+        ['RED','LED', { dotted:true, label:'redemption' }],
+        ['INST','AUDIT', { dotted:true }],
+        ['SESS','INST', { dotted:true }],
+        ['I18N','INST', { dotted:true }]
+      ],
+      example: {
+        title: 'Worked example — one source of truth: how a balance is computed',
+        steps: [
+          { label:'Installer',  value:'<code>ivo@instalaterm.hr</code>', nodes:['INST'] },
+          { label:'Ledger rows', value:'every <code>points_ledger</code> row where <code>installer_id = ivo</code>', nodes:['LED'] },
+          { label:'+400', value:'<code>accrual</code> · approved receipt', nodes:['LED','RCPT'] },
+          { label:'+700', value:'<code>accrual</code> · approved receipt', nodes:['LED','RCPT'] },
+          { label:'−1 500', value:'<code>redemption</code> · reward claimed', nodes:['LED','RED'] },
+          { label:'+1 500', value:'<code>reversal</code> · redemption cancelled', nodes:['LED','RED'] },
+          { label:'Balance Σ(delta)', value:'400 + 700 − 1 500 + 1 500 = <code>1 100</code>', nodes:['LED'] },
+          { label:'Tier · tier.ts', value:'1 100 &lt; 2 000 → <strong>Bronze</strong>', result:true, nodes:['INST'] }
+        ],
+        note: 'The balance is <strong>never stored</strong> — it is always <code>Σ(delta)</code> folded over the immutable ledger rows. Here a 1 500-point redemption was later cancelled, so a <code>+1 500</code> <code>reversal</code> row makes the installer whole; the running sum lands at <code>1 100</code>, which <code>tier.ts</code> maps to Bronze (Silver needs ≥ 2 000). Re-run the sum any time and you get the same number — a disputed total is always a specific row you can read, never a counter that drifted.'
+      }
+    });
+    </script>
 
     <!-- ── HERO STATS ────────────────────────────────────────── -->
     <div class="ov-stats">
