@@ -102,6 +102,8 @@
   .legend .lt{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:8px}
   .legend .li{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);margin:0 10px 5px 0;font-weight:500}
   .legend .sw{width:11px;height:11px;border-radius:4px}
+  .stage-frame{position:absolute;border:1.5px dashed var(--line-2);background:rgba(148,163,184,.05);border-radius:18px;z-index:0;pointer-events:none}
+  .stage-lbl{position:absolute;top:-12px;left:18px;background:var(--bg);padding:2px 11px;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-mute);border-radius:5px}
 
   .preview-card{position:absolute;top:16px;left:18px;width:188px;background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow-md);z-index:9;overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s}
   .preview-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
@@ -363,6 +365,66 @@ const OVERVIEW=`<div class="ov-wrap">
 const FLOWS=[
 { key:'overview', name:'Overview', tag:'☆', over:true, html:OVERVIEW },
 
+// ---------- FULL SYSTEM MAP ----------
+{ key:'system', name:'Full system map', tag:'⬡',
+  stages:[{t:'Input',c0:0,c1:0},{t:'Read & extract',c0:1,c1:1},{t:'Validate & dedupe',c0:2,c1:2},{t:'Match',c0:3,c1:3},{t:'Loyalty engine',c0:4,c1:4},{t:'Admin review',c0:5,c1:5},{t:'Outputs',c0:6,c1:6},{t:'Platform & audit',c0:7,c1:7}],
+  nodes:[
+    // Input
+    {id:'PDF',col:0,row:0,cat:'input',icon:'receipt',title:'PDF invoice',sub:'digital · e-invoice export',what:'A digital PDF invoice with a real text layer.',input:'A .pdf file',output:'Raw PDF document'},
+    {id:'PHOTO',col:0,row:1,cat:'input',icon:'camera',title:'Phone photo',sub:'JPEG · scan',what:'A photo or scan of a paper invoice.',input:'An image',output:'Raw image'},
+    {id:'XML',col:0,row:2,cat:'input',icon:'layers',title:'e-invoice XML',sub:'UBL · HR-CIUS · PEPPOL',what:'An official Croatian e-invoice file.',input:'An .xml file',output:'Structured XML'},
+    {id:'CTX',col:0,row:3,cat:'input',icon:'userCheck',title:'Installer context',sub:'OIB · account · session',what:'Who is uploading — their account OIB and session.',input:'The signed-in installer',output:'Account OIB + identity'},
+    // Read & extract
+    {id:'UNPDF',col:1,row:0,cat:'read',icon:'eye',title:'unpdf (PDF text)',sub:'digital PDFs',what:'Pulls the text layer out of a digital PDF.',input:'PDF document',output:'Plain text',tech:'<code>unpdf</code> — fast, free, no AI.'},
+    {id:'OCR',col:1,row:1,cat:'read',icon:'eye',title:'Tesseract OCR',sub:'hrv+eng · on-device',what:'Reads text from a photo, on the device.',input:'Image',output:'Plain text',tech:'<code>tesseract.js</code> (Croatian + English) in the browser; only the text is sent on.'},
+    {id:'XMLP',col:1,row:2,cat:'read',icon:'layers',title:'fast-xml-parser',sub:'UBL · HR-CIUS · PEPPOL',what:'Reads structured fields straight from an e-invoice.',input:'XML',output:'Structured fields'},
+    {id:'CIP',col:1,row:3,cat:'find',icon:'building',title:'Croatian parser',sub:'OIB · KPD · 1.299,00',what:'Turns the text into structured invoice fields and line items.',input:'Plain text',output:'Parsed receipt (parties, total, lines)',formula:'finds <code>OIB</code> · <code>Racun</code> · <code>Datum izdavanja</code> · <code>Ukupan iznos</code>; <code>1.299,00</code> → 1299.00'},
+    {id:'CLAUDE',col:1,row:4,cat:'read',icon:'star',title:'Claude vision',sub:'optional · off by default',what:'A paid AI fallback for tricky scans — switched off by default.',input:'Image (no text layer)',output:'Parsed fields',tech:'Only used if <code>ANTHROPIC_API_KEY</code> is set; the app never needs it.'},
+    // Validate & dedupe
+    {id:'OIB',col:2,row:0,cat:'check',icon:'shield',title:'OIB checksum',sub:'mod-11-10',what:'Validates the company numbers and that the buyer is this installer.',input:'Seller & buyer OIBs',output:'Valid / invalid · yours / not',formula:'ISO 7064 <b>mod-11-10</b> over 11 digits · buyer OIB = account OIB'},
+    {id:'EUR',col:2,row:1,cat:'check',icon:'coins',title:'Currency check',sub:'EUR only',what:'Confirms the invoice is in euros.',input:'Currency code',output:'EUR / not EUR'},
+    {id:'VEL',col:2,row:2,cat:'check',icon:'gauge',title:'Velocity check',sub:'30 / hour',what:'Flags an unusual burst of submissions.',input:'Recent submission count',output:'Normal / flagged',formula:'flag if <b>&gt; 30 in 1 hour</b>'},
+    {id:'DUP',col:2,row:3,cat:'decide',icon:'copy',title:'Duplicate lookup',sub:'tuple index',what:'Checks if this exact invoice was already approved.',input:'(seller OIB, invoice no, buyer OIB, total)',output:'Unique / duplicate',formula:'look up the 4-field fingerprint among <b>approved</b> invoices'},
+    {id:'DECIDE',col:2,row:4,cat:'decide',icon:'scale',title:'Status decision',sub:'approve / review / reject',what:'Weighs all the checks and decides the outcome.',input:'All check results',output:'approved · needs_review · rejected · duplicate',formula:'hard fail → reject · soft flag → review · else → approve'},
+    // Match
+    {id:'SKU',col:3,row:0,cat:'find',icon:'search',title:'SKU matcher',sub:'KPD → model → fuzzy',what:'Matches each line to a Viessmann product.',input:'Invoice line (text + KPD + qty)',output:'Matched product + confidence',formula:'KPD 95 · model 90 · similarity ≥ 0.35 · family 50'},
+    {id:'CAT',col:3,row:1,cat:'data',icon:'database',title:'Viessmann catalog',sub:'products · KPD · pts',what:'The list of Viessmann products with their codes and points.',input:'—',output:'Reference data for matching'},
+    {id:'CLS',col:3,row:2,cat:'find',icon:'filter',title:'Classify lines',sub:'Viessmann vs other',what:'Splits lines into Viessmann (earn points) and other (0).',input:'Matched lines',output:'Eligible lines + their base points'},
+    // Loyalty engine
+    {id:'BASE',col:4,row:0,cat:'reward',icon:'star',title:'Base points',sub:'pts/unit × qty',what:'Base points per product line.',input:'product points, quantity',output:'Base points',formula:'<b>base = points-per-unit × quantity</b>'},
+    {id:'CAMP',col:4,row:1,cat:'reward',icon:'megaphone',title:'Active campaigns',sub:'mult% · flat · family',what:'Applies the best matching campaign bonus.',input:'base, applicable campaigns',output:'Candidate point totals',formula:'<b>final = round(base × mult%) + flat × qty</b>'},
+    {id:'CAP',col:4,row:2,cat:'decide',icon:'sigma',title:'Best + cap',sub:'highest · per-installer cap',what:'Keeps the single best campaign and applies any per-installer cap.',input:'candidates, cap, already-claimed',output:'Final points for the line',formula:'best, then <b>remaining = max(0, cap − claimed)</b>'},
+    {id:'LEDG',col:4,row:3,cat:'data',icon:'database',title:'Points ledger',sub:'append-only · Σ Δ',what:'Every points change as one immutable entry.',input:'A points delta',output:'Balance = sum of all deltas',formula:'<b>balance = Σ Δ</b> · reasons: accrual / redemption / reversal / adjustment'},
+    {id:'TIER',col:4,row:4,cat:'reward',icon:'trophy',title:'Tier ladder',sub:'Bronze → Platinum',what:'The tier follows the balance.',input:'balance',output:'Tier',formula:'Bronze 0 · Silver 2,000 · Gold 8,000 · Platinum 25,000'},
+    // Admin review
+    {id:'QUEUE',col:5,row:0,cat:'admin',icon:'layers',title:'Review queue',sub:'needs_review',what:'Flagged invoices wait here for a human.',input:'needs_review invoices',output:'A reviewable list'},
+    {id:'DEC',col:5,row:1,cat:'decide',icon:'userCheck',title:'Approve / reject',sub:'+ override · note',what:'A reviewer decides, optionally overriding the points.',input:'A queued invoice',output:'A decision + ledger entry',tech:'<code>requireAdmin()</code>; Zod-validated decision.'},
+    {id:'REV',col:5,row:2,cat:'decide',icon:'copy',title:'Re-decide → reverse',sub:'no double-count',what:'Changing a decision reverses the old points first.',input:'A changed decision',output:'A reversal + new accrual',formula:'reverse the prior accrual, then add the new — idempotent'},
+    // Outputs
+    {id:'BAL',col:6,row:0,cat:'output',icon:'trophy',title:'Balance + tier',sub:'installer dashboard',what:'What the installer sees: balance, tier, progress.',input:'ledger + tier',output:'The installer home screen'},
+    {id:'RWD',col:6,row:1,cat:'output',icon:'gift',title:'Rewards + redeem',sub:'cost · tier gate',what:'The catalogue and redemptions.',input:'balance + tier',output:'Redeemable rewards'},
+    {id:'NOTIF',col:6,row:2,cat:'output',icon:'megaphone',title:'Notifications',sub:'status · tier change',what:'Tells the installer about approvals and tier changes.',input:'status events',output:'In-app notifications'},
+    {id:'DASH',col:6,row:3,cat:'output',icon:'chart',title:'Intelligence',sub:'admin analytics',what:'Dashboards of what is selling, by whom, where.',input:'approved invoices',output:'Charts & tables'},
+    {id:'CSV',col:6,row:4,cat:'output',icon:'layers',title:'CSV export',sub:'UTF-8 BOM',what:'Export for finance and spreadsheets.',input:'queue / installer data',output:'Excel-ready CSV'},
+    // Platform & audit
+    {id:'AUTH',col:7,row:0,cat:'check',icon:'shield',title:'Sign-in & session',sub:'iron-session · scrypt',what:'Secure login that ties every action to an account.',input:'email + password',output:'A signed session',tech:'<code>iron-session</code> cookie · <code>scrypt</code> hashing.'},
+    {id:'I18N',col:7,row:1,cat:'check',icon:'building',title:'Language EN / HR',sub:'cookie locale',what:'The whole app in English or Croatian.',input:'A language choice',output:'Localised UI'},
+    {id:'ALOG',col:7,row:2,cat:'data',icon:'database',title:'Audit log',sub:'actor · action · ts',what:'Every important action is recorded.',input:'Admin & system actions',output:'An immutable trail'},
+    {id:'FF',col:7,row:3,cat:'data',icon:'x',title:'Fraud flags',sub:'per-receipt',what:'The reasons behind each review or rejection, kept on the receipt.',input:'Check results',output:'A stored flag list'}
+  ],
+  edges:[
+    ['CTX','AUTH',{dashed:1}],['PDF','UNPDF'],['PHOTO','OCR'],['XML','XMLP'],
+    ['UNPDF','CIP'],['OCR','CIP'],['UNPDF','CLAUDE',{dashed:1,lbl:'no text'}],['CLAUDE','CIP',{dashed:1}],
+    ['CIP','OIB'],['XMLP','OIB'],['OIB','EUR'],['EUR','VEL'],['VEL','DUP'],['DUP','DECIDE',{lbl:'unique'}],
+    ['CIP','SKU'],['CAT','SKU',{dashed:1}],['SKU','CLS'],['CLS','BASE'],
+    ['DECIDE','BASE',{lbl:'approved'}],['DECIDE','QUEUE',{lbl:'review',dashed:1}],['QUEUE','DEC'],['DEC','REV',{dashed:1}],['DEC','LEDG',{dashed:1,lbl:'approve'}],
+    ['BASE','CAMP'],['CAMP','CAP'],['CAP','LEDG'],['LEDG','TIER'],
+    ['TIER','BAL'],['LEDG','BAL'],['BAL','RWD'],['BAL','NOTIF'],['LEDG','DASH',{dashed:1}],['DASH','CSV'],
+    ['LEDG','ALOG',{dashed:1}],['DEC','ALOG',{dashed:1}],['DECIDE','FF',{dashed:1}],['I18N','BAL',{dashed:1}]
+  ],
+  happy:['PDF','UNPDF','CIP','OIB','EUR','VEL','DUP','DECIDE','BASE','CAMP','CAP','LEDG','TIER','BAL']
+},
+
 // ---------- REAL · APPROVED ----------
 { key:'real-ok', name:'Real invoice · approved', tag:'✓', real:true,
   preview:{img:'samples/agria-001-1.png', title:'Invoice AGRIA #001', sub:'Agria → Instalaterm · tap to zoom'},
@@ -453,6 +515,7 @@ const FLOWS=[
 
 // ---------- THE BIG PICTURE ----------
 { key:'journey', name:'The big picture', tag:'1',
+  stages:[{t:'Capture',c0:0,c1:0},{t:'Understand',c0:1,c1:2},{t:'Check',c0:3,c1:3},{t:'Reward',c0:4,c1:5}],
   nodes:[
     {id:'u',col:0,row:1,cat:'input',icon:'camera',title:'Snap the invoice',sub:'photo, PDF or e-invoice',
       what:'The installer sends the wholesaler invoice from their phone — a photo, a PDF, or an official e-invoice.',
@@ -490,37 +553,42 @@ const FLOWS=[
 
 // ---------- READING AN INVOICE ----------
 { key:'reading', name:'Reading an invoice', tag:'2',
+  stages:[{t:'Input',c0:0,c1:0},{t:'Read',c0:1,c1:1},{t:'Parse fields',c0:2,c1:2},{t:'Match',c0:3,c1:3},{t:'Result',c0:4,c1:4}],
   nodes:[
-    {id:'a',col:0,row:0,cat:'input',icon:'camera',title:'Photo or file',sub:'phone or computer',
-      what:'The installer adds the invoice as a photo, a PDF, or an e-invoice file.',
-      input:'JPG/PNG photo, PDF, or e-invoice XML',output:'The raw document',
-      ex:'Whatever they have to hand — a quick snap is fine.',
-      tech:'Photos are capped and read on-device; only extracted text is sent on (keeps it under the upload limit).'},
-    {id:'b',col:1,row:0,cat:'read',icon:'eye',title:'Turn it into text',sub:'on the device · free',
-      what:'The app turns the picture into text right on the device — free and private.',
-      input:'The document (image or PDF)',output:'Plain text of the invoice',
-      ex:'No cloud AI bills, and a photo <b>stays on the phone</b>.',
-      tech:'PDF: <code>unpdf</code> text layer. Photo: Tesseract OCR (hrv + eng) in the browser. XML: parsed directly.'},
-    {id:'c',col:2,row:0,cat:'find',icon:'building',title:'Find who & how much',sub:'company, date, total',
-      what:'It finds the seller, the buyer, the date and the total.',
-      input:'Plain invoice text',output:'Parties, OIBs, invoice no, date, total',
-      formula:'finds <code>OIB</code> · <code>Racun</code> · <code>Datum izdavanja</code> · <code>Ukupan iznos</code><br>Croatian <code>1.299,00</code> → <b>1299.00</b>',
-      ex:'It reads a Croatian total like <b>1.299,00 €</b> correctly.'},
-    {id:'d',col:3,row:0,cat:'find',icon:'search',title:'Spot Viessmann items',sub:'match the models',
-      what:'It recognises the Viessmann product names and models in the list.',
-      input:'Each line: description + KPD code + qty',output:'A matched product + confidence',
-      formula:'KPD exact → 95 · model in text → 90 · similarity ≥ 0.35 → fuzzy · family → 50',
-      ex:'“VITODENS 200-W” on paper is matched to the real product.'},
-    {id:'e',col:4,row:0,cat:'output',icon:'check',title:'Ready to score',sub:'clean, tidy data',
-      what:'The messy invoice is now neat, structured information.',
-      input:'All the parsed pieces',output:'A structured receipt with matched lines',
-      ex:'From a crooked photo to <b>clean data</b> in a second or two.'}
+    {id:'pdf',col:0,row:0,cat:'input',icon:'receipt',title:'PDF',sub:'digital invoice',
+      what:'A digital PDF — the most common case.',input:'A .pdf file',output:'PDF document'},
+    {id:'photo',col:0,row:1,cat:'input',icon:'camera',title:'Photo',sub:'phone scan',
+      what:'A photo or scan of a paper invoice.',input:'A JPG/PNG image',output:'Image'},
+    {id:'xml',col:0,row:2,cat:'input',icon:'layers',title:'e-invoice XML',sub:'official format',
+      what:'An official Croatian e-invoice file.',input:'An .xml file',output:'Structured XML'},
+    {id:'unpdf',col:1,row:0,cat:'read',icon:'eye',title:'unpdf text',sub:'from a PDF',
+      what:'Pulls the text layer out of a PDF — fast and free.',input:'PDF',output:'Plain text',tech:'<code>unpdf</code>, no AI.'},
+    {id:'ocr',col:1,row:1,cat:'read',icon:'eye',title:'Tesseract OCR',sub:'on-device · free',
+      what:'Reads text from a photo on the device — nothing private leaves the phone.',input:'Image',output:'Plain text',tech:'<code>tesseract.js</code> (hrv + eng); only the text is sent on.'},
+    {id:'xmlp',col:1,row:2,cat:'read',icon:'layers',title:'XML reader',sub:'structured',
+      what:'Reads fields straight from an e-invoice — no guessing needed.',input:'XML',output:'Structured fields'},
+    {id:'parser',col:2,row:0,cat:'find',icon:'building',title:'Croatian parser',sub:'the brain',
+      what:'Understands a Croatian invoice — the same logic for PDF, photo or XML.',input:'Plain text / fields',output:'Organised invoice',
+      formula:'finds <code>OIB</code> · <code>Racun</code> · <code>Datum izdavanja</code> · <code>Ukupan iznos</code>'},
+    {id:'fields',col:2,row:1,cat:'find',icon:'search',title:'Key fields',sub:'who · when · how much',
+      what:'Pulls out the seller, buyer, date and total.',input:'Parsed invoice',output:'Parties, OIBs, date, total',formula:'Croatian <code>1.299,00</code> → <b>1299.00</b>'},
+    {id:'lines',col:2,row:2,cat:'find',icon:'filter',title:'Line items',sub:'products + KPD + qty',
+      what:'Pulls out each product line with its code and quantity.',input:'Parsed invoice',output:'A list of line items'},
+    {id:'sku',col:3,row:0,cat:'find',icon:'search',title:'Match products',sub:'KPD → model → fuzzy',
+      what:'Matches each line to a real Viessmann product.',input:'A line + the catalog',output:'Matched product + confidence',formula:'KPD 95 · model 90 · similarity ≥ 0.35 · family 50'},
+    {id:'cat',col:3,row:1,cat:'data',icon:'database',title:'Viessmann catalog',sub:'products · KPD · pts',
+      what:'The reference list of Viessmann products.',input:'—',output:'Reference data'},
+    {id:'out',col:4,row:0,cat:'output',icon:'check',title:'Structured receipt',sub:'ready to score',
+      what:'The messy invoice is now clean, structured data with matched products.',input:'Fields + matched lines',output:'A structured receipt'}
   ],
-  edges:[['a','b'],['b','c'],['c','d'],['d','e']],happy:['a','b','c','d','e']
+  edges:[['pdf','unpdf'],['photo','ocr'],['xml','xmlp'],['unpdf','parser'],['ocr','parser'],['xmlp','parser'],
+    ['parser','fields'],['parser','lines'],['lines','sku'],['cat','sku',{dashed:1}],['fields','out'],['sku','out']],
+  happy:['pdf','unpdf','parser','lines','sku','out']
 },
 
 // ---------- POINTS & THE MATHS ----------
 { key:'points', name:'Points & the maths', tag:'3',
+  stages:[{t:'Per matched line',c0:0,c1:5},{t:'Per invoice',c0:6,c1:6},{t:'Ledger & tier',c0:7,c1:8}],
   nodes:[
     {id:'l',col:0,row:0,cat:'input',icon:'receipt',title:'A matched line',sub:'product × quantity',
       what:'We start from one matched Viessmann line on an approved invoice.',
@@ -574,69 +642,76 @@ const FLOWS=[
 
 // ---------- KEEPING IT FAIR ----------
 { key:'fair', name:'Keeping it fair', tag:'4',
+  stages:[{t:'Parsed',c0:0,c1:0},{t:'Validate',c0:1,c1:2},{t:'Dedupe',c0:3,c1:3},{t:'Decide',c0:4,c1:4},{t:'Outcome',c0:5,c1:5}],
   nodes:[
-    {id:'i',col:0,row:1,cat:'check',icon:'shield',title:'Every invoice is checked',sub:'automatically',
-      what:'Before any points are given, the app runs a few quick, automatic checks.',
-      input:'A parsed, product-matched invoice',output:'A set of pass/fail flags',
-      ex:'It all happens in the background, in a moment.',
-      tech:'All checks are deterministic — same input, same result, fully auditable.'},
-    {id:'o',col:1,row:1,cat:'check',icon:'building',title:'Is the company real?',sub:'valid OIB & yours',
-      what:'It validates the official company number (OIB) and that the buyer is this installer.',
-      input:'Seller &amp; buyer OIBs + the account OIB',output:'Valid / invalid · yours / not yours',
-      formula:'<b>OIB checksum</b> (ISO 7064 mod-11-10) over 11 digits<br>and <b>buyer OIB = account OIB</b>',
-      ex:'A made-up or mistyped number fails the checksum and is caught immediately.'},
-    {id:'c',col:2,row:1,cat:'check',icon:'copy',title:'Used before?',sub:'no double-claims',
-      what:'It checks whether this exact invoice has already been submitted and approved.',
-      input:'(seller OIB, invoice no, buyer OIB, total)',output:'Unique / already-claimed',
-      formula:'look up the 4-field fingerprint among <b>approved</b> invoices → match ⇒ <b>duplicate</b>',
-      ex:'The same invoice <b>can’t be claimed twice</b>.'},
-    {id:'v',col:3,row:1,cat:'check',icon:'gauge',title:'Too many, too fast?',sub:'sensible limits',
-      what:'It watches for an unusual flurry of submissions in a short time.',
-      input:'Recent submission count for this installer',output:'Normal / flagged',
-      formula:'flag if <b>&gt; 30 submissions within 1 hour</b>',
-      ex:'Dozens of invoices in a minute? That gets flagged for a look.'},
-    {id:'d',col:4,row:1,cat:'decide',icon:'scale',title:'Decision',sub:'approve · review · reject',
-      what:'Based on the checks, the invoice is approved, sent to a human, or declined.',
-      input:'All the check flags',output:'One of: approved · needs review · rejected · duplicate',
-      formula:'hard fail (e.g. not your invoice, no Viessmann line) → <b>reject</b><br>soft flag (odd date, unmatched line) → <b>review</b><br>else → <b>approve</b>',
-      ex:'Clean invoices sail through automatically.'},
+    {id:'rcpt',col:0,row:1,cat:'data',icon:'database',title:'Parsed receipt',sub:'the facts to check',
+      what:'The structured invoice — parties, OIBs, total, lines — ready to be checked.',input:'A read, product-matched invoice',output:'Fields for every check'},
+    {id:'soib',col:1,row:0,cat:'check',icon:'shield',title:'Seller OIB valid?',sub:'mod-11-10',
+      what:'Checks the wholesaler’s company number is genuine.',input:'Seller OIB',output:'Valid / invalid',formula:'ISO 7064 <b>mod-11-10</b> over 11 digits'},
+    {id:'boib',col:1,row:1,cat:'check',icon:'shield',title:'Buyer OIB valid?',sub:'mod-11-10',
+      what:'Checks the buyer’s company number is genuine.',input:'Buyer OIB',output:'Valid / invalid',formula:'same <b>mod-11-10</b> checksum'},
+    {id:'mine',col:1,row:2,cat:'check',icon:'userCheck',title:'Is it your invoice?',sub:'buyer = account',
+      what:'The buyer on the invoice must be the signed-in installer.',input:'Buyer OIB vs account OIB',output:'Yours / not yours',formula:'<b>buyer OIB = account OIB</b>'},
+    {id:'cur',col:2,row:0,cat:'check',icon:'coins',title:'Currency EUR?',sub:'euros only',
+      what:'Confirms the invoice is in euros.',input:'Currency code',output:'EUR / not EUR'},
+    {id:'tot',col:2,row:1,cat:'check',icon:'scale',title:'Totals add up?',sub:'subtotal + VAT',
+      what:'The maths on the invoice must be consistent.',input:'subtotal, VAT, total',output:'OK / mismatch',formula:'<b>|subtotal + VAT − total| ≤ a few cents</b>'},
+    {id:'date',col:2,row:2,cat:'check',icon:'gauge',title:'Date sensible?',sub:'recent · not future',
+      what:'The invoice date should be recent and not in the future.',input:'Issue date',output:'OK / flagged',formula:'flag if <b>older than 90 days</b> or in the future'},
+    {id:'vel',col:2,row:3,cat:'check',icon:'gauge',title:'Not too fast?',sub:'pace limit',
+      what:'Watches for a burst of submissions in a short time.',input:'Recent submission count',output:'Normal / flagged',formula:'flag if <b>&gt; 30 in 1 hour</b>'},
+    {id:'dup',col:3,row:1,cat:'decide',icon:'copy',title:'Already used?',sub:'tuple fingerprint',
+      what:'Has this exact invoice already been approved before?',input:'(seller OIB, invoice no, buyer OIB, total)',output:'Unique / duplicate',formula:'look up the fingerprint among <b>approved</b> invoices'},
+    {id:'flags',col:3,row:2,cat:'data',icon:'x',title:'Fraud flags',sub:'reasons collected',
+      what:'Any failed or odd checks are gathered as flags on the receipt.',input:'All check results',output:'A stored list of reasons'},
+    {id:'dec',col:4,row:1,cat:'decide',icon:'scale',title:'Decision',sub:'weigh it all',
+      what:'Weighs every check and lands on an outcome.',input:'All the flags',output:'approved · review · rejected · duplicate',formula:'hard fail → <b>reject</b> · soft flag → <b>review</b> · else → <b>approve</b>'},
     {id:'ok',col:5,row:0,cat:'reward',icon:'check',title:'Approved',sub:'points awarded',
-      what:'Everything checks out — points are awarded right away.',input:'A clean invoice',output:'Points credited',ex:'The happy, common path.'},
+      what:'Everything checks out — points are awarded right away.',input:'A clean invoice',output:'Points credited'},
     {id:'rv',col:5,row:1,cat:'admin',icon:'userCheck',title:'Needs a look',sub:'human review',
-      what:'Something was slightly unusual, so a colleague reviews it first.',input:'A soft-flagged invoice',output:'A human decision',ex:'A safety net, not a roadblock.'},
-    {id:'no',col:5,row:2,cat:'output',icon:'x',title:'Declined',sub:'with a clear reason',
-      what:'If it fails a key check, it’s declined and the installer is told why.',input:'A hard-failed invoice',output:'A rejection + reason',ex:'e.g. “This invoice was already used.”'}
+      what:'Slightly unusual, so a Viessmann colleague reviews it first.',input:'A soft-flagged invoice',output:'A human decision'},
+    {id:'no',col:5,row:2,cat:'output',icon:'x',title:'Rejected',sub:'clear reason',
+      what:'Fails a key check, so it’s declined with a reason the installer can see.',input:'A hard-failed invoice',output:'A rejection + reason'},
+    {id:'dupo',col:5,row:3,cat:'output',icon:'copy',title:'Duplicate',sub:'0 points',
+      what:'Already claimed before — kept for the record but earns nothing.',input:'A duplicate',output:'Status duplicate · 0 points'}
   ],
-  edges:[['i','o'],['o','c'],['c','v'],['v','d'],['d','ok',{lbl:'all clear'}],['d','rv',{lbl:'unsure',dashed:1}],['d','no',{lbl:'failed',dashed:1}]],
-  happy:['i','o','c','v','d','ok']
+  edges:[['rcpt','soib'],['rcpt','cur'],['soib','boib'],['boib','mine'],['cur','tot'],['tot','date'],['date','vel'],
+    ['mine','dup'],['vel','dup'],['mine','flags',{dashed:1}],['vel','flags',{dashed:1}],['dup','dec',{lbl:'unique'}],['dup','dupo',{lbl:'match',dashed:1}],['flags','dec',{dashed:1}],
+    ['dec','ok',{lbl:'all clear'}],['dec','rv',{lbl:'unsure',dashed:1}],['dec','no',{lbl:'failed',dashed:1}]],
+  happy:['rcpt','soib','boib','mine','dup','dec','ok']
 },
 
 // ---------- BEHIND THE SCENES ----------
 { key:'admin', name:'Behind the scenes', tag:'5',
+  stages:[{t:'Queue',c0:0,c1:0},{t:'Review',c0:1,c1:2},{t:'Apply',c0:3,c1:3},{t:'Manage',c0:4,c1:4},{t:'Insight',c0:5,c1:5}],
   nodes:[
-    {id:'q',col:0,row:0,cat:'admin',icon:'layers',title:'Submissions queue',sub:'everything in one place',
-      what:'Every submitted invoice lands in one tidy queue for the Viessmann team.',
-      input:'All incoming invoices',output:'A sorted, searchable queue',
-      ex:'The ones needing attention float to the top.',tech:'Filter by status; export to CSV for finance.'},
-    {id:'r',col:1,row:0,cat:'admin',icon:'userCheck',title:'Quick review',sub:'approve or decline',
-      what:'A reviewer opens an invoice, sees what the app found, and approves or declines.',
-      input:'A queued invoice + the app’s findings',output:'A decision (with optional points override)',
-      ex:'They can fine-tune the points or add a note if needed.'},
-    {id:'p',col:2,row:0,cat:'reward',icon:'coins',title:'Points go out',sub:'or a reason is given',
-      what:'Approving credits the installer instantly; declining records a clear reason.',
-      input:'The decision',output:'A ledger entry, or a logged rejection',
-      formula:'re-approving first <b>reverses</b> the old points, then adds the new — never double-counts',
-      ex:'Change a 400-pt approval to 700 → reverse −400, add +700 → net +300.'},
-    {id:'c',col:3,row:0,cat:'check',icon:'megaphone',title:'Run campaigns',sub:'boost chosen products',
-      what:'The team launches promotions that add bonus points to chosen product ranges.',
-      input:'A campaign: family, multiplier, flat bonus, cap, dates',output:'Bonus points applied automatically going forward',
-      ex:'“Double points on heat pumps this quarter.”'},
-    {id:'i',col:4,row:0,cat:'output',icon:'chart',title:'See the trends',sub:'what’s selling, where',
-      what:'Dashboards show what’s being installed, by whom, and where.',
-      input:'All approved invoices',output:'Volume, family mix, top wholesalers, pricing',
-      ex:'Real market insight, built only from approved data.'}
+    {id:'queue',col:0,row:1,cat:'admin',icon:'layers',title:'Submissions queue',sub:'all in one place',
+      what:'Every submitted invoice lands in one tidy, searchable queue, with the ones needing attention on top.',input:'All incoming invoices',output:'A sorted queue'},
+    {id:'detail',col:1,row:0,cat:'admin',icon:'search',title:'Open an invoice',sub:'see what the app found',
+      what:'The reviewer opens an invoice and sees the parsed fields, matched products and flags.',input:'A queued invoice',output:'The full picture'},
+    {id:'override',col:1,row:1,cat:'reward',icon:'coins',title:'Adjust points?',sub:'optional override',
+      what:'They can fine-tune the points the app worked out, if needed.',input:'The computed points',output:'A final point value'},
+    {id:'note',col:1,row:2,cat:'admin',icon:'building',title:'Add a note',sub:'reason / context',
+      what:'A short note can be attached for the record or the installer.',input:'Free text',output:'A reviewer note'},
+    {id:'decide',col:2,row:1,cat:'decide',icon:'userCheck',title:'Approve or decline',sub:'the call',
+      what:'The reviewer approves or declines the invoice.',input:'Everything above',output:'A decision',tech:'<code>requireAdmin()</code> · Zod-validated.'},
+    {id:'already',col:2,row:2,cat:'decide',icon:'copy',title:'Already approved?',sub:'idempotency',
+      what:'If this invoice was already approved, the old points are undone before re-applying.',input:'Current status',output:'Yes / no'},
+    {id:'reverse',col:3,row:0,cat:'reward',icon:'x',title:'Reverse old points',sub:'if re-deciding',
+      what:'Undoes the previous accrual so points are never double-counted.',input:'The prior accrual',output:'A reversal entry',formula:'add <b>−old</b> before adding the new'},
+    {id:'accrue',col:3,row:1,cat:'reward',icon:'coins',title:'Credit points',sub:'to the ledger',
+      what:'The final points are written to the installer’s ledger, or a rejection is logged.',input:'The decision + points',output:'A ledger entry'},
+    {id:'camp',col:4,row:0,cat:'check',icon:'megaphone',title:'Run campaigns',sub:'boost chosen ranges',
+      what:'Launch promotions that add bonus points to chosen product families.',input:'family · multiplier · flat · cap · dates',output:'Bonuses applied automatically',ex:'“Double points on heat pumps this quarter.”'},
+    {id:'dash',col:5,row:0,cat:'output',icon:'chart',title:'Dashboards',sub:'what’s selling, where',
+      what:'Clear charts of volume, product mix, top wholesalers and pricing.',input:'Approved invoices',output:'Market insight'},
+    {id:'audit',col:5,row:1,cat:'data',icon:'database',title:'Audit log',sub:'every action',
+      what:'Every decision and change is recorded — who, what, when.',input:'Admin & system actions',output:'An immutable trail'}
   ],
-  edges:[['q','r'],['r','p'],['p','c'],['c','i']],happy:['q','r','p','c','i']
+  edges:[['queue','detail'],['detail','decide'],['detail','override',{dashed:1}],['detail','note',{dashed:1}],
+    ['decide','already'],['decide','audit',{dashed:1,lbl:'logged'}],['already','reverse',{lbl:'yes'}],['already','accrue',{lbl:'no'}],
+    ['reverse','accrue'],['override','accrue',{dashed:1}],['accrue','dash',{dashed:1}],['camp','accrue',{dashed:1,lbl:'bonus'}]],
+  happy:['queue','detail','decide','already','accrue','dash']
 }
 ];
 
@@ -702,6 +777,11 @@ const WF={
     const vp=this.el.viewport;vp.querySelectorAll('.node').forEach(n=>n.remove());
     let maxX=0,maxY=0;this.nodes.forEach(n=>{maxX=Math.max(maxX,n.x+NW);maxY=Math.max(maxY,n.y+NH);});
     this.worldW=maxX+PAD;this.worldH=maxY+PAD;
+    vp.querySelectorAll('.stage-frame').forEach(s=>s.remove());
+    if(this.flow.stages){let minY=1e9,maxRowY=0;this.nodes.forEach(n=>{minY=Math.min(minY,n.y);maxRowY=Math.max(maxRowY,n.y+NH);});
+      this.flow.stages.forEach(st=>{const fx=PAD+st.c0*(NW+HG)-18,fw=(st.c1-st.c0)*(NW+HG)+NW+36,fy=minY-34,fh=(maxRowY-minY)+58;
+        const sf=document.createElement('div');sf.className='stage-frame';sf.style.cssText=`left:${fx}px;top:${fy}px;width:${fw}px;height:${fh}px`;
+        sf.innerHTML=`<span class="stage-lbl">${st.t}</span>`;vp.insertBefore(sf,vp.firstChild);});}
     const W=this.el.wires;W.setAttribute('width',this.worldW);W.setAttribute('height',this.worldH);
     let paths='';
     this.flow.edges.forEach(([a,b,o])=>{o=o||{};const A=this.byId[a],B=this.byId[b];if(!A||!B)return;

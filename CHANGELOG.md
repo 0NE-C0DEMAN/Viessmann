@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.2.27 — 2026-05-11
+
+### Much denser, technical-depth flow diagrams + a full system map
+
+The friendly flows were still far lighter than the technical view. This pass brings the detail across — every diagram now has many more elements, grouped into **labelled stages**, while staying playable and click-for-detail.
+
+- **New "Full system map" tab** — the whole architecture in one diagram: **~34 elements across 8 labelled stages** (Input · Read & extract · Validate & dedupe · Match · Loyalty engine · Admin review · Outputs · Platform & audit), with data-stores, branches and dashed control/audit links. It mirrors the technical view's depth but you can watch it run and click any node.
+- **Every topic flow is far richer now**, grouped into stages:
+  - **Keeping it fair**: 8 → **15 nodes** — each check is its own node (seller/buyer OIB, "is it yours?", currency, totals add up, date, pace), plus a fraud-flag store and four outcomes (approved / review / rejected / duplicate).
+  - **Reading an invoice**: 5 → **12 nodes** — the three input types, three readers (unpdf / OCR / XML), the Croatian parser, separate field- and line-extractors, the SKU matcher and the catalog.
+  - **Behind the scenes**: 5 → **11 nodes** — open → adjust/note → approve → idempotent re-decide (reverse then re-credit) → ledger → campaigns → dashboards → audit.
+  - **Points & the maths** and **The big picture** gained labelled stages.
+- **Stage frames** (labelled, dashed groupings behind the nodes) give every diagram clear structure.
+
+Browser-verified at a real viewport (the system map and the expanded flows render with their stage frames, branches and detail panels; no broken node references).
+
 ## v0.2.26 — 2026-05-11
 
 ### Fix: the enlarged invoice now opens fit-to-screen
