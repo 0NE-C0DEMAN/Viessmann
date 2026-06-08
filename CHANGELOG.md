@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.2.24 — 2026-05-11
+
+### The tour now runs a *real* invoice — with previews, real data, and the points maths
+
+The animated tour was clear but abstract. It now runs two real scenarios on an actual demo invoice (`Invoice_AGRIA_001.pdf` — Agria d.o.o. → Instalaterm d.o.o.), so the CEO and Frane can watch a genuine invoice go through end-to-end.
+
+- **Two real runs, as tabs:** **✓ Real invoice · approved** and **✕ Real invoice · rejected (duplicate)**.
+- **Invoice preview** pinned on the canvas — click to enlarge the actual rendered invoice.
+- **Real data at every step:** the extracted seller/buyer/OIBs/total, the matched Viessmann lines (3 of 4, with KPD codes), and the genuine safety-check results — pulled from the real seed data and parser behaviour.
+- **The points maths, shown as a table:** Vitodens 100-W ×5 = 1,500 base +250 campaign = 1,750 · Vitoconnect 500 · sensor 300 · expansion vessel (not Viessmann) 0 → **Total 2,550 → Bronze→Silver**. The rejected run shows the duplicate fingerprint catching a re-submission → **0 points**.
+- **"Under the hood" layer:** every step now has an optional technical section (unpdf/OCR, the Croatian regexes, OIB mod-11-10, the duplicate tuple, the campaign formula, the append-only ledger) — for the technical viewer, without cluttering the plain-language story.
+- **Outcome card** reveals at the end of each run (Approved +2,550 / Duplicate 0).
+- The five simple tours are kept, each with added technical depth.
+
+### Detailed technical report restored
+
+The in-depth technical architecture report is back at **`/architecture-technical.html`** (the dense node-graph + per-section diagrams), linked from the **"Technical view"** button top-right.
+
 ## v0.2.23 — 2026-05-11
 
 ### Architecture report rebuilt for non-technical viewers — an animated, plain-language tour
